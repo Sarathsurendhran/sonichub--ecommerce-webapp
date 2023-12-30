@@ -1,0 +1,140 @@
+{% extends "admin_side/admin-base.html" %}
+{% load static %}
+{% block title %} Variant list {% endblock %}
+{% block  content %}
+
+<style>
+    .dropdown-custom{
+        background-color: rgb(207, 200, 200);
+    }
+</style>
+
+<section class="content-main">
+    <div class="content-header">
+        {% comment %} <div>
+            <h2 class="content-title card-title">Product: {{product.get_product_name}}</h2>
+        </div> {% endcomment %}
+        <div>
+            <h4 class="content-title card-title">Available Variants</h4>
+        </div>
+     
+    </div>
+    <div class="card mb-4">
+        <header class="card-header">
+            <div class="row align-items-center">
+                <div class="col-lg-4 col-md-6 me-auto">
+                    <form action="#" method="get">
+                        <input type="text" name="query" placeholder="Search..." class="form-control">                 
+                </div>
+                <div class="col-lg-4 col-md-2 col-6">
+                    <button type="submit" class="btn btn-outline-primary">Search</button>
+                </div>
+
+                <div class="col-md-2 col-6">
+                    <input type="date" value="02.05.2021" class="form-control">
+                </div>
+
+                <div class="col-md-2 col-6">
+                    <select class="form-select">
+                        <option selected>Status</option>
+                        <option>Active</option>
+                        <option>Disabled</option>
+                        <option>Show all</option>
+                    </select>
+                </div>
+            </div>
+        </header> <!-- card-header end// -->
+
+        <div class="card-body">
+            
+                        <div class="table-responsive"  >
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th> Variant Colours</th>
+                                        <th>Variant Name</th>
+                                        <th>Stock</th>                                   
+                                        <th class="text-middle">Status</th>
+                                        <th class="text-middle">Action</th> 
+                                        
+                                    </tr>
+                                </thead>
+                                <tbody >
+                                    {% for variant in variants %}
+                                    <tr>
+                                        
+                                        <td>
+                                             <div style="width: 70px; height: 40px; background-color: {{variant.colour_code}}"></div>
+                                        </td>
+
+                                        <td><a href="#"> <h6 class="mb-0">{{ products.product_name }}</h6></a></td>
+                                          <td class="text-middle">
+                                            <span class="badge  {% if variant.variant_stock %} alert-success {% else %} alert-danger {% endif %}">
+                                                {% if variant.variant_stock %} {{variant.variant_stock}} {% else %} Out Of Stock {% endif %} </span>
+                                        </td>
+                                        <td class="text-middle">
+                                            <span  class="badge rounded-pill {% if variant.variant_status %} alert-success {% else %} alert-danger {% endif %}">
+                                                {% if variant.variant_status %} Active {% else %}Inactive {% endif %} </span>
+                                        </td>
+                                        <td class="text-middle" >
+                                            <div class="dropdown">
+                                                <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm text-secondary fw-bold font-sm"> 
+                                                    More
+                                                </a>
+                                                <div class="dropdown-menu dropdown-custom">
+                                                    {% comment %} <a class="dropdown-item" href="#">View detail</a> {% endcomment %}
+                                                    <a class="dropdown-item" href="#">Edit</a>
+                                                    <a class="dropdown-item" href="{% url 'product:variant-status-change' variant.id %}" id="update" data-variant-id="{{ variant.id }}" onclick="update(this)">
+                                                    <input type="hidden"  id="variant-status-change-url" value="{% url 'product:variant-status-change' variant.id %}">
+
+                                                      {% if not variant.variant_status %}Enable {% else %}Disable{% endif %}</a>
+                                                </div>
+                                            </div> <!-- dropdown //end -->
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>     
+             <!-- itemlist  .// -->
+        </div> <!-- card-body end// -->
+    </div> <!-- card end// -->
+    {% comment %} <div class="pagination-area mt-30 mb-50">
+        <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-start">
+                <li class="page-item active"><a class="page-link" href="#">01</a></li>
+                <li class="page-item"><a class="page-link" href="#">02</a></li>
+                <li class="page-item"><a class="page-link" href="#">03</a></li>
+                <li class="page-item"><a class="page-link dot" href="#">...</a></li>
+                <li class="page-item"><a class="page-link" href="#">16</a></li>
+                <li class="page-item"><a class="page-link" href="#"><i class="material-icons md-chevron_right"></i></a></li>
+            </ul>
+        </nav>
+    </div> {% endcomment %}
+ 
+</section>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+{% comment %} <script>
+
+
+  function update(element) {
+    const url = $('#variant-status-change-url').val();
+
+      $.ajax({
+        type: 'GET',
+        url: url,
+        success:function(response){ 
+      
+          
+           location.reload();
+        },
+        error:function(error){
+          alert('Error')
+          console.log(variantId)
+        }
+      })
+  }
+</script> {% endcomment %}
+
+{% endblock content %}

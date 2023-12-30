@@ -1,0 +1,76 @@
+ {% extends "admin_side/admin-base.html" %}
+ {% load static  %}
+ {% block content %}
+ 
+    <section class="content-main">
+        <div class="row">
+
+              {% for message in messages %}
+                  <div class="alert alert-{{message.tags}} alert-dismissible fade show" role="alert">
+                      <strong></strong>{{message}}
+                      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                  </div>
+              {% endfor %}
+            <div class="col-9">
+                <div class="content-header">
+                    <h2 class="content-title">Add New Brand</h2>
+                    <div><a href="{% url 'brand:brand-list' %}" class="btn btn-md rounded font-sm hover-up">View Brands</a></div>
+                </div>
+            </div>
+            <div class="col-9">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row gx-5">
+                            <div class="col-lg-9">
+                                <section class="content-body p-xl-4">
+                                    <!-- Form -->
+                                    <form action="#" method="post" enctype="multipart/form-data">
+                                        {% csrf_token %}
+                                        <section class="content-body p-xl-4">
+                                            <!-- Form -->
+                                            <div class="col-lg-12">
+                                                <div class="card mb-12">
+                                                    <div class="card-header">
+                                                        <h4>Media</h4>
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <div class="input-upload">
+                                                            <img src="{% static 'admin-assets/imgs/theme/upload.svg' %}" alt="">
+                                                            <input class="form-control" type="file" id="file" name="brand_image" accept="image/*" required>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </section>
+                                        <div class="row mb-4">
+                                            <label class="col-lg-3 col-form-label" for="name">Brand name*</label>
+                                            <div class="col-lg-9">
+                              
+                                                <input type="text" class="form-control" id="id_name" name="brand_name" placeholder="Type here" value="{{ brand_name }}">
+
+                                            </div>
+                                        </div>
+                                        <div class="row mb-4">
+                                            <label class="col-lg-3 col-form-label">Status</label>
+                                            <div class="col-lg-9">
+                                                <label class="form-check my-2">
+                                            
+                                                    <input type="checkbox"  class="form-check-input" name = 'status' checked>
+                                                
+                                                    <span class="form-check-label">Enable this Brand</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <br>
+                                        <button class="btn btn-primary" type="submit"> Continue to next</button>
+                                    </form>
+                                </section>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock content %}

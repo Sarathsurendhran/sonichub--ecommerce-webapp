@@ -1,0 +1,80 @@
+
+{% extends "admin_side/admin-base.html" %}
+{% load static  %}
+{% block content %}
+<style>
+  .custom-select-options { font-size: 16px; }
+</style>
+ <section class="content-main">
+        <div class="content-header">
+            <div>
+                <h2 class="content-title card-title">Categories </h2>
+                <p>Add, edit or delete a category</p>
+            </div>
+            <div>
+               {% comment %} <a href="{% url 'category:add_category' %}" class="btn btn-primary">Go Back</a> {% endcomment %}
+            </div>
+        </div>
+        <!-- FORM FOR ADD NEW CATEGORY -->
+        <div class="card" >
+            <div class="card-body">
+                 <div class="container mt-4">
+                    <h4>Add New Category</h4><hr>
+                     <div class="row">
+                                    
+                      {% for message in messages %}
+                          <div class="alert alert-{{message.tags}} alert-dismissible fade show" role="alert">
+                              <strong></strong>{{message}}
+                              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                          </div>
+                      {% endfor %}
+
+                     </div>
+                       <form method="post" id="add-category-form" action="{% url 'category:add-category' %}" enctype="multipart/form-data">
+                          {% csrf_token %}
+                          <div class="container">
+                            <div class="row">
+                                <div class="col-4"><h5>Category Name</h5></div>
+                                <div class="col-4"><h5>Status</h5></div>
+                                <div class="col-4"><h5>Parent Category ID</h5></div>
+                            </div>
+                            <div class="row">
+                                <div class="col-4">
+                                    <input type="text" id="id_name" name="category_name" placeholder="Type here" class="form-control" value="{{ NewCategory.name.value }}">  
+                                    <label for="name"></label>
+                                </div>
+                                <div class="col-4">
+                                    <select id="id_status" name="status" class="form-select custom-select-options">
+                                      <option value="True" class="fw-bolder" selected>Active</option>
+                                      <option value="False" class="fw-bolder">Inactive</option>
+                                    </select>
+                                    <label for="status"></label>
+                                </div>
+                                <div class="col-4">
+
+                                  <select id="id_parent-category" name="parent" class="form-select custom-select-options">
+                                      <option value="0" selected class="fw-bolder">No Parent</option>
+                                      {% for parent in parentlist %}
+                                        <option value="{{ parent.id }}" >{{ parent.category_name }}</option>
+                                      {% endfor %}
+                                  </select>
+                                    <label for="parent-category"></label>
+                                </div>
+                            </div>
+                          </div>
+                          <div class="container">
+                            <div class="row">
+                              <div class="col-5"></div>
+                              <div class="col-5"></div>
+                              <div class="col-2 d-flex flex-column-reverse">
+                                <button type="submit" class="btn btn-brand">Upload</button>
+                              </div>
+                            </div>
+                          </div>
+                      </form> 
+                 </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock content %}

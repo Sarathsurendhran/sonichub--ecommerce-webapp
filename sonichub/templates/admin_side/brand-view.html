@@ -1,0 +1,122 @@
+{% extends "admin_side/admin-base.html" %}
+{% load static  %}
+{% block content %}
+       
+        <section class="content-main">
+            <div class="content-header">
+                <div>
+                    <h2 class="content-title card-title">Brand </h2>
+                    <p>Brand and vendor management</p>
+                </div>
+                <div>
+                   <a href="{% url 'brand:add-brand' %}" class="btn btn-primary">Add New Brand</a>
+
+                       
+                    </a>
+                </div>
+            </div>
+            <div class="card mb-4">
+                <header class="card-header">
+                    <div class="row gx-3">
+                        <div class="col-lg-4 mb-lg-0 mb-15 me-auto">
+                            <input type="text" placeholder="Search..." class="form-control">
+                        </div>
+                        <div class="col-lg-2 col-6"></div>
+                        <div class="col-lg-2 col-6"></div>
+                    </div>
+                </header>
+                <!-- BRAND MAIN DIV -->
+
+                <div class="card-body">
+                    <div class="row gx-3">
+                        <!-- BRAND MAIN LOOP -->
+                        {% for brand in brandlist %}
+                        
+                        <div class="col-xl-2 col-lg-3 col-md-4 col-6">
+                            <figure class="card border-1">
+                                <a class="p-2" id="brand-edit"  href="{% url 'brand:edit-brand' brand.id  %}">
+                                   <i class="material-icons md-edit"></i>
+
+                                </a>
+                                <div class="card-header bg-white text-center">
+
+                                    {% if brand.brand_image is None %}
+                                    <img src="{% static 'admin-assets/imgs/items/No-Image.png' %}" alt="No Image">
+                                    {% else %}
+                                    <img src="{{ brand.brand_image.url }}" alt="Brand Image"/>
+                                    {% endif %}
+
+                                </div>
+                                <figcaption class="card-body text-center">
+                                    <h6 class="card-title m-0" data-brand-id="{{ brand.id }}">{{ brand.brand_name }}</h6>
+
+                                    <div class="my-2">
+                                        <form method="POST" onsubmit="return false;" action="{%  url 'brand:status_update' brand.id %}">
+                                        {% csrf_token %}
+
+                                            {% if brand.status %}
+                                              <button type="submit" class="rounded-pill alert-success" onclick="confirmUpdate(this.form)">Active</button>
+                                            {% endif %} 
+
+                                            {% if not brand.status %}   
+                                            <button type="submit" class="rounded-pill alert-danger" onclick="confirmUpdate(this.form)" >InActive</button>
+                                            {% endif %}       
+
+                                        </form>
+                                    </div>
+                                    {% comment %} <span class="product-count" data-id="{{ brand.id }}">{{ BrandCount.get(brand.id)|default:"0" }} Products</span> {% endcomment %}
+
+                                </figcaption>
+                            </figure>
+                        </div>
+                        {% endfor %}
+                        <!-- BRAND MAIN LOOP ENDS -->
+                    </div>
+                </div>
+                <!-- BRAND MAIN DIV ENDS -->
+            </div>
+            <!-- PAGINATION STARTS HERE -->
+            {% comment %} <div class="pagination-area mt-30 mb-50">
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination justify-content-start">
+                        <li class="page-item" th:each="page, iterStat : ${#numbers.sequence(0, BrandPage.totalPages - 1)}"
+                            th:class="${page == BrandPage.pageNo} ? 'page-item active' : 'page-item'">
+                            <a class="page-link"
+                               th:href="@{/dashboard/brands(pageNo=${page},pageSize=${BrandPage.pageSize})}"
+                               th:text="${page + 1}"></a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" th:if="${BrandPage.hasNext}"
+                               th:href="@{/dashboard/brands(pageNo=${BrandPage.totalPages - 1},pageSize=${BrandPage.pageSize})}">
+                                <i class="material-icons md-chevron_right"></i>
+                            </a>
+                        </li>
+
+                    </ul>
+                </nav>
+            </div> {% endcomment %}
+            <!-- PAGINATION ENDS HERE -->
+        </section>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <script>
+        function confirmUpdate(form) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: 'You won\'t be able to revert this!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, do it!'
+            })
+            .then( result => {
+                    if (result.isConfirmed) {
+                        form.submit()
+                    }
+            });
+        }
+    </script>
+
+{% endblock content %}

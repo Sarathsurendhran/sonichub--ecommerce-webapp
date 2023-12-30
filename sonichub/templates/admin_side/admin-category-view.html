@@ -1,0 +1,133 @@
+{% extends 'admin_side/admin-base.html' %}
+{% load static  %}
+{% block content %}
+    <section class="content-main">
+        <div class="content-header">
+            <div>
+                <h2 class="content-title card-title">Categories </h2>
+                <p>Add, edit or delete a category</p>
+            </div>
+            <div>
+                <a href="{% url 'category:add-category' %}" class="btn btn btn-primary">Create</a>
+            </div>
+        </div>
+        {% if categories == None %}
+            <h3>No Category found in the database.</h3>
+        
+         {% else %}
+        <div class="card" >
+            <header class="card-header">
+                <div class="row gx-3">
+                    <div class="col-lg-4 col-md-6 me-auto">
+                        <label for="search"></label>
+                        <input type="text" placeholder="Search..." class="form-control" id="search">
+                    </div>
+                    <div class="col-lg-2 col-6 col-md-3"></div>
+                    <div class="col-lg-2 col-6 col-md-3"></div>
+                </div>
+            </header>
+            <div class="card-body" id="product-list">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Status</th>
+                                    <th>Parent-ID</th>
+                                    <th >Action</th>
+                                    
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <!-- Loop Start --> 
+                                {% for category in categories%}
+                                    <tr>
+                                        <td></td>
+                                        <td><h4>{{ forloop.counter }}</h4></td>
+                                        <td><h4>{{ category.category_name }}</h4></td>
+                                        <td>
+                                            <form method="post" action="{% url 'category:category-status-update' category.id %}" onsubmit="return false;">
+                                                {% csrf_token %}
+                                                {% if category.is_available %} 
+                                                    <button type="submit" class="rounded-pill alert-success" onclick="confirmUpdate(this.form)">Active</button>
+                                                {% else %}
+                        
+                                                    <button type="submit" class="rounded-pill alert-danger" onclick="confirmUpdate(this.form)">InActive</button>
+                                                {% endif %}
+                                            </form>
+                                        </td>
+                                        <td>
+                                            {% if category.parent == None    %} 
+                                                <h4>No Parent</h4>
+                                            {% else %}
+                                                <h4> {{category.parent}}</h4>
+                                            {% endif %}
+                                        </td>
+                                        <td class="">
+                                            <a href="{% url 'category:edit-category' category.id %}" class="btn btn btn-primary">Edit info</a>
+                                        </td>
+                                        
+                                    </tr>
+                                {% endfor %}
+                                <!-- Loop End -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <!-- Pagination -->
+                {% comment %} <div class="pagination-area mt-30 mb-50">
+                    <nav aria-label="Page navigation example">
+                        <ul class="pagination justify-content-start">
+
+                            {% for i in page  %}
+                                {% if page == CategoryList.pageNo %}
+                                <li class="page-item active">
+                                {% endif %}
+                                    <a class="page-link" href="{% url 'your_view_categories_view' pageNo=page pageSize=CategoryList.pageSize %}">
+                                        {{ page + 1 }}
+                                    </a>
+                                </li>
+                            {% endfor %}
+
+                            <li class="page-item"><a class="page-link dot" href="#">...</a></li>
+                            <li class="page-item">
+                                <a class="page-link" {% if CategoryList.hasNext %}href="{% url 'your_view_categories_view' pageNo=CategoryList.totalPages|default:"0"-1 pageSize=CategoryList.pageSize %}"{% endif %}>
+                                    <i class="material-icons md-chevron_right"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div> {% endcomment %}
+                <!-- End of pagination -->
+            </div>
+        </div>
+        {% endif %}
+    </section>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <script>
+        function confirmUpdate(form) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: 'You won\'t be able to revert this!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, do it!'
+            })
+            .then( result => {
+                    if (result.isConfirmed) {
+                        form.submit()
+                    }
+            });
+        }
+    </script>
+{% endblock %}

@@ -1,0 +1,108 @@
+{% extends "admin_side/admin-base.html" %}
+{% load static  %}
+{% block content %}
+
+<section class="content-main">
+    <div class="content-header">
+        <div>
+            <h2 class="content-title card-title">Customers List</h2>
+        </div>
+    </div>
+    <div class="card mb-4">
+        <header class="card-header">
+            <div class="row align-items-center">
+                <div class="col col-check flex-grow-0">
+                    <div class="form-check ms-2">
+                        <input class="form-check-input" type="checkbox" value="">
+                    </div>
+                </div>
+                <div class="col-md-2 col-6">
+                    <select class="form-select">
+                        <option selected>Status</option>
+                        <option>Active</option>
+                        <option>Blocked</option>
+                    </select>
+                </div>
+            </div>
+        </header>
+        <div class="card-body">
+            {% if user %}
+                {% for user in user_details %}
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <span>{{ user.username }}</span>
+                        </div>
+                        
+                        <div >
+                            <span>{{ user.phone_number}}</span>
+                        </div>
+                        <div>
+                            <span>{{ user.email }}</span>
+                        </div>                    
+                        <div>
+                           <form method="post" action="{% url 'admin_panel:block_unblock_user' user.id %}" onsubmit="return false">
+                            {% csrf_token %}
+                            <!-- Add an event handler for button click -->
+                                {% if user.is_active %}
+                                <button type="button" class="rounded-pill alert-success" onclick="confirmUpdate(this.form)">Active</button>
+                                {% endif %}
+
+                                {% if not user.is_active %}
+                                <button type="button" class="rounded-pill alert-danger" onclick="confirmUpdate(this.form)">Blocked</button>
+                                {% endif %}
+                            </form>
+                        </div>
+                    </div>
+                    <br>
+                {% endfor %}
+            {% else %}
+                <h3>No users found in the database.</h3>
+            {% endif %}
+            <!-- Pagination -->
+            {% comment %} <div class="pagination-area mt-30 mb-50">
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination justify-content-start">
+                        {% for page in range(0, UserList.totalPages) %}
+                            <li class="page-item{% if page == UserList.pageNo %} active{% endif %}">
+                                <a class="page-link" href="{% url 'dashboard:view-users' pageNo=page pageSize=UserList.pageSize %}">
+                                    {{ page + 1 }}
+                                </a>
+                            </li>
+                        {% endfor %}
+                        <li class="page-item"><a class="page-link dot" href="#">...</a></li>
+                        {% if UserList.hasNext %}
+                            <li class="page-item">
+                                <a class="page-link" href="{% url 'dashboard:view-users' pageNo=UserList.totalPages-1 pageSize=UserList.pageSize %}">
+                                    <i class="material-icons md-chevron_right"></i>
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div> {% endcomment %}
+            <!-- End of pagination -->
+        </div>
+    </div>
+</section>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<script>
+    function confirmUpdate(form) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'You won\'t be able to revert this!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, do it!'
+          })
+          .then( result => {
+                if (result.isConfirmed) {
+                    form.submit()
+                }
+          });
+    }
+</script>
+{% endblock content %}

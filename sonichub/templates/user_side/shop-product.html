@@ -1,0 +1,263 @@
+﻿{% extends 'user_side/base.html' %}
+{% load static %}
+{% block content %}
+<div class="page-header breadcrumb-wrap">
+  <div class="container">
+    <div class="breadcrumb">
+      <a rel="nofollow" href="#">Home</a>
+      <span>{{ categories.category_name }}</span>
+      <span>{{ ProductDetails.name }}</span>
+    </div>
+  </div>
+</div>
+<section class="mt-50 mb-50">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="product-detail accordion-detail">
+          <div class="row mb-50">
+            <div class="col-md-6 col-sm-12 col-xs-12">
+              <div class="detail-gallery">
+                <span class="zoom-icon"><i class="fi-rs-search"></i></span>
+                <!-- MAIN SLIDES -->
+                <div class="product-image-slider"   >
+                  {% for image in images %}
+                  <figure class="border-radius-10" >
+                    <img src="{{image.images.url}}" class="product-image" alt="product image" >
+                  </figure>
+                  {% endfor %}
+                </div>
+                <!-- THUMBNAILS Loop through all images in the product and display-->
+                <div class="slider-nav-thumbnails pl-15 pr-15">
+                  {% for image in images %}
+                  <img src="{{image.images.url}}" alt="product image">
+                  {% endfor %}
+                </div>
+              </div>
+              <!-- End Gallery -->
+            </div>
+            <div class="col-md-6 col-sm-12 col-xs-12">
+              <div class="detail-info">
+                <h2 class="title-detail">{{ products.product_name }}</h2>
+                <div class="product-detail-rating">
+                  <div class="pro-details-brand">
+                    <span>Brands:
+                      <a href="#">
+                      <span>{{ products.product_brand.brand_name }}</span>
+                      </a></span>
+                  </div>
+                  <div class="product-rate-cover text-end">
+                    <div class="product-rate d-inline-block">
+                      <div class="product-rating" style="width:90%"></div>
+                    </div>
+                    <span class="font-small ml-5 text-muted">(25 reviews)</span>
+                  </div>
+                </div>
+                <div class="clearfix product-price-cover row">
+                  <div class="product-price primary-color float-left">
+                   <ins class="old-price font-md ml-15" style="text-decoration: line-through;">₹ {{ products.price }}</span></ins>
+                    <ins><span class="text-brand">₹ {{ products.offer_price }}</span></ins>
+                   
+                    <span id="save-price" class="save-price font-md color3 ml-15"></span>
+                  </div>
+                  <div class="p-2">
+                    <span class="h6 primary-color"></span>
+                    <span id="category-offer" class="h4 text-success"></span>
+                    <span class="h6 primary-color"></span>
+                  </div>
+                </div>
+
+                <div class="bt-1 border-color-1 mt-15 mb-15"></div>
+                <div class="short-desc mb-30">
+                  <p>{{ ProductDetails.description }}</p>
+                </div>
+                <div class="product_sort_info font-xs mb-30">
+                  <ul>
+                    <li class="mb-10"><i class="fi-rs-crown mr-5"></i> 1 Year AL Jazeera Brand Warranty</li>
+                    <li class="mb-10"><i class="fi-rs-refresh mr-5"></i> 30 Day Return Policy</li>
+                    <li><i class="fi-rs-credit-card mr-5"></i> Cash on Delivery available</li>
+                  </ul>
+                </div>
+                <div class="bt-1 border-color-1 mt-30 mb-30"></div>
+                <div class="detail-extralink">
+                  <div class="detail-qty border radius">
+                    <input type="number" id="product-qty" value="{{ ProductDetails.qty }}" hidden="hidden">
+                    <a href="#" class="qty-up"><i class="fi-rs-angle-small-up"></i></a>
+                    <span class="qty-val">1</span>
+                    <a href="#" class="qty-down"><i class="fi-rs-angle-small-down"></i></a>
+                  </div>
+
+                  <div class="product-extra-link2">
+                    <button type="submit" id="addtocart" class="button button-add-to-cart">
+                      Add to cart
+                    </button>
+
+                    <button type="submit" data-id="{{ ProductDetails.id }}"
+                      onclick="buyNow(this.getAttribute('data-id'))" id="button-buy-now">
+                      Buy Now
+                    </button>
+                    <a aria-label="Add To Wishlist" class="action-btn hover-up" data-id="{{ ProductDetails.id }}"
+                      onclick="addToWishList(this.getAttribute('data-id'))"><i class="fi-rs-heart"></i></a>
+                  </div>
+
+                </div>
+                
+                <ul class="product-meta font-xs color-grey mt-50">
+                  <li>Availability
+                    :<span class="in-stock text-success ml-5">{{ products.stock }} Items In Stock</span></li>
+                </ul>
+
+                <div class="row">
+                  <div class="col-lg-10 m-auto entry-main-content">
+                    <h2 class="section-title style-1 mb-30">Description</h2>
+                    <div class="description mb-50">
+                      <p>{{ products.product_description }}</p>
+                    </div>
+                    <div class="social-icons single-share">
+                      <ul class="text-grey-5 d-inline-block">
+                        <li><strong class="mr-10">Share this:</strong></li>
+                        <li class="social-facebook"><a href="#"><img
+                              src="{% static 'assets/imgs/theme/icons/icon-facebook.svg' %}" alt=""></a></li>
+                        <li class="social-twitter"> <a href="#"><img
+                              src="{% static 'assets/imgs/theme/icons/icon-twitter.svg' %}" alt=""></a></li>
+                        <li class="social-instagram"><a href="#"><img
+                              src="{% static 'assets/imgs/theme/icons/icon-instagram.svg' %}" alt=""></a></li>
+                        <li class="social-linkedin"><a href="#"><img
+                              src="{% static 'assets/imgs/theme/icons/icon-pinterest.svg' %}" alt=""></a></li>
+                      </ul>
+                    </div>
+                    <h3 class="section-title style-1 mb-30 mt-30">Reviews </h3>
+                    <!--Comments-->
+                    <div class="comments-area style-2">
+                      <div class="row">
+                        <div class="col-lg-8">
+                          <div class="comment-list">
+                            <!-- REVIEW LOOP STARTS HERE -->
+                            {% for review in Review %}
+                            <div class="single-comment justify-content-between d-flex">
+                              <div class="user justify-content-between d-flex">
+                                <div class="thumb text-center">
+                                  <h6>
+                                    <span>{{ review.user.lastName|default:'' }} {{ review.user.firstName }}</span>
+                                  </h6>
+                                </div>
+                                <div class="desc">
+                                  <div class="product-rate d-inline-block">
+                                    <div class="product-rating" style="width:90%"></div>
+                                  </div>
+                                  <p>{{ review.review }}</p>
+                                  <div class="d-flex justify-content-between">
+                                    <div class="d-flex align-items-center">
+                                      <p class="font-xs mr-30">{{ review.date }}</p>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            {% endfor %}
+                            <!-- REVIEW LOOP ENDS HERE -->
+                          </div>
+                        </div>
+                        <div class="col-lg-4">
+                          <h4 class="mb-30">Customer reviews</h4>
+                          <div class="d-flex mb-30">
+                            <div class="product-rate d-inline-block mr-15">
+                              <div class="product-rating" style="width:90%">
+                              </div>
+                            </div>
+                            <h6>4.8 out of 5</h6>
+                          </div>
+                          <div class="progress">
+                            <span>5 star</span>
+                            <div class="progress-bar" role="progressbar" style="width: 50%;" aria-valuenow="50"
+                              aria-valuemin="0" aria-valuemax="100">50%</div>
+                          </div>
+                          <div class="progress">
+                            <span>4 star</span>
+                            <div class="progress-bar" role="progressbar" style="width: 25%;" aria-valuenow="25"
+                              aria-valuemin="0" aria-valuemax="100">25%</div>
+                          </div>
+                          <div class="progress">
+                            <span>3 star</span>
+                            <div class="progress-bar" role="progressbar" style="width: 45%;" aria-valuenow="45"
+                              aria-valuemin="0" aria-valuemax="100">45%</div>
+                          </div>
+                          <div class="progress">
+                            <span>2 star</span>
+                            <div class="progress-bar" role="progressbar" style="width: 65%;" aria-valuenow="65"
+                              aria-valuemin="0" aria-valuemax="100">65%</div>
+                          </div>
+                          <div class="progress mb-30">
+                            <span>1 star</span>
+                            <div class="progress-bar" role="progressbar" style="width: 85%;" aria-valuenow="85"
+                              aria-valuemin="0" aria-valuemax="100">85%</div>
+                          </div>
+                          <a href="#" class="font-xs text-muted">How are ratings calculated?</a>
+                        </div>
+                      </div>
+                    </div>
+                    <!--comment form-->
+                    <div class="comment-form">
+                      <div class="rating-box">
+                        <header>How was your experience?</header>
+                        <div class="stars">
+                          <i class="fa-solid fa-star"></i>
+                          <i class="fa-solid fa-star"></i>
+                          <i class="fa-solid fa-star"></i>
+                          <i class="fa-solid fa-star"></i>
+                          <i class="fa-solid fa-star"></i>
+                        </div>
+                        <div class="row">
+                          <div class="col-lg-8 col-md-12">
+                            <div class="row">
+                              <div class="col-12">
+                                <div class="form-group">
+                                  <label for="review"></label>
+                                  <textarea class="form-control w-100" name="review" id="review" rows="1"
+                                    placeholder="Write a review"></textarea>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="form-group">
+                              <button type="submit" id="review-rating"
+                                class="btn btn-twitter rounded rounded-pill">Submit Review</button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+            </section>
+                <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+                <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+                <script>
+                  $('#addtocart').on('click', function () {
+                      var csrfToken = $('meta[name=csrf-token]').attr('content');
+                      var productId = '{{ products.id }}' 
+              
+                      $.ajax({
+                          type: 'POST',
+                          url: '{% url "cart:product-cart" %}', 
+                          data: {
+                              product: productId,
+                              csrf_token: csrfToken
+                          },
+              
+                          success: function (response) {
+                              Swal.fire({
+                                  icon: 'success',
+                                  title: 'Added to Cart!',
+                                  text: 'The item has been added to your cart.',
+                              });
+                          },
+                          error: function () {
+                              console.log('Something went wrong');
+                          }
+                      });
+                  });
+              </script>
+              
+
+{% endblock %}

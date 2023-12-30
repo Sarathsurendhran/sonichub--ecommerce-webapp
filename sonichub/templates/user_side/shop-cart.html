@@ -1,0 +1,198 @@
+{% extends "user_side/base-footer.html" %}
+{% load static %}
+
+{% block content %}
+<main class="main">
+  <!-- Modal -->
+  <div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLongTitle">Update Quantity</h5>
+          <button type="button" onclick="hideModal()" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        {#
+        <form method="put" action="{updateQuantity}" onsubmit="return isValid()">
+        #}
+
+        <div class="modal-body">
+          <span class="h5">Say how much you need, We will bring it you :)</span><br />
+          <label for="qty"></label>
+          <label for="CartID"></label>
+          <input id="CartID" value="" name="CartID" hidden="hidden" />
+          <label for="availableQty"></label>
+          <input id="availableQty" value="" type="number" name="availableQty" hidden="hidden" />
+          <input type="number" placeholder="Quantity" id="qty" name="qty" class="border border-dark rounded" required="required" />
+        </div>
+        <div class="modal-footer">
+          <button type="button" onclick="hideModal()" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary">Save changes</button>
+        </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <!-- MODAL -->
+  <div class="page-header breadcrumb-wrap">
+    <div class="container">
+      <h2>My Cart</h2>
+    </div>
+  </div>
+  <div class="page-header breadcrumb-wrap" th:if="${#lists.isEmpty(ProductDetails)}">
+    <div class="container">
+      <h2>Cart is Empty</h2>
+    </div>
+  </div>
+  <section class="mt-50 mb-50" th:unless="${#lists.isEmpty(ProductDetails)}">
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+          <div class="table-responsive">
+            <table class="table shopping-summery text-center clean">
+              <thead>
+                <tr class="main-heading">
+                  <th scope="col">Image</th>
+                  <th scope="col">Name</th>
+                  <th scope="col">Price</th>
+                  <th scope="col">Quantity</th>
+                  <th scope="col">Sub Total</th>
+                  <th scope="col">Remove</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- CART LOOP STARTS -->
+                {% for cart in products %}
+                <tr>
+                  <td class="image product-thumbnail">
+                    <img alt="" src="{% if cart.product.images %}{% static 'images/' %}{{ cart.product.images.0.id }}{% else %}{% static 'assets/admin-assets/imgs/items/No-Image.png' %}{% endif %}" />
+                  </td>
+                  <td class="product-des product-name">
+                   {% if cart.product.status %}
+                    <h5 class="product-name">
+                      <a href="#">
+                        <span>{{ cart.product.name|truncatechars:50 }}</span>
+                      </a>
+                      {% if not OfferApplied %}
+                      <span style="color: green">
+                        {% for offer, discount in OfferApplied %}
+                        <br />
+                        <span>{{ offer }} {{ discount }}%</span>
+                        {% endfor %}
+                      </span>
+                      {% endif %}
+                    </h5>
+                    {% if not cart.product.status %}
+                    <div class="d-flex flex-column justify-content-center">
+                      <div>
+                        <h5 class="product-name">
+                          <a href="#">
+                            <span>{{ cart.product.name }}</span>
+                          </a>
+                        </h5>
+                      </div>
+                      <div>
+                        <h5 class="h5 mt-15" style="color: red">
+                          Out of Stock
+                        </h5>
+                      </div>
+                    </div>
+                    {% endif %}
+                  </td>
+                  <td class="price" data-title="Price">
+                    <span class="h6 px-1">&#8377;{{ cart.product.discountPrice }}</span>
+                    {% if cart.product.price != cart.product.discountPrice %}
+                    <span class="old-price">&#8377;{{ cart.product.price }}</span>
+                    {% endif %}
+                  </td>
+                  <td class="text-center" data-title="Stock">
+                    <div class="button-group row">
+                      <div class="detail-qty border radius m-auto col-lg-8">
+                        <span>{{ cart.qty }}</span>
+                      </div>
+                      <button data-id="{{ cart.id }}" data-qty="{{ cart.product.qty }}" class="d-flex border-0 center_icon p-2 col-lg-4" onclick="showModal(this.getAttribute('data-id'), this.getAttribute('data-qty'))">
+                        <i class="material-icons fi-rs-edit" id="editButton"></i>
+                      </button>
+                    </div>
+                  </td>
+                  <td class="price" data-title="Price">
+                    <span>&#8377;{{ cart.product.discountPrice }}</span>
+                  </td>
+                  <td class="action" data-title="Remove">
+                    <form method="post" action="{% url 'delete_product' cart.id %}" onsubmit="return false">
+                      {% csrf_token %}
+                      <button class="btn border-0" onclick="confirmDelete(this.form)">
+                        <i class="fi-rs-trash"></i>
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+                <!-- CART LOOP END -->
+                <tr>
+                  <td colspan="6" class="text-end">
+                    <form method="post" action="#" onsubmit="return false">
+                      {% csrf_token %}
+                      <button class="text-muted btn border-0" onclick="confirmClear(this.form)">
+                        <i class="fi-rs-cross-small"></i> Clear Cart
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="cart-action text-end">
+            <a class="btn" href="#">
+              <i class="fi-rs-shopping-bag mr-10"></i>Continue Shopping
+            </a>
+          </div>
+          <div class="divider center_icon mt-50 mb-50">
+            <i class="fi-rs-fingerprint"></i>
+          </div>
+          <div class="row mb-50">
+            <div class="col-lg-6 col-md-12"></div>
+            <div class="col-lg-6 col-md-12">
+              <div class="border p-md-4 p-30 border-radius cart-totals">
+                <div class="heading_s1 mb-3"><h4>Cart Totals</h4></div>
+                <div class="table-responsive">
+                  <table class="table">
+                    <tbody>
+                      <tr>
+                        <td class="cart_total_label">Cart Subtotal</td>
+                        <td class="cart_total_amount">
+                          <span class="font-lg fw-900 text-brand">&#8377; {{ TotalAmount }}</span>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td class="cart_total_label">Shipping</td>
+                        <td class="cart_total_amount">
+                          <i class="ti-gift mr-5"></i>Free Shipping
+                        </td>
+                      </tr>
+                      <tr>
+                        <td class="cart_total_label">Total</td>
+                        <td class="cart_total_amount">
+                          <strong>
+                            <span class="font-xl fw-900 text-brand">&#8377; {{ TotalAmount }}</span>
+                          </strong>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <a href="#" class="btn btn-brand">
+                  <i class="fi-rs-box-alt mr-10"></i>Proceed To CheckOut
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+{% endblock content %}

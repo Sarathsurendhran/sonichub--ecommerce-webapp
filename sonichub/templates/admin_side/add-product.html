@@ -1,0 +1,154 @@
+
+{% extends "admin_side/admin-base.html" %}
+{% load static  %}
+{% block content %}
+
+
+    <section class="content-main">
+        <div class="row">
+
+              {% for message in messages %}
+                          <div class="alert alert-{{message.tags}} alert-dismissible fade show" role="alert">
+                              <strong></strong>{{message}}
+                              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                          </div>
+              {% endfor %}
+
+            <div class="col-9">
+                <div class="content-header">
+                    <h2 class="content-title">Add New Product</h2>
+                    <div>
+                       <a href="{% url 'product:product-list' %}" class="btn btn-md rounded font-sm hover-up">View Products</a>
+
+                            
+                    </div>
+                </div>
+            </div>
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row gx-5">
+                            <aside class="col-lg-2 border-end">
+                                <nav class="nav nav-pills flex-column mb-4">
+                                    <a class="nav-link active" aria-current="page" href="{% url 'product:add-product' %}">General</a>
+                                    <a class="nav-link"  >Images</a>
+                                    <a class="nav-link"  >Variants</a>
+                                </nav>
+                            </aside>
+                            <div class="col-lg-10">
+                               <section class="content-body p-xl-4">
+                                    <!-- Form  -->
+                                    <form method="post" action = '{% url "product:add-product" %}' enctype="multipart/form-data">
+                                        {% csrf_token %}
+                                        <div class="row mb-4">
+                                            <label class="col-lg-3 col-form-label" for="name">Product name*</label>
+                                            <div class="col-lg-9">
+                                             
+                                                <input type="text" name="product_name" id="name" class="form-control" placeholder="Type here" value="{{ form.name.value }}">
+                                            </div>
+                                        </div>
+                                        <div class="row mb-4">
+                                            <label class="col-lg-3 col-form-label">Description*</label>
+                                            <div class="col-lg-9">
+                                                
+                                                <textarea name="product_description" class="form-control" placeholder="Type here" rows="4">{{ form.description.value }}</textarea>
+                                            </div>
+                                        </div>
+                                        <div class="row mb-4">
+                                            <label class="col-lg-5 col-form-label">Brand</label>
+                                            <div class="col-lg-2"></div>
+                                            <label class="col-lg-5 col-form-label">Category</label>
+                                            <div class="col-lg-5">
+                                                <!-- BRAND LOOP -->
+                                                
+                                                <select size="5" name="brand" class="form-control select-multiple">
+                                                    {% for brand in branddata %}
+                                                          <option value="{{ brand.id }}" {% if brand.id == brand.id %}selected{% endif %}>{{ brand.brand_name }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                            <div class="col-lg-2"></div>
+                                            <div class="col-lg-5">
+                                                <!-- CATEGORY LOOP -->
+                                              
+                                                <select size="5" name="category" class="form-control select-multiple">
+                                                    {% for category in categorydata %}
+                                                        <option value="{{ category.id }}" selected>{{ category.category_name }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="row mb-4">
+                                            <label class="col-lg-6 col-form-label">Price*</label>
+                                            <label class="col-lg-6 col-form-label">Offer price*</label>
+                                            <div class="col-lg-6">
+                                             
+                                                <input type="number" name="price" id="priceInput" class="form-control" placeholder="Unit Price" value="{{ form.price}}">
+                                            </div>
+                                            <div class="col-lg-6">
+                                            
+                                                <input type="number" name="offer_price" id="discountPriceInput" class="form-control" placeholder="Total Quantity" value="{{ form.offer_price }}">
+                                            </div>
+                                        </div>
+                                        {% comment %} <div class="row">
+                                            <label class="col-lg-6 col-form-label"></label>
+                                            <label class="col-lg-6 col-form-label">Quantity</label>
+                                        </div> {% endcomment %}
+
+                                        
+                      
+
+                                        <div class="row mb-4">
+                                            <label class="col-lg-2 col-form-label">Status</label>
+                                            <div class="col-lg-4">
+                                                <label class="form-check my-2">
+                                                    <input type="checkbox" name="status" class="form-check-input"checked>
+                                                    <span class="form-check-label">Enable this product</span>
+                                                </label>
+                                            </div>
+                                            {% comment %} <div class="col-lg-6">
+                                              
+                                                <input type="number" name="stock" class="form-control" placeholder="Total Quantity" value="{{ form.qty.value }}">
+                                            </div> {% endcomment %}
+                                        </div>
+                                            <div class="card mb-4">
+                                        <div class="card-header">
+                                                <h4>Thumbnail</h4>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="input-group mb-3">
+                                                    <div class="custom-file">
+                                                        <input class="custom-file-input form-control" type="file" required="true" name="thumbnail_image"
+                                                            accept=".jpg,.jpeg,.webp,.png">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <br>
+                                        <button class="btn btn-primary" type="submit"> Continue to next</button>
+                                   
+                                </section>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+                  </form>
+                    
+                </div>  
+        </div>
+    </section>
+
+   <script>
+            document.querySelectorAll('[name^="product_images"]').forEach(function(element) {
+                var cropper = new Cropper(element, {
+                    aspectRatio: 1,  // Set aspect ratio as needed
+                    viewMode: 1,     // Set the view mode (optional)
+                    // Add more Cropper.js options as needed
+                });
+            });
+        </script> 
+
+{% endblock content %}

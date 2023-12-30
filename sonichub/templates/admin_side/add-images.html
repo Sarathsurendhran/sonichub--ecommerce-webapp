@@ -1,0 +1,44 @@
+ 
+{% extends "admin_side/admin-base.html" %}
+{% load static  %}
+{% block content %}
+<style>
+    .img-card {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr); /* Adjust the number of columns as needed */
+        gap: 10px; /* Adjust the gap between images */
+    }
+
+    .img-card img {
+        width: 100%;
+        height: auto;
+        border-radius: 8px; /* Optional: Add rounded corners to images */
+    }
+</style>
+<section class="content-main">
+
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h4>Additional Images</h4>
+        </div>
+        <div class="card-body">
+            <form  method='post' action= "{% url 'product:add-images' product %}" enctype="multipart/form-data">
+            {% csrf_token %}
+                <div>
+                    <div class="input-group mb-3">
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input form-control" id="images" name="images" accept=".jpg,.jpeg,.webp,.png" multiple required>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" type="submit">Continue to Next</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="card p-5 img-card">
+  
+    </div>
+</section>
+
+{% endblock content %}
