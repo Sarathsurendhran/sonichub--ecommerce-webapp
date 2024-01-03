@@ -4,7 +4,7 @@
 {% block content %}
 <main class="main">
   <!-- Modal -->
-  <div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+  <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
@@ -12,17 +12,14 @@
           <button type="button" onclick="hideModal()" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
-        </div>
-
-        {#
-        <form method="put" action="{updateQuantity}" onsubmit="return isValid()">
-        #}
-
+        </div>         
+        <form method="post" action="#" onsubmit="return isValid()">
+        {% csrf_token %}
+        <input type="hidden" id="CartID" name="CartID" value=""/>
         <div class="modal-body">
-          <span class="h5">Say how much you need, We will bring it you :)</span><br />
+          <span class="h5">Tell us what you need, and we'll bring it to you.</span><br />
           <label for="qty"></label>
           <label for="CartID"></label>
-          <input id="CartID" value="" name="CartID" hidden="hidden" />
           <label for="availableQty"></label>
           <input id="availableQty" value="" type="number" name="availableQty" hidden="hidden" />
           <input type="number" placeholder="Quantity" id="qty" name="qty" class="border border-dark rounded" required="required" />
@@ -35,21 +32,24 @@
       </div>
     </div>
   </div>
-  <!-- MODAL -->
+  <!-- MODAL end -->
+  {% if cart_items %}
   <div class="page-header breadcrumb-wrap">
     <div class="container">
       <h2>My Cart</h2>
     </div>
   </div>
-  <div class="page-header breadcrumb-wrap" th:if="${#lists.isEmpty(ProductDetails)}">
+  {% else %}
+  <div class="page-header breadcrumb-wrap">
     <div class="container">
       <h2>Cart is Empty</h2>
     </div>
   </div>
-  <section class="mt-50 mb-50" th:unless="${#lists.isEmpty(ProductDetails)}">
-    <div class="container">
+  {% endif %}
+  <section class="mt-50 mb-50">
+    <div class="container" style="max-width:80%">
       <div class="row">
-        <div class="col-12">
+        <div class="col-lg-12">
           <div class="table-responsive">
             <table class="table shopping-summery text-center clean">
               <thead>
@@ -57,42 +57,44 @@
                   <th scope="col">Image</th>
                   <th scope="col">Name</th>
                   <th scope="col">Price</th>
+                  <th scope="col">Colour</th>
                   <th scope="col">Quantity</th>
-                  <th scope="col">Sub Total</th>
+                  {% comment %} <th scope="col">Total</th> {% endcomment %}
                   <th scope="col">Remove</th>
                 </tr>
               </thead>
               <tbody>
                 <!-- CART LOOP STARTS -->
-                {% for cart in products %}
+                {% for cart in cart_items %}
                 <tr>
-                  <td class="image product-thumbnail">
-                    <img alt="" src="{% if cart.product.images %}{% static 'images/' %}{{ cart.product.images.0.id }}{% else %}{% static 'assets/admin-assets/imgs/items/No-Image.png' %}{% endif %}" />
+                  <td class="image product-thumbnail " >
+                    <img alt="" src="{{cart.product.thumbnail.url}}"/>
                   </td>
-                  <td class="product-des product-name">
-                   {% if cart.product.status %}
+                  <td class="product-des product-name text-center" style="vertical-align:middle">
+                   {% if cart.product.is_active %}
                     <h5 class="product-name">
                       <a href="#">
-                        <span>{{ cart.product.name|truncatechars:50 }}</span>
+                        <span>{{ cart.product.product_name}}</span>
                       </a>
-                      {% if not OfferApplied %}
+                      {% comment %} {% if not OfferApplied %}
                       <span style="color: green">
                         {% for offer, discount in OfferApplied %}
                         <br />
                         <span>{{ offer }} {{ discount }}%</span>
                         {% endfor %}
                       </span>
-                      {% endif %}
+                      {% endif %} {% endcomment %}
                     </h5>
-                    {% if not cart.product.status %}
-                    <div class="d-flex flex-column justify-content-center">
-                      <div>
+
+                    {% else %}
+                    <div class="d-flex flex-column justify-content-center" style="vertical-align:middle">
+                       <div>
                         <h5 class="product-name">
                           <a href="#">
-                            <span>{{ cart.product.name }}</span>
+                            <span>{{ cart.product.product_name }}</span>
                           </a>
                         </h5>
-                      </div>
+                      </div> 
                       <div>
                         <h5 class="h5 mt-15" style="color: red">
                           Out of Stock
@@ -101,27 +103,44 @@
                     </div>
                     {% endif %}
                   </td>
-                  <td class="price" data-title="Price">
-                    <span class="h6 px-1">&#8377;{{ cart.product.discountPrice }}</span>
-                    {% if cart.product.price != cart.product.discountPrice %}
-                    <span class="old-price">&#8377;{{ cart.product.price }}</span>
+                  <td class="price text-center" data-title="Price"  style="vertical-align:middle">
+                    <span class="h5 px-1">&#8377;{{ cart.product.offer_price }}</span>
+                    {% if cart.product.price != cart.product.offer_price %}
+                    <span class="old-price" style ="text-decoration:line-through">&#8377;{{ cart.product.price }}</span>
                     {% endif %}
                   </td>
-                  <td class="text-center" data-title="Stock">
+
+                  {% if cart.variant.variant_status %}
+                  <td class="variant-color text-center " style="vertical-align:middle">
+                    <div  style ="height:40px; width:40px; background-color:{{cart.variant.colour_code}}; display:inline-block; border-radius:20% "></div>
+                  </td>
+                  {% else %}
+                  <td class="variant-color text-center " style="vertical-align:middle">
+                    <div  style ="height:40px; width:40px; background-color:{{cart.variant.colour_code}}; display:inline-block; border-radius:20% "></div>
+                  
+                   <div>
+                      <h5 class="h5 mt-15" style="color: red">
+                        Out of Stock
+                      </h5>
+                    </div>
+                    </td>
+                  {% endif %}
+
+                  <td class="text-center" data-title="Stock" style="vertical-align:middle">
                     <div class="button-group row">
                       <div class="detail-qty border radius m-auto col-lg-8">
-                        <span>{{ cart.qty }}</span>
+                        <span>{{ cart.quantity }}</span>
                       </div>
-                      <button data-id="{{ cart.id }}" data-qty="{{ cart.product.qty }}" class="d-flex border-0 center_icon p-2 col-lg-4" onclick="showModal(this.getAttribute('data-id'), this.getAttribute('data-qty'))">
+                      <button data-id="{{ cart.id }}" data-qty="{{ cart.quantity }}" data-max-quantity="{{ cart.variant.variant_stock }}" class="d-flex border-0 center_icon p-2 col-lg-4" onclick="showModal(this.getAttribute('data-id'), this.getAttribute('data-qty'), this.getAttribute('data-max-quantity'))">
                         <i class="material-icons fi-rs-edit" id="editButton"></i>
                       </button>
                     </div>
                   </td>
-                  <td class="price" data-title="Price">
+                  {% comment %} <td class="price" data-title="Price">
                     <span>&#8377;{{ cart.product.discountPrice }}</span>
-                  </td>
-                  <td class="action" data-title="Remove">
-                    <form method="post" action="{% url 'delete_product' cart.id %}" onsubmit="return false">
+                  </td> {% endcomment %}
+                  <td class="action" data-title="Remove" style="vertical-align:middle">
+                    <form method="post" action="{% url 'cart:delete-cart-product' cart.id %}" onsubmit="return false">
                       {% csrf_token %}
                       <button class="btn border-0" onclick="confirmDelete(this.form)">
                         <i class="fi-rs-trash"></i>
@@ -129,7 +148,7 @@
                     </form>
                   </td>
                 </tr>
-                {% endif %}
+                
                 {% endfor %}
                 <!-- CART LOOP END -->
                 <tr>
@@ -144,6 +163,7 @@
                 </tr>
               </tbody>
             </table>
+
           </div>
           <div class="cart-action text-end">
             <a class="btn" href="#">
@@ -193,6 +213,107 @@
         </div>
       </div>
     </div>
-  </section>
+  </section>  
 </main>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+ 
+
+
+<script>
+function confirmDelete(form){
+  Swal.fire({
+    title:'Are you sure?',
+    text:'You won\'t be able to revert this!',
+    icon: "warning",
+    showCancelButton:true,
+    confirmButtonColor:'#3085d6',
+    cancelButtonColor:'#d33',
+    confirmButtonText:'Yes, delete'
+
+  })
+  .then(result =>{
+    if(result.isConfirmed){
+      Swal.fire({
+        title:'Deleted!',
+        text:"Item has been deleted!",
+        icon:"success"
+      })
+      .then(()=>{
+          form.submit()
+      })
+      
+    }
+  })
+}
+</script>
+
+<script>
+
+function hideModal() {
+  $('#exampleModal').modal('hide');
+}
+
+function showModal(id, quantity, maxQuantity) {
+ 
+  $('#CartID').val(id);
+  $('#availableQty').val(maxQuantity); 
+
+
+if (id) {
+    $('#exampleModal form').attr('action', 'cartquantity-update/'+id);
+} else {
+    console.error("Invalid 'id' parameter");
+   
+}
+
+  $('#exampleModal').modal('show');
+}
+
+function isValid() {
+   event.preventDefault();
+  
+  var enteredQty = parseInt($('#qty').val());
+  var cartID = $('#CartID').val();
+  
+  var maxQty = parseInt($('#availableQty').val());
+
+ 
+  if (isNaN(enteredQty) || enteredQty <= 0 ) {
+    Swal.fire({
+      title: 'Invalid Quantity',
+      text: 'Please enter a valid positive Integer quantity',
+      icon: 'error',
+    });
+    return false; 
+  }
+
+    if (enteredQty > maxQty) {
+    Swal.fire({
+      title: 'Invalid Quantity',
+      text: 'Maximum Quantity is '+maxQty+'\n'+'Please enter a quantity less than or equal to ' + maxQty,
+      icon: 'error',
+    });
+    return false; 
+  }
+
+    
+ 
+    Swal.fire({
+        title: 'Success',
+        text: 'Quantity Updated Successfully',
+        icon: 'success',
+    });
+
+
+   return true;
+
+}
+
+</script>
+
+
+
 {% endblock content %}

@@ -26,35 +26,66 @@
             </div>
         </header>
         <div class="card-body">
-            {% if user %}
-                {% for user in user_details %}
-                    <div class="d-flex align-items-center justify-content-between">
-                        <div>
-                            <span>{{ user.username }}</span>
-                        </div>
-                        
-                        <div >
-                            <span>{{ user.phone_number}}</span>
-                        </div>
-                        <div>
-                            <span>{{ user.email }}</span>
-                        </div>                    
-                        <div>
-                           <form method="post" action="{% url 'admin_panel:block_unblock_user' user.id %}" onsubmit="return false">
-                            {% csrf_token %}
-                            <!-- Add an event handler for button click -->
-                                {% if user.is_active %}
-                                <button type="button" class="rounded-pill alert-success" onclick="confirmUpdate(this.form)">Active</button>
-                                {% endif %}
+            {% if user_details %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th class="text-middle">Username</th>
+                                <th class="text-middle">Phone Number</th>
+                                <th class="text-middle">Email</th>
+                                <th class="text-middle">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in user_details %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center justify-content-between">
+                                            <div>
+                                                <strong>{{ user.username }}</strong>
+                                            </div>
+                                        </div>
+                                    </td>
 
-                                {% if not user.is_active %}
-                                <button type="button" class="rounded-pill alert-danger" onclick="confirmUpdate(this.form)">Blocked</button>
-                                {% endif %}
-                            </form>
-                        </div>
-                    </div>
-                    <br>
-                {% endfor %}
+                                    <td>
+                                        <div class="d-flex align-items-center justify-content-between">
+                                            <div>
+                                                <strong>{{ user.phone_number }}</strong>
+                                            </div>
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        <div class="d-flex align-items-center justify-content-between">
+                                            <div>
+                                                <strong>{{ user.email }}</strong>
+                                            </div>
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        <div class="d-flex align-items-center justify-content-between">
+                                            <div>
+                                                <form method="post" action="{% url 'admin_panel:block_unblock_user' user.id %}" onsubmit="return false">
+                                                    {% csrf_token %}
+                                                    
+                                                    {% if user.is_active %}
+                                                        <button type="button" class="btn btn-success btn-sm " onclick="confirmUpdate(this.form)">Active</button>
+                                                    {% endif %}
+
+                                                    {% if not user.is_active %}
+                                                        <button type="button" class="btn btn-danger btn-sm" onclick="confirmUpdate(this.form)">Blocked</button>
+                                                    {% endif %}
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             {% else %}
                 <h3>No users found in the database.</h3>
             {% endif %}

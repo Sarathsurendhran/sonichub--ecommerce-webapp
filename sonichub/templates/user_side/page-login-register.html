@@ -1,151 +1,115 @@
-﻿{% extends "user_side/base-footer.html" %} {% load static %} {% block content %}
+﻿{% extends "user_side/base-footer.html" %}
+{% load static %}
+{% block content %}
 
 <style>
-  .error {
-    outline: 2px solid #ff0000;
-    box-shadow: 1px solid #e51818;
-  }
-  .error-msg {
-    color: red;
+  .container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
   }
 
-  input::-webkit-outer-spin-button,
-  input::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
+  .page-header {
+    background-color: #f8f9fa;
+    padding: 20px 0;
+  }
+
+  .breadcrumb {
+    background-color: transparent;
+  }
+
+  .breadcrumb a {
+    color: #007bff;
+    text-decoration: none;
+  }
+
+  .pt-150,
+  .pb-150 {
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  .login_wrap {
+    padding: 20px;
+  }
+
+  .widget-taber-content {
+    border-radius: 5px;
+  }
+
+  .form-group {
+    margin-bottom: 15px;
+  }
+
+  #submit-button:hover {
+    background-color: #007bff !important;
   }
 </style>
-<main class="main">
-  <div class="page-header breadcrumb-wrap">
+
+  <section>
     <div class="container">
-      <div class="breadcrumb">
-        <a href="index.html" rel="nofollow">Home</a>
-        <span class="error-msg"></span> Pages
-        <span class="error-msg"></span> Login / Register
-      </div>
-    </div>
-  </div>
-  <section class="pt-150 pb-150">
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-10 m-auto">
-          <div class="row">
-            <div class="col-lg-1"></div>
-            <div class="col-lg-6">
-              {% for message in messages %}
-              <div
-                class="alert alert-{{message.tags}} alert-dismissible fade show"
-                role="alert"
-              >
-                <strong></strong>{{message}}
-                <button
-                  type="button"
-                  class="btn-close"
-                  data-bs-dismiss="alert"
-                  aria-label="Close"
-                ></button>
+      <div class="col-lg-6">
+        {% for message in messages %}
+        <div class="alert alert-{{message.tags}} alert-dismissible fade show" role="alert">
+          <strong></strong>{{message}}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+
+        <div class="login_wrap widget-taber-content background-white">
+          <div class="padding_eight_all bg-white">
+            <div class="heading_s1 text-center">
+              <h3 class="mb-4">Create an Account</h3>
+            </div>
+
+            <form method="post" id="signupform" action="signup">
+              {% csrf_token %}
+              <div class="form-group mb-3">
+                <input type="text" name="username" class="form-control" placeholder="User name" id="username" />
+                <span class="error-msg"></span>
               </div>
-              {% endfor %}
 
-              <div
-                class="login_wrap widget-taber-content p-30 background-white border-radius-5"
-              >
-                <div class="padding_eight_all bg-white">
-                  <div class="heading_s1">
-                    <h3 class="mb-30">Create an Account</h3>
-                  </div>
-                  <p class="mb-50 font-sm">
-                    Your personal data will be used to support your experience
-                    throughout this website, to manage access to your account,
-                    and for other purposes described in our privacy policy
-                  </p>
-
-                  <form method="post" id="signupform" action="signup">
-                    {% csrf_token %}
-                    <div class="form-group">
-                      <input
-                        type="text"
-                        name="username"
-                        placeholder="User name"
-                        id="username"
-                      />
-                      <span class="error-msg"></span>
-                    </div>
-
-                    <div class="form-group mx-3">
-                      <div
-                        class="border rounded row d-flex align-items-center"
-                        id="email-div"
-                      >
-                        <input
-                          type="text"
-                          class="border-0"
-                          name="email"
-                          placeholder="Email"
-                          id="email"
-                        />
-                      </div>
-                      <span id="emailError" class="error-msg"></span>
-                    </div>
-
-                    <div class="form-group">
-                      <input
-                        type="number"
-                        name="phone_number"
-                        id="phone"
-                        placeholder="Phone Number"
-                      />
-                      <span class="error-msg"></span>
-                    </div>
-
-                    <div class="form-group">
-                      <input
-                        type="password"
-                        name="password"
-                        placeholder="Password"
-                        id="password"
-                      />
-                      <span class="error-msg"></span>
-                    </div>
-                    <div class="form-group">
-                      <input
-                        type="password"
-                        name="confirm_password"
-                        placeholder="Confirm password"
-                        id="confirm_password"
-                      />
-                      <span class="error-msg"></span>
-                    </div>
-
-                    <div class="form-group">
-                      <button
-                        type="submit"
-                        class="btn btn-fill-out btn-block hover-up"
-                        id="submit-button"
-                        name="login"
-                        onclick="toggle()"
-                      >
-                        Submit &amp; Register
-                      </button>
-                    </div>
-                  </form>
-                  <div class="divider-text-center mt-15 mb-15">
-                    <span> or</span>
-                  </div>
-
-                  <div class="text-muted text-center">
-                    Already have an account?
-                    <a href="{% url 'user_side:user_login' %}">Sign in now</a>
-                  </div>
-                </div>
+              <div class="form-group mb-3">
+                <input type="text" class="form-control" name="email" placeholder="Email" id="email" />
+                <span class="error-msg"></span>
               </div>
+
+              <div class="form-group mb-3">
+                <input type="number" name="phone_number" class="form-control" id="phone" placeholder="Phone Number" />
+                <span class="error-msg"></span>
+              </div>
+
+              <div class="form-group mb-3">
+                <input type="password" name="password" class="form-control" placeholder="Password" id="password" />
+                <span class="error-msg"></span>
+              </div>
+
+              <div class="form-group mb-3">
+                <input type="password" name="confirm_password" class="form-control" placeholder="Confirm password" id="confirm_password" />
+                <span class="error-msg"></span>
+              </div>
+
+              <div class="form-group mb-3">
+                <button type="submit" class="btn btn-fill-out btn-block hover-up" id="submit-button" name="login" onclick="toggle()">
+                  Submit &amp; Register
+                </button>
+              </div>
+            </form>
+
+            <div class="divider-text-center mb-4">
+              <span> or</span>
+            </div>
+
+            <div class="text-muted text-center">
+              Already have an account?
+              <a href="{% url 'user_side:user_login' %}">Sign in now</a>
             </div>
           </div>
         </div>
       </div>
     </div>
   </section>
-</main>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script>
@@ -160,8 +124,8 @@
   });
 
   $("#email").on("focus", function () {
-    $("#email-div").next().text("");
-    $("#email-div").removeClass("error");
+    $("#email").next().text("");
+    $("#email").removeClass("error");
   });
 
   $("#phone").on("focus", function () {
@@ -196,8 +160,8 @@
       }
 
       if (email === "") {
-        $("#email-div").next().text("Email Field Cannot Be Empty");
-        $("#email-div").addClass("error");
+        $("#email").next().text("Email Field Cannot Be Empty");
+        $("#email").addClass("error");
       } else if (!emailRegex.test(email)) {
         $("#email").next().text("Enter Valid Email Address");
         $("#email").addClass("error");

@@ -1,6 +1,8 @@
-﻿{% extends 'user_side/base.html' %}
+﻿
+{% extends 'user_side/base.html' %}
 {% load static %}
 {% block content %}
+
 <div class="page-header breadcrumb-wrap">
   <div class="container">
     <div class="breadcrumb">
@@ -41,7 +43,7 @@
                 <h2 class="title-detail">{{ products.product_name }}</h2>
                 <div class="product-detail-rating">
                   <div class="pro-details-brand">
-                    <span>Brands:
+                    <span>Brand:
                       <a href="#">
                       <span>{{ products.product_brand.brand_name }}</span>
                       </a></span>
@@ -55,58 +57,83 @@
                 </div>
                 <div class="clearfix product-price-cover row">
                   <div class="product-price primary-color float-left">
-                   <ins class="old-price font-md ml-15" style="text-decoration: line-through;">₹ {{ products.price }}</span></ins>
-                    <ins><span class="text-brand">₹ {{ products.offer_price }}</span></ins>
+                 <h4 style="font-size: 1.2em; margin-bottom: 5px;">Offer Price</h4>
+                  <br>
+                  <ins><span class="text-brand offer-price">₹ {{ products.offer_price }}</span></ins>
+                   <ins><span class="old-price  ml-10 orginal-price" style="text-decoration: line-through; margin-right: 15px;">₹ {{ products.price }}</span></ins>
+                    
                    
-                    <span id="save-price" class="save-price font-md color3 ml-15"></span>
-                  </div>
+                {% comment %} <span id="save-price" class="save-price font-md color3 ml-15"></span>
+                </div>
                   <div class="p-2">
                     <span class="h6 primary-color"></span>
                     <span id="category-offer" class="h4 text-success"></span>
                     <span class="h6 primary-color"></span>
                   </div>
-                </div>
+                </div> {% endcomment %}
 
-                <div class="bt-1 border-color-1 mt-15 mb-15"></div>
+                {% comment %} <div class="bt-1 border-color-1 mt-15 mb-15"></div>
                 <div class="short-desc mb-30">
                   <p>{{ ProductDetails.description }}</p>
-                </div>
-                <div class="product_sort_info font-xs mb-30">
+                </div> {% endcomment %}
+                <div class="product_sort_info font-xs mb-30 mt-3  0">
                   <ul>
                     <li class="mb-10"><i class="fi-rs-crown mr-5"></i> 1 Year AL Jazeera Brand Warranty</li>
                     <li class="mb-10"><i class="fi-rs-refresh mr-5"></i> 30 Day Return Policy</li>
                     <li><i class="fi-rs-credit-card mr-5"></i> Cash on Delivery available</li>
                   </ul>
                 </div>
+
+                <h4 style="font-size: 1em; margin-bottom: 2px;">Available Colours</h4>
+                <div class="d-flex justify-content mt-15 mb-30" id="colorPalette">
+                 
+                  {% for variant in variants %}
+                   
+                    <div id='defaultColor'
+                      class="color-div "
+                      data-id="{{variant.id}}"
+                      data-color="{{variant.colour_code}}"
+                      data-quantity = "{{variant.variant_stock}}"
+                      style="width: 35px; height: 35px; border-radius: 9px; margin-right: 8px; cursor:pointer; background-color: {{ variant.colour_code }}"
+                      onclick="selectColor(this, '{{ variant.colour_code }}')"
+                    ></div>
+                  {% endfor %}
+                  
+                </div>
+
                 <div class="bt-1 border-color-1 mt-30 mb-30"></div>
                 <div class="detail-extralink">
-                  <div class="detail-qty border radius">
-                    <input type="number" id="product-qty" value="{{ ProductDetails.qty }}" hidden="hidden">
-                    <a href="#" class="qty-up"><i class="fi-rs-angle-small-up"></i></a>
-                    <span class="qty-val">1</span>
-                    <a href="#" class="qty-down"><i class="fi-rs-angle-small-down"></i></a>
-                  </div>
+
+                <div class="detail-qty border radius">
+                  <input type="number" id="product-qty" value="1" min="1" hidden="hidden">
+
+                  <a href="#" class="qty-up" onclick="incrementQty()"><i class="fi-rs-angle-small-up"></i></a>
+                  <span class="qty-val" id="quantityDisplay"></span>
+                  <a href="#" class="qty-down" onclick="decrementQty()"><i class="fi-rs-angle-small-down"></i></a>
+                </div>
+                 
 
                   <div class="product-extra-link2">
-                    <button type="submit" id="addtocart" class="button button-add-to-cart">
+                    <button type="submit" id="addtocart" class="button">
                       Add to cart
                     </button>
 
                     <button type="submit" data-id="{{ ProductDetails.id }}"
-                      onclick="buyNow(this.getAttribute('data-id'))" id="button-buy-now">
+                      onclick="buyNow(this.getAttribute('data-id'))" id="button-buy-now" class="button ">
                       Buy Now
                     </button>
                     <a aria-label="Add To Wishlist" class="action-btn hover-up" data-id="{{ ProductDetails.id }}"
                       onclick="addToWishList(this.getAttribute('data-id'))"><i class="fi-rs-heart"></i></a>
                   </div>
 
+                  <ul class="product-meta font-sm color-grey mt-35 mb-30">
+                    <li>Availability
+                      :<span class="in-stock text-success ml-5">{{ products.stock }} Items In Stock</span></li>
+                  </ul>
+
                 </div>
                 
-                <ul class="product-meta font-xs color-grey mt-50">
-                  <li>Availability
-                    :<span class="in-stock text-success ml-5">{{ products.stock }} Items In Stock</span></li>
-                </ul>
-
+        
                 <div class="row">
                   <div class="col-lg-10 m-auto entry-main-content">
                     <h2 class="section-title style-1 mb-30">Description</h2>
@@ -231,18 +258,26 @@
             </section>
                 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
                 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+                <script src="{% static 'js/profile.js' %}"></script>
 
                 <script>
+                
+
                   $('#addtocart').on('click', function () {
                       var csrfToken = $('meta[name=csrf-token]').attr('content');
-                      var productId = '{{ products.id }}' 
-              
+                      var productId = '{{ products.id }}'
+                      var variantId = selectedColorDiv ? selectedColorDiv.dataset.id : null; 
+                      var quantity = document.getElementById("product-qty").value;  
+                    
                       $.ajax({
                           type: 'POST',
-                          url: '{% url "cart:product-cart" %}', 
+                          url: '{% url "cart:add-to-cart" %}', 
                           data: {
                               product: productId,
-                              csrf_token: csrfToken
+                              csrf_token: csrfToken,
+                               variant: variantId,
+                               quantity: quantity,
+                              
                           },
               
                           success: function (response) {
@@ -258,6 +293,86 @@
                       });
                   });
               </script>
-              
 
+          <script>
+              let selectedColorDiv = null;
+              let selectedColorValue = null;
+
+              function selectColor(colorDiv, colorValue) {
+                  if (selectedColorDiv) {
+                      selectedColorDiv.style.border = 'none';
+                  }    
+                  colorDiv.style.border = '4px solid gray';
+                  
+                  selectedColorDiv = colorDiv;
+                  selectedColorValue = colorValue;
+
+                  updateQuantity(); 
+              }
+
+              function updateQuantity() {
+                  const quantityInput = document.getElementById("product-qty");
+                  const quantityDisplay = document.getElementById("quantityDisplay");
+
+                  if (quantityInput && quantityDisplay) {
+                      const currentQty = parseInt(quantityInput.value, 10);
+                      const maxQty = selectedColorDiv.dataset.quantity;
+
+                      if (currentQty > maxQty) {
+                          quantityInput.value = maxQty;
+                          quantityDisplay.innerText = maxQty;
+
+                          
+                      }
+                  }
+              }
+
+              window.onload = function () {
+                  const firstColorDiv = document.getElementById('defaultColor'); 
+                  selectColor(firstColorDiv, firstColorDiv.dataset.color); 
+              };
+          </script>
+
+          <script>
+              function incrementQty() {
+                  const quantityInput = document.getElementById("product-qty");
+                  const quantityDisplay = document.getElementById("quantityDisplay");
+
+                  if (quantityInput && quantityDisplay) {
+                      const currentQty = parseInt(quantityInput.value, 10);
+
+                      if (currentQty < selectedColorDiv.dataset.quantity) {
+                          quantityInput.value = currentQty + 1;
+                          quantityDisplay.innerText = quantityInput.value;
+                      }
+                  }
+              }
+
+              function decrementQty() {
+                  const quantityInput = document.getElementById("product-qty");
+                  const quantityDisplay = document.getElementById("quantityDisplay");
+
+                  if (quantityInput && quantityDisplay) {
+                      const currentQty = parseInt(quantityInput.value, 10);
+
+                      if (currentQty > 1) {
+                          quantityInput.value = currentQty - 1;
+                          quantityDisplay.innerText = quantityInput.value;
+                      }
+                  }
+              }
+
+              document.addEventListener("DOMContentLoaded", function () {
+                  const quantityInput = document.getElementById("product-qty");
+                  const quantityDisplay = document.getElementById("quantityDisplay");
+
+                  if (quantityInput && quantityDisplay) {
+                      quantityDisplay.innerText = quantityInput.value;
+                  }
+              });
+
+          </script>
+
+            
+            
 {% endblock %}

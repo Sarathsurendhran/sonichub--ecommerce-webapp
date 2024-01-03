@@ -200,17 +200,8 @@ def user_login(request):
 
 
 
-@cache_control(no_cache=True, must_revalidate=True, no_store=True)
-def user_profile(request):
-   if not request.user.is_authenticated:
-          return redirect('user_side:user_login')
-   return render(request, 'user_side/user_profile.html')
 
 
-def logout_user(request):
-    if not request.user.is_authenticated:
-          return redirect('user_side:user_login')
-    logout(request)
-    return redirect("user_side:index")
+
 
 
