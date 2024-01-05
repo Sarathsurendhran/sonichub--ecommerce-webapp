@@ -1449,12 +1449,12 @@ label {
 }
 
 .form-control {
-  border: 1px solid #f0e9ff;
+  border: 1px solid #8f8f8f;
   border-radius: 5px;
   height: 48px;
   padding-left: 18px;
   font-size: 14px;
-  background: transparent;
+  background: #0000001f;
 }
 
 .comment-form {

@@ -5,14 +5,12 @@
 
 <section>
 <div class="container"  style="margin-top: 60px; margin-bottom:40px;">
-
  {% for message in messages %}
         <div class="alert alert-{{message.tags}} alert-dismissible fade show" role="alert">
             <strong></strong>{{message}}
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     {% endfor %}  
-
     <div class="main-body">
           <div class="row gutters-sm">
             <div class="col-md-4 mb-3">
@@ -32,12 +30,17 @@
             <div class="col-md-8">
               <div class="card mb-3">
                 <div class="card-body">
+
+                <form method="post" action="{% url 'user_panel:edit-profile' user.id %}">
+                {% csrf_token %}
+
                   <div class="row">
                     <div class="col-sm-3">
                       <h6 class="mb-0">User Name</h6>
                     </div>
                     <div class="col-sm-9 text-secondary">
-                      {{users.username}}
+                    <input type="text" value="{{users.username}}" name="name">
+                      
                     </div>
                   </div>
                   <hr>
@@ -46,7 +49,8 @@
                       <h6 class="mb-0">Email</h6>
                     </div>
                     <div class="col-sm-9 text-secondary">
-                     {{users.email}}
+                    <input type="text" value="{{users.email}}"  name="email">
+                     
                     </div>
                   </div>
                   <hr>
@@ -54,20 +58,23 @@
                     <div class="col-sm-3">
                       <h6 class="mb-0">Phone</h6>
                     </div>
-                    <div class="col-sm-9 text-secondary">
-                      {{users.phone_number}}
+                    <div class="col-sm-9 text-secondary" >
+                      <input type="text"value="{{users.phone_number}}" name="phone_number">
                     </div>
                   </div>
                   
                   <hr>
                   <div class="row">
-                    <div class="col-sm-12">
-                      <a class="btn btn-info" href = "{% url 'user_panel:edit-profile' user.id%}">Edit</a>
+                    <div class="col-sm-3">
+                    <input class="btn btn-info" type="submit"  value="Update">
+                    
                     </div>
                   </div>
                 </div>
               </div>
+              </form>
             </div>
+            
           </div>
         </div>       
     </div>

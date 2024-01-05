@@ -184,7 +184,7 @@
                       <tr>
                         <td class="cart_total_label">Cart Subtotal</td>
                         <td class="cart_total_amount">
-                          <span class="font-lg fw-900 text-brand">&#8377; {{ TotalAmount }}</span>
+                          <span class="font-lg fw-900 text-brand">&#8377; {{ Total_Amount }}</span>
                         </td>
                       </tr>
                       <tr>
@@ -197,14 +197,14 @@
                         <td class="cart_total_label">Total</td>
                         <td class="cart_total_amount">
                           <strong>
-                            <span class="font-xl fw-900 text-brand">&#8377; {{ TotalAmount }}</span>
+                            <span class="font-xl fw-900 text-brand">&#8377; {{ Total_Amount }}</span>
                           </strong>
                         </td>
                       </tr>
                     </tbody>
                   </table>
                 </div>
-                <a href="#" class="btn btn-brand">
+                <a href="{% url 'order:checkout' user.id %}" class="btn btn-brand">
                   <i class="fi-rs-box-alt mr-10"></i>Proceed To CheckOut
                 </a>
               </div>
@@ -262,17 +262,14 @@ function showModal(id, quantity, maxQuantity) {
   $('#availableQty').val(maxQuantity); 
 
 
-if (id) {
-    $('#exampleModal form').attr('action', 'cartquantity-update/'+id);
-} else {
-    console.error("Invalid 'id' parameter");
-   
-}
+
+  $('#exampleModal form').attr('action', 'cartquantity-update/'+id);
+
 
   $('#exampleModal').modal('show');
 }
 
-function isValid() {
+function isValid(event) {
    event.preventDefault();
   
   var enteredQty = parseInt($('#qty').val());
@@ -298,17 +295,14 @@ function isValid() {
     });
     return false; 
   }
-
-    
- 
+  
     Swal.fire({
         title: 'Success',
         text: 'Quantity Updated Successfully',
         icon: 'success',
     });
+return true;
 
-
-   return true;
 
 }
 

@@ -96,7 +96,7 @@ def signup(request):
  
       
 
-@never_cache
+
 # wiillnbwbdzphfla
 @csrf_exempt
 def send_otp(request):
@@ -121,7 +121,7 @@ def send_otp(request):
         return redirect("user_side:verify_otp")
 
    
-@never_cache
+
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def verify_otp(request):
 
@@ -183,7 +183,7 @@ def user_login(request):
                 messages.warning(request, "Your UserProfile is blocked")
                 return redirect("user_side:user_login")
             
-        except userprofile.DoesNotExist:
+        except UserProfile.DoesNotExist:
             messages.warning(request, "No user found")
             return redirect("user_side:user_login")
 

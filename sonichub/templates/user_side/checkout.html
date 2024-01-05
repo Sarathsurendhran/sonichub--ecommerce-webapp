@@ -1,0 +1,166 @@
+{% extends 'user_side/base-footer.html' %}
+
+{% block content %}
+<main class="main">
+<section class="mt-100 mb-50">
+    <div class="container" style="max-width:1300px">
+
+        <!-- <div class="col-lg-6">
+            <div class="toggle_info">
+                <span><i class="fi-rs-label mr-10"></i><span class="text-muted">Have a coupon?</span> <a href="#coupon"
+                        data-bs-toggle="collapse" class="collapsed" aria-expanded="false">Click here to enter your
+                        code</a></span>
+            </div>
+            <div class="panel-collapse collapse coupon_form " id="coupon">
+                <div class="panel-body">
+                    <p class="mb-30 font-sm">If you have a coupon code, please apply it below.</p>
+                    <form method="post">
+                        <div class="form-group">
+                            <label for="coupon-field"></label>
+                            <input type="text" id="coupon-field" placeholder="Enter Coupon Code...">
+                            <span style="color: red" id="coupon-field-error"></span>
+                        </div>
+                        <div class="form-group">
+                            <button class="btn  btn-md" name="login" id="coupon-btn">Apply Coupon</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div> -->
+<!-- 
+        <div class="row">
+            <div class="col-12">
+                <div class="divider mt-50 mb-50"></div>
+            </div>
+        </div> -->
+            <form method="post" action="#" onsubmit="return false">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="order_review">
+                            <div class="mb-20">
+                                <h4 {% if AddressList %} th:unless="${AddressList} == null" {% endif %}>Select Your address</h4>
+                                <h4 {% if not AddressList %} th:if="${AddressList} == null" {% endif %}>
+                                    Oops!! No address Found, Add a new address
+                                </h4>
+                            </div>
+                            <!-- LOOP -->
+                            {% if AddressList %}
+                            {% for address in AddressList %}
+                            <div class="border border-dark rounded pt-15 pb-20 mb-15 table-responsive order_table text-center row">
+                                <div class="col-lg-11">
+                                    <div>
+                                        <span class="mr-5 bold font-lg"
+                                            th:text="{{ User.firstName }} + ' ' + {{ User.lastName }}"></span>
+                                        <span class="ml-5 mr-5"></span>
+                                        <span class="ml-5" th:text="{{ address.phone }}"></span>
+                                    </div>
+                                    <div>
+                                        <p th:text="{{ address.streetAddress }}"></p>
+                                        <span th:text="{{ address.district }}"></span><span class="mr-5">,</span>
+                                        <span th:text="{{ address.state }}"></span><span class="mr-5">,</span>
+                                        <span th:text="{{ address.country }}"></span><span class="mr-5">,</span>
+                                        <span th:text="'Pin code: ' + {{ address.pinCode }}"></span>
+                                    </div>
+                                </div>
+                                <div class="col-lg-1">
+                                    <label for="addressId"></label>
+                                    <input type="radio" checked="checked" class="" id="addressId" name="addressId"
+                                        th:value="{{ address.id }}">
+                                </div>
+                            </div>
+                            {% endfor %}
+                            {% endif %}
+                            <!-- LOOP ENDS -->
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="order_review">
+                            <div class="mb-20">
+                                <h4>Your Orders</h4>
+                            </div>
+                            <div class="table-responsive order_table text-center">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th colspan="2">Product</th>
+                                            <th>Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- PRODUCT LOOP -->
+                                        {% for cart in ProductDetails %}
+                                        <tr>
+                                            <td class="image product-thumbnail">
+                                                <img src="{% url 'product_image' imgId=cart.product.images.0.id %}" alt="#">
+                                            </td>
+                                            <td>
+                                                <h5><a href="#">
+                                                        <span th:text="{{ cart.product.name|slice:'0:40' }}"></span>
+                                                    </a></h5>
+                                                <span class="product-qty" th:text="'x ' + {{ cart.qty }}"></span>
+                                            </td>
+                                            <td><span th:text="'₹ ' + {{ cart.product.discountPrice }}"></span></td>
+                                        </tr>
+                                        {% endfor %}
+                                        <!-- PRODUCT LOOP ENDS HERE -->
+                                        <tr>
+                                            <th>SubTotal</th>
+                                            <td class="product-subtotal" colspan="2">
+                                                <span class="bold pr-2"></span>
+                                                <span class="total-amount-no-discount" th:text="'₹ ' + {{ TotalAmount }}"></span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Shipping</th>
+                                            <td colspan="2"><em>Free Shipping</em></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Total</th>
+                                            <td colspan="2" class="product-subtotal">
+                                                <span class="font-xl text-brand fw-900 pr-2"></span>
+                                                <span class="font-xl text-brand fw-900 total-amount-no-discount"
+                                                    th:text="'₹ ' + {{ TotalAmount }}"></span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+    <div class="bt-1 border-color-1 mt-30 mb-30"></div>
+    <div class="payment_method">
+        <div class="mb-25">
+            <h5>Payment</h5>
+        </div>
+        <div class="payment_option">
+            <div class="custome-radio">
+                <input class="form-check-input" required="" value="1" type="radio" name="payment_option" id="exampleRadios3"
+                    checked="">
+                <label class="form-check-label" for="exampleRadios3" aria-controls="bankTranfer">
+                    Cash On Delivery
+                </label><br><br>
+                <input class="form-check-input" required="" value="2" type="radio" name="payment_option"
+                    id="exampleRadios4">
+                <label class="form-check-label" for="exampleRadios4" aria-controls="bankTranfer">Online Payment
+                </label><br><br>
+                <input class="form-check-input" required="" value="3" type="radio" name="payment_option"
+                    id="exampleRadios5">
+                <label class="form-check-label" for="exampleRadios5" aria-controls="bankTranfer">Wallet Payment
+                </label>
+            </div>
+        </div>
+    </div>
+    <button type="submit" onclick="checkForCredentials(this.form)" class="btn btn-brand btn-lg mt-30">Place
+        Order</button>
+    </div>
+    </div>
+    </div>
+    </form>
+    <!--  FORM STARTS  -->
+    </div>
+    </section>
+    </main>
+
+{% endblock %}

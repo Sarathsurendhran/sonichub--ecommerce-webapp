@@ -20,7 +20,8 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
     <link rel="shortcut icon" type="image/x-icon" href= "{% static '/images/theme/favicon.svg' %}">
     <!-- Template CSS -->
-    
+  
+ 
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="{% static '/css/main.css' %}">
     <style>
@@ -34,8 +35,17 @@
       }
 
     </style>
-
-
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+<style>
+.material-symbols-outlined {
+  font-variation-settings:
+  'FILL' 0,
+  'wght' 400,
+  'GRAD' 0,
+  'opsz' 24
+}
+</style>
     <!-- jQuery -->
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" />
@@ -90,28 +100,25 @@
                             <i class="material-icons md-nights_stay"></i>
                         </a>
                     </li>
+ 
                     <li class="dropdown nav-item">
                         <a class="dropdown-toggle" data-toggle="dropdown" id="dropdownAccount" aria-expanded="true">
-                            <i class="fi-rs-user"></i><span class="dropdown-label">Account</span>
-                            <i class="material-icons md-keyboard_arrow_down"></i>
+                            <i class="fi-rs-user"></i><span class="dropdown-label">Account</span>                   
+
+                            <a href="# "><i class="fi fi-sr-pencil" style="font-size: 24px;"></i></a>
                         </a>
                         <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownAccount">
                             <a class="dropdown-item" href="{% url 'user_panel:user-profile' user.id %}"><i class="fi-rs-user"></i>Profile</a>
-                            <a class="dropdown-item" href="#"><i class="material-icons md-settings"></i>Address</a>
+                            <a class="dropdown-item" href="{% url 'user_panel:address-list' user.id %}"><i class="fi fi-rs-marker"></i></i>Address</a>
                             <a class="dropdown-item" href="#"><i class="material-icons md-account_balance_wallet"></i>Orders</a>
                             {% comment %} <a class="dropdown-item" href="#"><i class="material-icons md-receipt"></i>Billing</a>
                             <a class="dropdown-item" href="#"><i class="material-icons md-help_outline"></i>Help center</a> {% endcomment %}
                             <div class="dropdown-divider"></div>
-                            <a class="dropdown-item text-danger" href="{% url 'user_panel:logout_user'%}"><i class="material-icons md-exit_to_app"></i>Logout</a>
-                        </div>
+                            <a class="dropdown-item text-danger" href="{% url 'user_panel:logout_user'%}"><i class="material-icons md-exit_to_app"></i>Logout</a>  
                     </li>
                 </ul>
             </div>
-        </header> 
-
-
-
-              
+        </header>              
            {% else %}
               <li>
                 <i class="fi-rs-user"></i><a href= "{% url 'user_side:signup' %}"> Sign Up</a>

@@ -1,0 +1,120 @@
+{% extends "user_side/base.html" %}
+{% load static  %}
+{% block content %}
+
+<section>
+  <div class="page-header breadcrumb-wrap">
+    <div class="container" style="margin-left:334px; margin-top:30px;">
+      <h2>Address</h2>
+    </div>
+
+    {% for message in messages %}
+        <div class="alert alert-{{message.tags}} alert-dismissible fade show" role="alert">
+            <strong></strong>{{message}}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}  
+  </div>  
+
+  <div class="container" style="margin-top:40px;">
+    <div>
+    </div>
+    <div class="row mx-0 justify-content-center">
+      <div class="col-md-11 col-lg-9 px-lg-5 col-xl-8 px-xl-3 px-xxl-5">
+        <form
+          method="POST"
+          class="w-100 rounded-1 p-4 border bg-white"
+          action="{% url 'user_panel:add-address' user.id %}"
+        >
+        {% csrf_token %}
+          <div class="row">
+            <div class="col-md-6">
+              <!-- Left side fields -->
+              <label class="d-block mb-4">
+                <span class="form-label d-block">Your name</span>
+                <input
+                  name="name"
+                  type="text"
+                  class="form-control"
+                  
+                />
+              </label>
+
+              <label class="d-block mb-4">
+                <span class="form-label d-block">House Name</span>
+                <input
+                  name="house_name"
+                  type="text"
+                  class="form-control"
+                  placeholder=""
+                />
+              </label>
+
+              <label class="d-block mb-4">
+                <span class="form-label d-block">Street Name</span>
+                <input
+                  name="street_name"
+                  type="text"
+                  class="form-control"
+                  placeholder=""
+                />
+              </label>
+
+              <label class="d-block mb-4">
+                <span class="form-label d-block">District</span>
+                <input name="district" type="text" class="form-control" placeholder="" />
+              </label>
+            </div>
+
+            <div class="col-md-6">
+              <!-- Right side fields -->
+              <label class="d-block mb-4">
+                <span class="form-label d-block">State/Province</span>
+                <input name="state" type="text" class="form-control" placeholder="" />
+              </label>
+
+                <label class="d-block mb-4">
+                <span class="form-label d-block">Country</span>
+                <input
+                  name="country"
+                  type="text"
+                  class="form-control"
+                  placeholder=""
+                />
+              </label>
+
+              <label class="d-block mb-4">
+                <span class="form-label d-block">Zip/Postal code</span>
+                <input name="pin_number" type="number" class="form-control" placeholder="" />
+              </label>
+
+            
+
+              <label class="d-block mb-4">
+                <span class="form-label d-block">Phone</span>
+                <input
+                  name="phone_number"
+                  type="number"
+                  class="form-control"
+                  placeholder=""
+                />
+              </label>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <button type="submit" class="btn btn-primary px-3 rounded-3">
+              Save
+            </button>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+{% comment %} <script src="{% static 'js/profile.js' %}"></script> {% endcomment %}
+{% endblock content %}

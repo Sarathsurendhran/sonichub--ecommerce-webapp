@@ -28,8 +28,9 @@ urlpatterns = [
     path('admin/brand',include('brand_management.urls')),
     path('admin/product',include('product_management.urls')),
     path('user/',include('user_panel.urls')),
-    path('user/cart',include('cart_management.urls'))
-    
+    path('user/cart',include('cart_management.urls')),
+    path('user/order',include('order_management.urls')),
+   
 ]
 
 if settings.DEBUG:
