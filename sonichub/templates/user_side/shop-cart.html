@@ -151,7 +151,7 @@
                 
                 {% endfor %}
                 <!-- CART LOOP END -->
-                <tr>
+                {% comment %} <tr>
                   <td colspan="6" class="text-end">
                     <form method="post" action="#" onsubmit="return false">
                       {% csrf_token %}
@@ -160,13 +160,13 @@
                       </button>
                     </form>
                   </td>
-                </tr>
+                </tr> {% endcomment %}
               </tbody>
             </table>
 
           </div>
           <div class="cart-action text-end">
-            <a class="btn" href="#">
+            <a class="btn" href="/">
               <i class="fi-rs-shopping-bag mr-10"></i>Continue Shopping
             </a>
           </div>
@@ -204,7 +204,11 @@
                     </tbody>
                   </table>
                 </div>
-                <a href="{% url 'order:checkout' user.id %}" class="btn btn-brand">
+                {% if Total_Amount == 0 %}
+                
+                {% else %}
+                {% endif %}
+                <a  id="checkbutton" href="{% url 'order:checkout' user.id %}" class="btn btn-brand">
                   <i class="fi-rs-box-alt mr-10"></i>Proceed To CheckOut
                 </a>
               </div>
@@ -217,9 +221,30 @@
 </main>
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js" integrity="sha384-cuYeSxntonz0PPNlHhBs68uyIAVpIIOZZ5JqeqvYYIcEL727kskC66kF92t6Xl2V" crossorigin="anonymous"></script>
  
+<script>
+$(document).ready(function(){
+  $("#checkbutton").on("click",function(e){
+
+  event.preventDefault()
+
+  if ({{Total_Amount}} == 0){
+
+    Swal.fire({
+      title:"Please add products in your cart",
+      icon:"warning"
+    })
+  }else{
+    window.location.href = "{% url 'order:checkout' user.id %}"
+  }
+})
+
+})
+
+</script>
+
 
 
 <script>
@@ -307,7 +332,8 @@ return true;
 }
 
 </script>
-
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="{% static 'js/profile.js' %}"></script> 
 
 
 {% endblock content %}

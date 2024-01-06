@@ -45,7 +45,7 @@ INSTALLED_APPS = [
     'user_panel',
     'cart_management',
     'corsheaders',
-    'order_management'
+    'order_managements'
     
 ]
 

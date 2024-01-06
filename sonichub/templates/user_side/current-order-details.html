@@ -1,0 +1,105 @@
+{% extends "user_side/base-footer.html" %}
+{% load static  %}
+{% block content %}
+
+ <nav class="navbar navbar-expand-lg navbar-light bg-info shadow-lg ">
+        <a class="navbar-brand" href="/"><span class="text-white">Sonic Hub</span></a>
+    </nav>  
+<div class="container-fluid ">
+<div class="container">
+  <!-- Title -->
+  
+  <!-- Main content -->
+  <div class="row de-flex justify-content-center mt-80" >
+
+    <div class="col-lg-10">
+     <h2 class="h5 mb-0"><a href="#" class="text-muted">ORDER ID: </a>{{order_main.order_id}}</h2>
+      <!-- Details -->
+      <div class="card mb-3">
+        <div class="card-body shadow-lg">
+          <div class="mb-3 d-flex justify-content-between">
+            <div>
+              <span class="me-3">{{order_main.date}}</span>
+              <span class="badge rounded-pill bg-info">SHIPPING</span>
+            </div>
+            <div class="d-flex">
+              <button class="btn btn-link p-0 me-3 d-none d-lg-block btn-icon-text"><i class="bi bi-download"></i> <span class="text">Invoice</span></button>
+              <div class="dropdown">
+                <button class="btn btn-link p-0 text-muted" type="button" data-bs-toggle="dropdown">
+                  <i class="bi bi-three-dots-vertical"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                  <li><a class="dropdown-item" href="#"><i class="bi bi-pencil"></i> Edit</a></li>
+                  <li><a class="dropdown-item" href="#"><i class="bi bi-printer"></i> Print</a></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <table class="table table-borderless">
+            <tbody >
+             {% for data in order_sub  %}
+              <tr>     
+                <td>
+                  <div class="d-flex mb-2">
+                    <div class="flex-shrink-0">
+                      <img src="{{data.variant.product.thumbnail_url}}" alt="" width="50" class="img-fluid">
+                    </div>
+                    <div class="flex-lg-grow-1 ms-3">
+                      <h6 class="small mb-0"><a href="#" class="text-reset">{{data.variant.product.product_name}}</a></h6>
+                      <span class="small">Color: {{data.variant.colour_name}}</span>
+                    </div>
+                  </div>
+                </td>
+                <td>{{data.quantity}}</td>
+                <td class="text-end">{{data.variant.product.offer_price}}</td>
+                
+              </tr>
+              {% endfor %}
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colspan="2">Subtotal</td>
+                <td class="text-end">{{order_main.total_amount}}</td>
+              </tr>
+              <tr>
+                <td colspan="2">Shipping</td>
+                <td class="text-end">Free Shipping</td>
+              </tr>
+
+              <tr class="fw-bold">
+                <td colspan="2">TOTAL</td>
+                <td class="text-end">{{order_main.total_amount}}</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+      <!-- Payment -->
+      <div class="card mb-4 shadow-lg">
+        <div class="card-body">
+          <div class="row">
+            <div class="col-lg-6">
+              <h3 class="h6">Payment Method</h3>
+              <p>{{order_main.payment_option}} <br>
+              
+            </div>
+            <div class="col-lg-6">
+              <h3 class="h6"></h3>
+              <address>
+                <strong>{{order_main.address.name}}</strong><br>
+                {{order_main.address.house_name}},{{order_main.address.street_name}}<br>
+                {{order_main.address.district}}, {{order_main.address.state}},{{order_main.address.pin_number}}<br>
+                <span>Phone Number: {{order_main.address.phone_number}}</span>
+              </address>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+  </div>
+
+
+{% endblock content %}

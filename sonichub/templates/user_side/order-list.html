@@ -1,0 +1,131 @@
+{% extends "user_side/base-footer.html" %}
+{% load static %}
+{% block title %} Order list {% endblock %}
+{% block  content %}
+
+<style>
+    .dropdown-custom{
+        background-color: rgb(207, 200, 200);
+    }
+</style>
+
+<section class="content-main">
+    <div class="content-header">
+        <div>
+            <h2 class="content-title card-title">Order List</h2>
+        </div>
+        <div>
+            <a  href="{% url 'product:add-product' %}" class="btn btn-primary btn-sm rounded">Create new</a>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <header class="card-header">
+            <div class="row align-items-center">
+                <div class="col-lg-4 col-md-6 me-auto">
+                    {% comment %} <form action="{% url 'product_mng:products_list' %}" method="get"> {% endcomment %}
+                        <input type="text" name="query" placeholder="Search..." class="form-control">
+                        
+                </div>
+                <div class="col-lg-4 col-md-2 col-6">
+                    <button type="submit" class="btn btn-outline-primary">Search</button>
+                </div>
+
+                <div class="col-md-2 col-6">
+                    <input type="date" value="02.05.2021" class="form-control">
+                </div>
+
+                <div class="col-md-2 col-6">
+                    <select class="form-select">
+                        <option selected>Status</option>
+                        <option>Active</option>
+                        <option>Disabled</option>
+                        <option>Show all</option>
+                    </select>
+                </div>
+            </div>
+        </header> 
+
+        <div class="card-body">
+            
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th class="text-middle">Image</th>
+                                        <th class="text-middle">Product</th>                                  
+                                        <th class="text-middle">Availability</th>
+                                        <th class="text-middle">Action</th> 
+                                        
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for product in products %}
+                                    <tr>
+                                        <td><img src="{{ product.thumbnail.url }}" class="img-sm img-thumbnail" alt="Thumbnail image"></td>
+                                        <td><a href="#"> <h6 class="mb-0">{{ product.product_name }}</h6></a></td>
+
+                                        <td class="text-middle">
+                                            <span class="badge rounded-pill {% if product.is_active %} alert-success {% else %} alert-danger {% endif %}">
+                                                {% if product.is_active %} Active {% else %}Inactive {% endif %} </span>
+                                        </td>
+                                        <td class="text-middle" >
+                                            <div class="dropdown">
+                                                <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm text-secondary fw-bold font-sm"> 
+                                                    More
+                                                </a>
+                                                <div class="dropdown-menu dropdown-custom">
+                                                    <a class="dropdown-item" href="{% url 'product:edit-product' product.id  %}">Edit_Product</a>
+                                                    <a class="dropdown-item" href="{% url 'product:variant-view' product.id  %}">Available variants</a>
+                                                    <a class="dropdown-item" href="{% url 'product:status-change' product.id %}">{% if not product.is_active %}Enable {% else %}Disable{% endif %}</a> 
+                                            </div> <!-- dropdown //end -->
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                   
+             <!-- itemlist  .// -->
+        </div> <!-- card-body end// -->
+    </div> <!-- card end// -->
+    {% comment %} <div class="pagination-area mt-30 mb-50">
+        <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-start">
+                <li class="page-item active"><a class="page-link" href="#">01</a></li>
+                <li class="page-item"><a class="page-link" href="#">02</a></li>
+                <li class="page-item"><a class="page-link" href="#">03</a></li>
+                <li class="page-item"><a class="page-link dot" href="#">...</a></li>
+                <li class="page-item"><a class="page-link" href="#">16</a></li>
+                <li class="page-item"><a class="page-link" href="#"><i class="material-icons md-chevron_right"></i></a></li>
+            </ul>
+        </nav>
+    </div> {% endcomment %}
+</section> 
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+{% comment %} 
+        <script>
+        function confirmUpdate(form) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: 'You won\'t be able to revert this!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, do it!'
+            })
+            .then( result => {
+                    if (result.isConfirmed) {
+                        form.submit()
+                    }
+            });
+        
+        }
+    </script> {% endcomment %}
+
+
+{% endblock content %}

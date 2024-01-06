@@ -37,6 +37,7 @@ def add_to_cart(request):
 def product_cart(request):
     
     data = Cart.objects.filter(user=request.user.id)
+    
 
     total_price = 0
 
@@ -46,8 +47,7 @@ def product_cart(request):
         
     context = {
         "cart_items": Cart.objects.filter(user=request.user.id),
-        "Total_Amount": total_price
-        
+        "Total_Amount": total_price        
     }
 
     return render(request, "user_side/shop-cart.html", context)

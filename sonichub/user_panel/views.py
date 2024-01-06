@@ -78,6 +78,7 @@ def add_address(request, id):
                 user=user_id,
             )
             messages.success(request, "Address Added Successfully")
+            return redirect('user_panel:address-list',id)
 
         except Exception as e:
             messages.error(request, f"Error adding address: {str(e)}")
@@ -97,7 +98,7 @@ def edit_profile(request, id):
     try:
         if UserProfile.objects.filter(username=name).exclude(id=id).exists():
             messages.warning(request, "Username is Already Taken")
-        elif UserProfile.objects.filter(email=email).exists():
+        elif UserProfile.objects.filter(email=email).exclude(id=id).exists():
             messages.warning(request, "Email is Already Taken")
         else:
             data = UserProfile.objects.get(id=id)
