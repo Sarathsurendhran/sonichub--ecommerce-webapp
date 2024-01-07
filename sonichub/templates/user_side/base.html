@@ -56,7 +56,7 @@
 <header class="header-area header-style-4 header-height-2">
   <div class="header-top header-top-ptb-1 d-none d-lg-block">
     <div class="container">
-      <div class="row align-items-center">
+      <div class="row d-flex justify-content-between align-items-center">
         <div class="col-xl-3 col-lg-4">
           <div class="header-info">
             <ul>
@@ -69,37 +69,18 @@
             </ul>
           </div>
         </div>
-        <div class="col-xl-6 col-lg-4">
-          <div class="text-center">
-            <div id="news-flash" class="d-inline-block">
-              <ul>
-                <li>
-                  Get great devices up to 50% off 
-                </li>
-                <li>Supper Value Deals - Save more with coupons</li>
-                <li>
-                  Trendy Earphones, save up 35% off today Shop now
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
         <div class="col-xl-3 col-lg-4">
-          <div class="header-info header-info-right">
+          <div class="header-info header-info-right ">
             <ul>
 
               {% if user.is_authenticated %}
               {% comment %} <li>
                 <i class="fi-rs-user"></i><a href= "{% url 'user_side:user_profile' %}">Account</a>
               </li>  {% endcomment %}
-      <header class="main-header navbar">
+      <header class="main-header navbar d-flex align-items-center ">
             <div class="col-nav">
                 <ul class="nav-list">
-                    <li class="nav-item">
-                        <a class="nav-link btn-icon darkmode" href="#">
-                            <i class="material-icons md-nights_stay"></i>
-                        </a>
-                    </li>
+                    
  
                     <li class="dropdown nav-item">
                         <a class="dropdown-toggle" data-toggle="dropdown" id="dropdownAccount" aria-expanded="true">
@@ -138,7 +119,7 @@
     <div class="container">
       <div class="header-wrap">
         <div class="logo logo-width-1 custom-logo">
-          <a href="index.html"><img src="{% static '/images/theme/sonichub.png' %}" alt="logo" style="width: 400px; height: auto;" /></a>
+          <a href="/"><img src="{% static '/images/theme/sonichub.png' %}" alt="logo" style="width: 400px; height: auto;" /></a>
         </div>
         <div class="header-right">
           <div class="search-style-2">
@@ -173,7 +154,7 @@
     <div class="container">
       <div class="header-wrap header-space-between position-relative">
         <div class="logo logo-width-1 d-block d-lg-none">
-          <a href="index.html"><img src="{% static '/images/theme/sonichub.png' %}" alt="logo" /></a>
+          <a href="/"><img src="{% static '/images/theme/sonichub.png' %}" alt="logo" /></a>
         </div>
         <div class="header-nav d-none d-lg-flex">
           <div class="main-categori-wrap d-none d-lg-block">
@@ -184,12 +165,7 @@
             <nav>
               <ul>
                 <li>
-                  <a class="active" href="index.html">Home <i class="fi-rs-angle-down"></i></a>
-                  <ul class="sub-menu">
-                    <li>
-                      <a href="index-4.html">Home 4</a>
-                    </li>
-                  </ul>
+                  <a class="active" href="/">Home</a>
                 </li>
                 <li>
                   <a href="page-about.html">About</a>

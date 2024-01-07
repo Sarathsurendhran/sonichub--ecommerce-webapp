@@ -36,7 +36,7 @@
                 <div class="divider mt-50 mb-50"></div>
             </div>
         </div> -->
-            <form method="post" action="{% url 'order:confirm-order' user.id %}">
+            <form method="post" id="formsubmit" action="{% url 'order:confirm-order' user.id %}">
             {% csrf_token %}
                 <div class="row">
                     <div class="col-md-6">
@@ -160,9 +160,11 @@
                             </div>
                              <input type="hidden" name="total_amount" value="{{ total_price }}">
                               <input type="hidden" name="order_status" value="{{ 'Order Placed' }}">
-                            <button type="submit" onclick="checkForCredentials(this.form)" class="btn btn-brand btn-lg mt-30">
+                                                         
+                            <button type="submit" id="placeorder" class="btn btn-brand btn-lg mt-30">
                                 Place Order
                             </button>  
+                            
                         </div>
                     </div>
                 </div>
@@ -178,20 +180,47 @@
     </section>
     </main>
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
     <script>
-        function checkForCredentials( form ) {
-                 // Iterate through each form element
-            $(form).find(':input').each(function () {
-                // Get the input name and value
-                var inputName = $(this).attr('name');
-                var inputValue = $(this).val();
 
-                // Display the name and value (you can customize this part)
-                console.log("Input Name: " + inputName + ", Input Value: " + inputValue);
+        $(document).ready(function(){
 
-                // If you want to display it in an alert
-                // alert("Input Name: " + inputName + ", Input Value: " + inputValue);
-            });
-        }
+            $("#placeorder").click(function(event){
+                event.preventDefault();
+
+                if ({{total_price}} == 0){
+                    
+                    Swal.fire({
+                        title:'Oops...',
+                        icon:'error',
+                        title:'Something went wrong!',
+                        showClass: {
+                            popup: `
+                            animate__animated
+                            animate__fadeInUp
+                            animate__faster
+                            `
+                        },
+                        hideClass: {
+                            popup: `
+                            animate__animated
+                            animate__fadeOutDown
+                            animate__faster
+                            `
+                        },
+                        confirmButtonText:'Back to Home',
+                          preConfirm: () => {
+                            
+                            window.location.href = '/'; 
+                        }
+
+                    })
+                }else{
+                    $("#formsubmit").submit()
+                }
+
+            })
+        })
+
     </script>
 {% endblock %}

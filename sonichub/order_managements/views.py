@@ -39,8 +39,15 @@ def confirm_order(request, id):
         user_id = UserProfile.objects.get(id=id)
         order_id = "#OD" + str(formatted_date) + str(user) + r_string.upper()
 
+        data = Cart.objects.filter(user=id)
+        total_price = 0
+        for i in data:
+            if i.variant.variant_status:
+                total_price += i.quantity * i.product.offer_price
+
+
         main_order = Order_Main_data.objects.create(
-            total_amount=total_amount,
+            total_amount=total_price,
             order_status=order_status,
             address=address_id,
             user=user_id,
@@ -48,9 +55,8 @@ def confirm_order(request, id):
             order_id=order_id,
         )
         
-        try:
-           
-            carts_data = Cart.objects.filter(user=id)
+        carts_data = Cart.objects.filter(user=id)
+        if carts_data:
             main_order_id = Order_Main_data.objects.get(id=main_order.id)
 
             for product in carts_data:
@@ -61,15 +67,16 @@ def confirm_order(request, id):
                     variant=product.variant,
                 )
             carts_data.delete()
-        except Exception as e:
-            print(e)
+        else:
+            print('cart is empty')
+            return redirect("/")
 
         context = {
             'order_id': order_id,
             'address':address_id
         }
 
-    return render(request, "user_side/order-success.html",context)
+        return render(request, "user_side/order-success.html",context)
 
 
 @cache_control(no_cache = True, must_revalidate = True, no_store = True)

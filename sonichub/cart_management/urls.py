@@ -12,4 +12,5 @@ urlpatterns = [
         name="delete-cart-product",
     ),
     path("quantity-update/<int:id>", views.quantity_update, name="quantity-update"),
+    path("add-to-cart-index",views.add_to_cart_index,name="add-to-cart-index")
 ]

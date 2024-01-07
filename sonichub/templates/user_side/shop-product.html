@@ -264,7 +264,6 @@
                 
 
                   $('#addtocart').on('click', function () {
-                      var csrfToken = $('meta[name=csrf-token]').attr('content');
                       var productId = '{{ products.id }}'
                       var variantId = selectedColorDiv ? selectedColorDiv.dataset.id : null; 
                       var quantity = document.getElementById("product-qty").value;  
@@ -274,7 +273,7 @@
                           url: '{% url "cart:add-to-cart" %}', 
                           data: {
                               product: productId,
-                              csrf_token: csrfToken,
+                               csrfmiddlewaretoken: '{{ csrf_token }}',
                                variant: variantId,
                                quantity: quantity,
                               
@@ -287,8 +286,13 @@
                                   text: 'The item has been added to your cart.',
                               });
                           },
-                          error: function () {
-                              console.log('Something went wrong');
+                          error:  function (response){
+
+                              Swal.fire({
+                                  icon: 'error',
+                                  title: 'Oops!',
+                                  text: 'limit',
+                              });
                           }
                       });
                   });

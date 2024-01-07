@@ -13,7 +13,7 @@
             <span aria-hidden="true">&times;</span>
           </button>
         </div>         
-        <form method="post" action="#" onsubmit="return isValid()">
+        <form method="post" action="#" onsubmit="return isValid(event)">
         {% csrf_token %}
         <input type="hidden" id="CartID" name="CartID" value=""/>
         <div class="modal-body">
@@ -39,13 +39,7 @@
       <h2>My Cart</h2>
     </div>
   </div>
-  {% else %}
-  <div class="page-header breadcrumb-wrap">
-    <div class="container">
-      <h2>Cart is Empty</h2>
-    </div>
-  </div>
-  {% endif %}
+  
   <section class="mt-50 mb-50">
     <div class="container" style="max-width:80%">
       <div class="row">
@@ -163,8 +157,8 @@
                 </tr> {% endcomment %}
               </tbody>
             </table>
-
           </div>
+        
           <div class="cart-action text-end">
             <a class="btn" href="/">
               <i class="fi-rs-shopping-bag mr-10"></i>Continue Shopping
@@ -204,11 +198,8 @@
                     </tbody>
                   </table>
                 </div>
-                {% if Total_Amount == 0 %}
-                
-                {% else %}
-                {% endif %}
-                <a  id="checkbutton" href="{% url 'order:checkout' user.id %}" class="btn btn-brand">
+               
+                <a id="checkbutton" href="{% url 'order:checkout' user.id %}" class="btn btn-brand">
                   <i class="fi-rs-box-alt mr-10"></i>Proceed To CheckOut
                 </a>
               </div>
@@ -217,7 +208,25 @@
         </div>
       </div>
     </div>
-  </section>  
+  </section> 
+    {% else %}
+  <div class="page-header breadcrumb-wrap">
+    <div class="container">
+      <h2>Cart is Empty</h2>
+    </div>
+  </div>
+
+<div class="cart-action d-flex flex-column align-items-center mt-50">
+   <div class="w-30 h-30 mb-3">
+      <img src="{% static '/images/theme/cartempty.jpg' %}" style="width: 100%; height: 100%; object-fit: contain;" alt="">
+   </div>
+   <a class="btn" href="/">
+      <i class="fi-rs-shopping-bag mr-2"></i>Continue Shopping
+   </a>
+</div>
+
+
+  {% endif %} 
 </main>
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
@@ -244,8 +253,6 @@ $(document).ready(function(){
 })
 
 </script>
-
-
 
 <script>
 function confirmDelete(form){
@@ -295,7 +302,9 @@ function showModal(id, quantity, maxQuantity) {
 }
 
 function isValid(event) {
-   event.preventDefault();
+  
+
+   console.log('validation function is called')
   
   var enteredQty = parseInt($('#qty').val());
   var cartID = $('#CartID').val();

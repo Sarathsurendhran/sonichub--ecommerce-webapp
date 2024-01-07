@@ -279,7 +279,7 @@ input[type=number]:focus,
 }
 
 .text-brand {
-  color: #088178 !important;
+  color: #000000  !important;
 }
 
 .text-primary {
@@ -882,8 +882,8 @@ button.submit, button[type='submit'] {
   padding: 12px 40px;
   color: #ffffff;
   border: none;
-  background-color: #088178;
-  border: 1px solid #046963;
+  background-color: #ac2eff;
+  border: 1px solid #b33fbb;
   border-radius: 5px;
 }
 
@@ -927,8 +927,8 @@ button.submit:hover, button[type='submit']:hover {
   padding: 12px 30px;
   border-radius: 4px;
   color: #fff;
-  border: 1px solid #046963;
-  background-color: #088178;
+  border: 1px solid #b700e8;
+  background-color: #b700e8;
   cursor: pointer;
   -webkit-transition: all 300ms linear 0s;
   transition: all 300ms linear 0s;
@@ -6602,9 +6602,9 @@ h6.post-title {
 }
 
 .header-style-4 .header-top-ptb-1 {
-  background-color: #dbb6fb;
+  background-color: #d874ff;
   background-image: none;
-  padding: 20px 0;
+  padding: 20px;
   border: 0;
 }
 
@@ -6613,7 +6613,7 @@ h6.post-title {
 }
 
 .header-style-4 .header-middle-ptb-1 {
-  padding: 40px 0;
+  padding: 11px 0;
 }
 
 .header-style-4 .select2-container {
@@ -6660,7 +6660,7 @@ h6.post-title {
 .header-style-4 .main-categori-wrap > a {
   color: #fff;
   line-height: 60px;
-  background: #b126ff;
+  background: #b700ff;
   padding: 0 30px;
 }
 
