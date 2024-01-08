@@ -8,6 +8,37 @@ from django.utils import timezone
 from product_management.models import Product_Variant
 from django.views.decorators.cache import cache_control
 from django.utils.crypto import get_random_string
+from collections import defaultdict
+from django.db.models import Prefetch
+
+@cache_control(no_cache = True, must_revalidate = True, no_store = True)
+def order_details(request,id):
+    print(id)
+    content={
+        "order_main":Order_Main_data.objects.get(id=id),
+        "order_sub_data":Order_Sub_data.objects.filter(main_order_id=id)   
+    }
+    return render(request, 'user_side/order-details.html',content)
+
+
+
+@cache_control(no_cache = True, must_revalidate = True, no_store = True)
+def order_list(request, id):
+
+    order_main_data = Order_Main_data.objects.filter(user_id=id)
+    
+    grouped_data = defaultdict(list)
+    
+    for data in order_main_data:
+
+        order_sub_data = data.order_sub_data_set.all()
+        grouped_data[data.order_id] = order_sub_data
+        
+    context = {"grouped_order_data": dict(grouped_data)}
+    return render(request, 'user_side/order-list.html', context)
+
+
+
 
 @cache_control(no_cache = True, must_revalidate = True, no_store = True)
 def current_order_details(request,order_id):
@@ -29,7 +60,7 @@ def confirm_order(request, id):
         user = request.user.id
         payment_option = request.POST.get("payment_option")
 
-        current_date = timezone.now().date()
+        current_date = timezone.now().date()    
         formatted_date = current_date.strftime("%Y%m%d")
 
         r_string = get_random_string(length=4)

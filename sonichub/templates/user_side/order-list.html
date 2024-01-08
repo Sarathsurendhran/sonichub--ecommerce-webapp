@@ -1,131 +1,79 @@
 {% extends "user_side/base-footer.html" %}
 {% load static %}
 {% block title %} Order list {% endblock %}
-{% block  content %}
+{% block content %}
 
 <style>
-    .dropdown-custom{
+    .dropdown-custom {
         background-color: rgb(207, 200, 200);
     }
 </style>
 
 <section class="content-main">
     <div class="content-header">
-        <div>
+        <div class="container mt-50">
             <h2 class="content-title card-title">Order List</h2>
         </div>
-        <div>
-            <a  href="{% url 'product:add-product' %}" class="btn btn-primary btn-sm rounded">Create new</a>
-        </div>
     </div>
-
-    <div class="card mb-4">
-        <header class="card-header">
-            <div class="row align-items-center">
-                <div class="col-lg-4 col-md-6 me-auto">
-                    {% comment %} <form action="{% url 'product_mng:products_list' %}" method="get"> {% endcomment %}
-                        <input type="text" name="query" placeholder="Search..." class="form-control">
-                        
-                </div>
-                <div class="col-lg-4 col-md-2 col-6">
-                    <button type="submit" class="btn btn-outline-primary">Search</button>
-                </div>
-
-                <div class="col-md-2 col-6">
-                    <input type="date" value="02.05.2021" class="form-control">
-                </div>
-
-                <div class="col-md-2 col-6">
-                    <select class="form-select">
-                        <option selected>Status</option>
-                        <option>Active</option>
-                        <option>Disabled</option>
-                        <option>Show all</option>
-                    </select>
-                </div>
-            </div>
-        </header> 
-
-        <div class="card-body">
-            
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th class="text-middle">Image</th>
-                                        <th class="text-middle">Product</th>                                  
-                                        <th class="text-middle">Availability</th>
-                                        <th class="text-middle">Action</th> 
-                                        
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for product in products %}
-                                    <tr>
-                                        <td><img src="{{ product.thumbnail.url }}" class="img-sm img-thumbnail" alt="Thumbnail image"></td>
-                                        <td><a href="#"> <h6 class="mb-0">{{ product.product_name }}</h6></a></td>
-
-                                        <td class="text-middle">
-                                            <span class="badge rounded-pill {% if product.is_active %} alert-success {% else %} alert-danger {% endif %}">
-                                                {% if product.is_active %} Active {% else %}Inactive {% endif %} </span>
-                                        </td>
-                                        <td class="text-middle" >
-                                            <div class="dropdown">
-                                                <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm text-secondary fw-bold font-sm"> 
-                                                    More
-                                                </a>
-                                                <div class="dropdown-menu dropdown-custom">
-                                                    <a class="dropdown-item" href="{% url 'product:edit-product' product.id  %}">Edit_Product</a>
-                                                    <a class="dropdown-item" href="{% url 'product:variant-view' product.id  %}">Available variants</a>
-                                                    <a class="dropdown-item" href="{% url 'product:status-change' product.id %}">{% if not product.is_active %}Enable {% else %}Disable{% endif %}</a> 
-                                            </div> <!-- dropdown //end -->
-                                        </td>
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                   
-             <!-- itemlist  .// -->
-        </div> <!-- card-body end// -->
-    </div> <!-- card end// -->
-    {% comment %} <div class="pagination-area mt-30 mb-50">
-        <nav aria-label="Page navigation example">
-            <ul class="pagination justify-content-start">
-                <li class="page-item active"><a class="page-link" href="#">01</a></li>
-                <li class="page-item"><a class="page-link" href="#">02</a></li>
-                <li class="page-item"><a class="page-link" href="#">03</a></li>
-                <li class="page-item"><a class="page-link dot" href="#">...</a></li>
-                <li class="page-item"><a class="page-link" href="#">16</a></li>
-                <li class="page-item"><a class="page-link" href="#"><i class="material-icons md-chevron_right"></i></a></li>
-            </ul>
-        </nav>
-    </div> {% endcomment %}
-</section> 
-
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
-{% comment %} 
-        <script>
-        function confirmUpdate(form) {
-            Swal.fire({
-                title: 'Are you sure?',
-                text: 'You won\'t be able to revert this!',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, do it!'
-            })
-            .then( result => {
-                    if (result.isConfirmed) {
-                        form.submit()
-                    }
-            });
+    <div class="container"  id="productdetail" >
+   
+        {% for order_id, order_sub_data_instances in grouped_order_data.items %}
         
-        }
-    </script> {% endcomment %}
+            <div class="row mb-3" style="cursor: pointer;">
+                <div class="col-md-12 card shadow-lg p-3 mb-2 bg-white rounded" >  
+
+                    {% for order_sub_data in order_sub_data_instances %}
+                    <a href="{% url 'order:order-details' order_sub_data.main_order_id %}" style="text-decoration:none">
+                        <div class="row"  data-order-id="{{order_sub_data.main_order_id}}" >
+                            <div class="col-md-1 order-md-1 mb-4">
+                                <img src="{{ order_sub_data.variant.product.thumbnail.url }}" class="card-img-top" alt="Thumbnail image">
+                            </div>
+                            
+                            <div class="col-md-11 order-md-2"> 
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <h5 class="card-title">{{ order_sub_data.variant.product.product_name }}</h5>
+                                        <p class="card-text">Colour: {{ order_sub_data.variant.colour_name }}</p>
+                                    </div>
+                                    <div class="col-md-4">
+                                       <p class="card-text">Price: {{ order_sub_data.variant.product.offer_price}} X {{ order_sub_data.quantity }} </p>
+
+                                    </div>
+                                    <div class="col-md-4">
+                                        <p class="card-text">
+                                          {% if forloop.first %}
+                                            <span class="badge rounded-pill alert-success">{{ order_sub_data.main_order.order_status }}</span>
+                                            <br>
+                                            <span>{{ order_sub_data.main_order.date }}</span>
+                                             {% endif %}
+                                        </p> 
+                                    </div>
+                                </div>
+                            </div>
+                        </div></a>
+                    {% endfor %}
+                </div>
+            </div></a>
+        {% endfor %}
+    </div>
+</section>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+{% comment %} <script>
+    document.getElementById("productdetail").addEventListener("click",()=>{
+       // Assuming you have a reference to the element, for example, by using document.querySelector
+   var element = document.querySelector('.row');
+var orderId = element.getAttribute('data-order-id');
+console.log(orderId);
+
+    },true)
+ document.querySelector('.row').addEventListener("click",()=>{
+
+ })
+
+</script> {% endcomment %}
 
 
 {% endblock content %}

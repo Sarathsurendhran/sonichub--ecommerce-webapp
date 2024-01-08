@@ -12,6 +12,7 @@ class Order_Main_data(models.Model):
     order_status = models.CharField(max_length=100, default="Order Placed")
     payment_option = models.CharField(max_length=100, default="cash_on_delivary")
     order_id = models.CharField(max_length=100, default=1)
+    is_active = models.BooleanField(default=True)
 
 
 class Order_Sub_data(models.Model):
@@ -19,3 +20,4 @@ class Order_Sub_data(models.Model):
     main_order = models.ForeignKey(Order_Main_data, on_delete=models.CASCADE)
     variant = models.ForeignKey(Product_Variant, on_delete=models.CASCADE)
     quantity = models.IntegerField(null=False, default=0)
+    is_active = models.BooleanField(default=True)

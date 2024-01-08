@@ -45,7 +45,7 @@ def add_to_cart(request):
         product_id = request.POST.get("product")
         user_id = request.user.id
         variant_id = request.POST.get("variant")
-        quantity = request.POST.get("quantity")
+        newQty = int(request.POST.get("quantity"))
 
         user_obj = UserProfile.objects.get(id=user_id)
         product_obj = Products.objects.get(id=product_id)
@@ -56,21 +56,17 @@ def add_to_cart(request):
                 user=user_obj,
                 variant=variant_obj,
                 product=product_obj,
-                defaults={"quantity": quantity},
+                defaults={"quantity": newQty},
             )
 
-            cart_quantity = cart_obj.quantity
-            if (not created) and (
-                (cart_quantity + int(quantity)) <= variant_obj.variant_stock
-            ):
-                cart_obj.quantity += int(quantity)
+            currentQty = cart_obj.quantity
+            availableQty = variant_obj.variant_stock
+            if not created:
+                if currentQty + newQty > availableQty:
+                    return JsonResponse({"error":"Error"}, status=400)
+                cart_obj.quantity += newQty
                 cart_obj.save()
-            else:
-                print("Error: Item not added to cart")
-                return JsonResponse({"error": "error"}, status=400)
-
-            print("Success: Item added to cart")
-            return JsonResponse({"success": "success"})
+            return JsonResponse({"success": "Success"},status=200)
 
 
 def product_cart(request):

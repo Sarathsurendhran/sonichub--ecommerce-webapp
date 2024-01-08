@@ -34,26 +34,26 @@
                     <th class="text-end">Price</th>
                 </tr>
             </thead>
+            {% for order in order_sub_data  %}
+            
             <tbody >
-             {% for data in order_sub  %}
               <tr>     
                 <td>
                   <div class="d-flex mb-2">
                     <div>
-                      <img src="{{data.variant.product.thumbnail.url}}" alt="" width="50" class="img-fluid">
+                      <img src="{{order.variant.product.thumbnail.url}}" alt="" width="50" class="img-fluid">
                     </div>
                     <div class="flex-lg-grow-1 ms-3">
-                      <h6 class="small mb-0">{{data.variant.product.product_name |title}}</h6>
-                      <span class="small">Color: {{data.variant.colour_name | title}}</span>
+                      <h6 class="small mb-0">{{order.variant.product.product_name |title}}</h6>
+                      <span class="small">Color: {{order.variant.colour_name | title}}</span>
                     </div>
                   </div>
                 </td>
-                <td>{{data.quantity}}</td>
-                <td class="text-end">{{data.variant.product.offer_price}}</td>
-                
+                <td>{{order.quantity}}</td>
+                <td class="text-end">{{order.variant.product.offer_price}}</td>
               </tr>
-              {% endfor %}
             </tbody>
+            {% endfor %}
             <tfoot>
               <tr>
                 <td colspan="2">Subtotal</td>
