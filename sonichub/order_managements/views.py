@@ -10,10 +10,20 @@ from django.views.decorators.cache import cache_control
 from django.utils.crypto import get_random_string
 from collections import defaultdict
 from django.db.models import Prefetch
+from django.http import HttpResponse
+
+
+def cancel_order(request,order_id,user_id):
+    if request.method == 'POST':
+        data = Order_Main_data.objects.get(order_id=order_id)
+        data.order_status = 'Cancelled'
+        data.save()
+        return redirect("order:order-list", user_id)
+
+
 
 @cache_control(no_cache = True, must_revalidate = True, no_store = True)
 def order_details(request,id):
-    print(id)
     content={
         "order_main":Order_Main_data.objects.get(id=id),
         "order_sub_data":Order_Sub_data.objects.filter(main_order_id=id)   
@@ -24,6 +34,7 @@ def order_details(request,id):
 
 @cache_control(no_cache = True, must_revalidate = True, no_store = True)
 def order_list(request, id):
+    print(id)
 
     order_main_data = Order_Main_data.objects.filter(user_id=id)
     
@@ -63,12 +74,12 @@ def confirm_order(request, id):
         current_date = timezone.now().date()    
         formatted_date = current_date.strftime("%Y%m%d")
 
-        r_string = get_random_string(length=4)
+        r_string = get_random_string(length=2)
 
         address_id = Address.objects.get(id=address)
 
         user_id = UserProfile.objects.get(id=id)
-        order_id = "#OD" + str(formatted_date) + str(user) + r_string.upper()
+        order_id = "#" + str(formatted_date) + str(user) + r_string.upper()
 
         data = Cart.objects.filter(user=id)
         total_price = 0

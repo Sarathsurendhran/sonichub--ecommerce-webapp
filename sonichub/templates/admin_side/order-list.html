@@ -1,0 +1,205 @@
+{% extends "admin_side/admin-base.html" %}
+{% load static %}
+{% block title %} Product list {% endblock %}
+{% block  content %}
+
+<style>
+    .dropdown-custom{
+        background-color: rgb(207, 200, 200);
+
+
+    }
+
+
+    .small-text {
+    font-size: 12px;  /* Adjust the size as needed */
+}
+</style>
+
+
+<section class="content-main">
+    <div class="content-header">
+        <div>
+            <h2 class="content-title card-title">Order List</h2>
+        </div>
+      
+    </div>
+
+    <div class="card mb-4">
+        <header class="card-header">
+            <div class="row align-items-center">
+                <div class="col-lg-4 col-md-6 me-auto">
+                    {% comment %} <form action="{% url 'product_mng:products_list' %}" method="get"> {% endcomment %}
+                        <input type="text" name="query" placeholder="Search..." class="form-control">
+                        
+                </div>
+                <div class="col-lg-4 col-md-2 col-6">
+                    <button type="submit" class="btn btn-outline-primary">Search</button>
+                </div>
+
+                <div class="col-md-2 col-6">
+                    <input type="date" value="02.05.2021" class="form-control">
+                </div>
+
+                <div class="col-md-2 col-6">
+                    <select class="form-select">
+                        <option selected>Status</option>
+                        <option>Active</option>
+                        <option>Disabled</option>
+                        <option>Show all</option>
+                    </select>
+                </div>
+            </div>
+        </header> 
+
+        <div class="card-body">
+            
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th class="text-middle">ID</th>
+                                        <th class="text-middle">Name</th>                                  
+                                        <th class="text-middle">Email</th>
+                                        <th class="text-middle">Total</th> 
+                                        <th class="text-middle">Date</th>
+                                        <th class="text-middle">Status</th>
+                                        {% comment %} <th class="text-middle">Payment Status</th> {% endcomment %}
+                                        <th class="text-middle">Payment Method</th>
+                                        
+                                        
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for data in order_main_data %}
+                                    <tr>
+                                       
+                                        <td><h6 class="mb-4 small-text order-id">{{ data.order_id }}</h6></td>
+                                        <td><h6 class="mb-4 small-text">{{ data.user.username|title }}</h6></td>
+                                        <td><h6 class="mb-4 small-text">{{ data.user.email }}</h6></td>
+                                        <td><h6 class="mb-4 small-text">{{ data.total_amount }}</h6></td>
+                                        <td><h6 class="mb-4 small-text">{{ data.date }}</h6></td>
+
+                                        <!-- Example single danger button -->
+                                          <td><div class="btn-group">
+                                            <button type="button" id="{{data.order_id}} "class="btn btn-info btn-sm dropdown-toggle bt-change" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" >
+                                              {{data.order_status}}
+                                            </button>
+                                            {% comment %} {% if  data.order_status != 'Cancelled' %} {% endcomment %}
+                                          
+                                            <div class="dropdown-menu">
+                                              <a class="dropdown-item" value="{{OrderPlaced}}">Order Placed</a>
+                                              <a class="dropdown-item" value="{{Shipped}}">Shipped</a>
+                                              <a class="dropdown-item" value="{{Delivered}}">Delivered</a>
+                                              <a class="dropdown-item" value="{{Cancelled}}">Cancelled</a>
+                                            
+                                          </div>
+                                            {% comment %} {% endif %} {% endcomment %}
+                                          </td>
+                                        
+                                        {% comment %} <td><h6 class="mb-4 small-text">ok</h6></td> {% endcomment %}
+                                        <td><h6 class="mb-4 small-text">{{ data.payment_option|title }}</h6></td>
+                                           
+                                        
+                                        {% comment %} <td class="text-middle" >
+                                            <div class="dropdown">
+                                                <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm text-secondary fw-bold font-sm"> 
+                                                    More
+                                                </a>
+                                                <div class="dropdown-menu dropdown-custom">
+                                                    <a class="dropdown-item" href="{% url 'product:edit-product' product.id  %}">Edit_Product</a>
+                                                    <a class="dropdown-item" href="{% url 'product:variant-view' product.id  %}">Available variants</a>
+                                                    <a class="dropdown-item" href="{% url 'product:status-change' product.id %}">{% if not product.is_active %}Enable {% else %}Disable{% endif %}</a> 
+                                            </div> 
+                                        </td> {% endcomment %}
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                   
+             <!-- itemlist  .// -->
+        </div> <!-- card-body end// -->
+    </div> <!-- card end// -->
+    {% comment %} <div class="pagination-area mt-30 mb-50">
+        <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-start">
+                <li class="page-item active"><a class="page-link" href="#">01</a></li>
+                <li class="page-item"><a class="page-link" href="#">02</a></li>
+                <li class="page-item"><a class="page-link" href="#">03</a></li>
+                <li class="page-item"><a class="page-link dot" href="#">...</a></li>
+                <li class="page-item"><a class="page-link" href="#">16</a></li>
+                <li class="page-item"><a class="page-link" href="#"><i class="material-icons md-chevron_right"></i></a></li>
+            </ul>
+        </nav>
+    </div> {% endcomment %}
+</section> 
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js" integrity="sha384-cuYeSxntonz0PPNlHhBs68uyIAVpIIOZZ5JqeqvYYIcEL727kskC66kF92t6Xl2V" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+
+
+  <script>  
+    $(document).ready(function(){
+      $('.dropdown-item').click(function(){
+        var selectedText =$(this).text();
+        var orderId=$(this).closest('tr').find('.order-id').text();
+        var dropdownButton = $(this).closest('.btn-group').find('.bt-change');
+        dropdownButton.text(selectedText);
+        console.log(orderId)
+
+        $.ajax({
+          url:"{% url 'admin_panel:order-status-change' %}",
+          method:'POST',
+          data:{
+            
+            "status":selectedText,
+            "order_id":orderId,
+            csrfmiddlewaretoken: '{{ csrf_token }}',
+
+          },
+
+          success:function(response){
+            console.log(response)
+          },
+
+          error:function(error){
+            console.log(error)
+          }
+          
+        })
+
+      })
+    })
+    
+  </script>
+
+{% comment %} 
+        <script>
+        function confirmUpdate(form) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: 'You won\'t be able to revert this!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, do it!'
+            })
+            .then( result => {
+                    if (result.isConfirmed) {
+                        form.submit()
+                    }
+            });
+        
+        }
+    </script> {% endcomment %}
+
+
+
+{% endblock content %}

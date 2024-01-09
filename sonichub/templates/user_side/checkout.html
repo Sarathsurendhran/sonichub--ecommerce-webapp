@@ -181,46 +181,61 @@
     </main>
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
-    <script>
+ <script>
+    $(document).ready(function(){
+        $("#placeorder").click(function(event){
+            event.preventDefault();
 
-        $(document).ready(function(){
+            var hasAddress = {% if address|length > 0 %}true{% else %}false{% endif %};
+            var totalPrice = {{ total_price }};
 
-            $("#placeorder").click(function(event){
-                event.preventDefault();
+            if (totalPrice === 0 && !hasAddress){
+                Swal.fire({
+                    title: 'Oops...',
+                    icon: 'error',
+                    text: 'Please select an address and ensure your total amount is greater than zero.',
+                    showClass: {
+                        popup: 'animate__animated animate__fadeInUp animate__faster'
+                    },
+                    hideClass: {
+                        popup: 'animate__animated animate__fadeOutDown animate__faster'
+                    },
+                    confirmButtonText: 'OK',
+                });
+            } else if (totalPrice === 0) {
+                Swal.fire({
+                    title: 'Oops...',
+                    icon: 'error',
+                    text: 'Something went wrong! Your total amount is zero.',
+                    showClass: {
+                        popup: 'animate__animated animate__fadeInUp animate__faster'
+                    },
+                    hideClass: {
+                        popup: 'animate__animated animate__fadeOutDown animate__faster'
+                    },
+                    confirmButtonText: 'Back to Home',
+                    preConfirm: () => {
+                        window.location.href = '/';
+                    }
+                });
+            } else if (!hasAddress) {
+                Swal.fire({
+                    title: 'Oops...',
+                    icon: 'error',
+                    text: 'Please select an address.',
+                    showClass: {
+                        popup: 'animate__animated animate__fadeInUp animate__faster'
+                    },
+                    hideClass: {
+                        popup: 'animate__animated animate__fadeOutDown animate__faster'
+                    },
+                    confirmButtonText: 'OK',
+                });
+            } else {
+                $("#formsubmit").submit();
+            }
+        });
+    });
+</script>
 
-                if ({{total_price}} == 0){
-                    
-                    Swal.fire({
-                        title:'Oops...',
-                        icon:'error',
-                        title:'Something went wrong!',
-                        showClass: {
-                            popup: `
-                            animate__animated
-                            animate__fadeInUp
-                            animate__faster
-                            `
-                        },
-                        hideClass: {
-                            popup: `
-                            animate__animated
-                            animate__fadeOutDown
-                            animate__faster
-                            `
-                        },
-                        confirmButtonText:'Back to Home',
-                          preConfirm: () => {
-                            
-                            window.location.href = '/'; 
-                        }
-
-                    })
-                }else{
-                    $("#formsubmit").submit()
-                }
-
-            })
-        })
-
-    </script>
 {% endblock %}

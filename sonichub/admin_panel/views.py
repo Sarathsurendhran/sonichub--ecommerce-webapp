@@ -3,6 +3,29 @@ from user_authentication.models import UserProfile
 from django.contrib import messages
 from django.contrib.auth import login, logout, authenticate
 from django.views.decorators.cache import cache_control
+from order_managements.models import Order_Main_data,Order_Sub_data
+from django.http import JsonResponse
+
+
+def order_status_change(request):
+    if request.method == 'POST':
+        order_id = request.POST.get('order_id')
+        status = request.POST.get('status')
+        order_data = Order_Main_data.objects.get(order_id=order_id)
+        order_data.order_status=status
+        order_data.save()
+        print(request.POST.get('order_id'))
+        return JsonResponse({"success":'success'})
+
+
+
+
+def order_list(request):
+    
+    content={
+        "order_main_data":Order_Main_data.objects.all()
+    } 
+    return render(request,'admin_side/order-list.html',content)
 
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
