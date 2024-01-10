@@ -66,8 +66,10 @@
                                         <th class="text-middle">Status</th>
                                         {% comment %} <th class="text-middle">Payment Status</th> {% endcomment %}
                                         <th class="text-middle">Payment Method</th>
+                                        <th class="text-middle">Details</th>
+
                                         
-                                        
+                  
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -99,13 +101,12 @@
                                         
                                         {% comment %} <td><h6 class="mb-4 small-text">ok</h6></td> {% endcomment %}
                                         <td><h6 class="mb-4 small-text">{{ data.payment_option|title }}</h6></td>
-                                           
-                                        
+
+                                        <td><a href="{% url 'admin_panel:admin-order-details' data.id %}" class="btn btn-light rounded btn-sm text-secondary fw-bold font-sm">Details</a></td> 
+
+
                                         {% comment %} <td class="text-middle" >
                                             <div class="dropdown">
-                                                <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm text-secondary fw-bold font-sm"> 
-                                                    More
-                                                </a>
                                                 <div class="dropdown-menu dropdown-custom">
                                                     <a class="dropdown-item" href="{% url 'product:edit-product' product.id  %}">Edit_Product</a>
                                                     <a class="dropdown-item" href="{% url 'product:variant-view' product.id  %}">Available variants</a>

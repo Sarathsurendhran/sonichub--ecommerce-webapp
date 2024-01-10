@@ -4,7 +4,15 @@ from django.contrib import messages
 from django.contrib.auth import login, logout, authenticate
 from django.views.decorators.cache import cache_control
 from order_managements.models import Order_Main_data,Order_Sub_data
-from django.http import JsonResponse
+from django.http import JsonResponse,HttpResponse
+
+
+def admin_order_details(request,id):
+   content = {
+      "order_main":Order_Main_data.objects.get(id=id),
+      "order_sub_data":Order_Sub_data.objects.filter(main_order_id=id) 
+   }  
+   return render(request,"admin_side/admin-order-details.html",content)
 
 
 def order_status_change(request):
@@ -23,7 +31,8 @@ def order_status_change(request):
 def order_list(request):
     
     content={
-        "order_main_data":Order_Main_data.objects.all()
+        "order_main_data":Order_Main_data.objects.all(),
+        "order_sub_data":Order_Sub_data.objects.all()
     } 
     return render(request,'admin_side/order-list.html',content)
 

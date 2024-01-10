@@ -1,0 +1,117 @@
+{% extends "user_side/base-footer.html" %}
+{% load static  %}
+{% block content %}
+
+
+ <nav class="navbar navbar-expand-lg navbar-light bg-success   shadow-lg ">
+        <a class="navbar-brand" href="/"><span class="text-white">Sonic Hub</span></a>
+    </nav>  
+<div class="container-fluid ">
+<div class="container">
+  <!-- Title -->
+  
+  <!-- Main content -->
+  <div class="row de-flex justify-content-center mt-80" >
+
+    <div class="col-lg-10">
+     <h2 class="h5 mb-0"><a href="#" class="text-muted">ORDER ID: </a>{{order_main.order_id}}</h2>
+      <!-- Details -->
+      <div class="card mb-3">
+        <div class="card-body shadow-lg">
+          <div class="mb-3 d-flex flex-row">
+            <div class=" d-flex flex-row">
+            <h4><span class=" mr-3 badge  bg-info">{{order_main.order_status}}</span></h4>
+              <span class="mt-2">{{order_main.date}}</span>
+              
+            </div>
+  
+          </div>
+          <table class="table table-borderless">
+             <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Quantity</th>
+                    <th class="text-end">Price</th>
+                </tr>
+            </thead>
+            {% for order in order_sub_data  %}
+            
+            <tbody >
+              <tr>     
+                <td>
+                  <div class="d-flex mb-2">
+                    <div>
+                      <img src="{{order.variant.product.thumbnail.url}}" alt="" width="50" class="img-fluid">
+                    </div>
+                    <div class="flex-lg-grow-1 ms-3">
+                      <h6 class="small mb-0">{{order.variant.product.product_name |title}}</h6>
+                      <span class="small">Color: {{order.variant.colour_name | title}}</span>
+                    </div>
+                  </div>
+                </td>
+                <td>{{order.quantity}}</td>
+                <td class="text-end">{{order.variant.product.offer_price}}</td>
+              </tr>
+            </tbody>
+            {% endfor %}
+            <tfoot>
+              <tr>
+                <td colspan="2">Subtotal</td>
+                <td class="text-end">{{order_main.total_amount}}</td>
+              </tr>
+              <tr>
+                <td colspan="2">Shipping</td>
+                <td class="text-end">Free Shipping</td>
+              </tr>
+
+              <tr class="fw-bold">
+                <td colspan="2">TOTAL</td>
+                <td class="text-end">{{order_main.total_amount}}</td>
+                
+              </tr>
+      
+            </tfoot>
+          </table>
+        </div>
+      </div>
+      <!-- Payment -->
+      <div class="card mb-4 shadow-lg">
+        <div class="card-body">
+          <div class="row">
+            <div class="col-lg-6">
+              <h3 class="h6">Payment Method</h3>
+              <p>{{order_main.payment_option |title }} <br>
+              
+            </div>
+            <div class="col-lg-6">
+              <h3 class="h6">Delivery Address</h3>
+              <address>
+              
+                <strong>{{order_main.address.name}}</strong><br>
+                {{order_main.address.house_name}},{{order_main.address.street_name}}<br>
+                {{order_main.address.district}}, {{order_main.address.state}},{{order_main.address.pin_number}}<br>
+                <span>Phone Number: {{order_main.address.phone_number}}</span>
+              </address>
+
+               <div class="d-flex justify-content-end">
+                  <a href="{% url 'admin_panel:order-list' %}" class="btn btn-outline-primary">Back</a>    
+                   
+                </div>    
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+  </div>
+<!-- Add these lines in the head section of your HTML -->
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js" integrity="sha384-cuYeSxntonz0PPNlHhBs68uyIAVpIIOZZ5JqeqvYYIcEL727kskC66kF92t6Xl2V" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+
+
+{% endblock content %}

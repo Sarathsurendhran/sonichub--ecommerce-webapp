@@ -170,7 +170,7 @@ def product_list(request):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def edit_product(request, id):
     product_data = Products.objects.get(id=id)
-    product_variant = Product_Variant.objects.get(product=id)
+    # product_variant = Product_Variant.objects.filter(product=id)
 
     if not request.user.is_superuser:
         return redirect("admin_panel:admin_login")
@@ -242,12 +242,12 @@ def edit_product(request, id):
                     product_data.stock = stock
                     product_data.save()
 
-                    product_variant.colour = colour
-                    variant_status = variant_status
-                    product_variant.variant_stock = variant_stock
-                    product_variant.product = product_data
-                    product_variant.thumbnail = thumbnail
-                    product_variant.save()
+                    # product_variant.colour = colour
+                    # variant_status = variant_status
+                    # product_variant.variant_stock = variant_stock
+                    # product_variant.product = product_data
+                    # product_variant.thumbnail = thumbnail
+                    # product_variant.save()
 
                     Product_images.objects.filter(product=product_data).delete()
                     new_images = []
@@ -268,12 +268,13 @@ def edit_product(request, id):
     content = {
         "products": product_data,
         "images": Product_images.objects.filter(product=id),
-        "product_variants": Product_Variant.objects.get(product=id),
+        # "product_variants": Product_Variant.objects.get(product=id),
         "branddata": Brand.objects.filter(brand_name__isnull=False),
         "categorydata": Category.objects.filter(category_name__isnull=False),
     }
 
     return render(request, "admin_side/edit-product.html", content)
+
 
 
 def status_change(request, id):

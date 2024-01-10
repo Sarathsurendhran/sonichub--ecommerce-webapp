@@ -13,6 +13,27 @@ from django.utils.crypto import get_random_string
 from django.views.decorators.csrf import csrf_exempt
 from datetime import datetime, timedelta
 from django.http import JsonResponse
+from django.contrib.auth.hashers import make_password, check_password
+from django.contrib.auth.decorators import login_required
+
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def change_password(request, id):
+    if request.method == "POST":
+        current_password = request.POST.get("current_password")
+        new_password = request.POST.get("new_password")
+        data = UserProfile.objects.get(id=id)
+
+        if data.check_password(current_password):
+            password = make_password(new_password)
+            data.password = password
+            data.save()
+            request.session["email"] = data.email
+            return redirect('user_panel:update-mail-otp')
+        else:
+           messages.warning(request, "Current Password is not correct")
+
+    return render(request, "user_side/change-password.html")
 
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
@@ -78,7 +99,7 @@ def add_address(request, id):
                 user=user_id,
             )
             messages.success(request, "Address Added Successfully")
-            return redirect('user_panel:address-list',id)
+            return redirect("user_panel:address-list", id)
 
         except Exception as e:
             messages.error(request, f"Error adding address: {str(e)}")
@@ -119,17 +140,19 @@ def edit_profile(request, id):
 
 # wiillnbwbdzphfla
 @csrf_exempt
+#@login_required(login_url="user_side:user_login")
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def update_mail_otp(request):
+
     otp = get_random_string(length=4, allowed_chars="0123456789")
 
     now = datetime.now().time()
     time_as_string = now.strftime("%H:%M:%S")
 
-    request.session["otp"] = "1000"
+    request.session["otp"] = otp
     request.session["otp_time"] = time_as_string
 
-    # send_mail("OTP for sign up", f"Hi {request.user} Your OTP is: {otp}", 'sonichubecommerce@outlook.com',[request.session['email']], fail_silently=False)
+    send_mail("OTP for sign up", f"Hi {request.user} Your OTP is: {otp}", 'sonichubecommerce@outlook.com',[request.session['email']], fail_silently=False)
 
     timenow = datetime.now()
     expire_time = timenow + timedelta(seconds=60)
@@ -168,13 +191,15 @@ def update_mail_verify_otp(request):
                 user = UserProfile.objects.get(email=request.session["email"])
 
                 if current_time <= expiration_time:
+                    
+
                     user.is_active = True
                     user.save()
 
                     del request.session["otp"]
                     del request.session["otp_expiration_time"]
 
-                    messages.success(request, "UserProfile Updated successfully.")
+                    messages.success(request, "Updated successfully.")
                     return redirect("user_panel:user-profile", user.id)
                 else:
                     messages.error(
@@ -231,4 +256,4 @@ def address_status_change(request, id):
     id = Address.objects.get(id=id)
     id.status = False
     id.save()
-    return redirect('user_panel:address-list',user_id)
+    return redirect("user_panel:address-list", user_id)

@@ -21,7 +21,6 @@ def cancel_order(request,order_id,user_id):
         return redirect("order:order-list", user_id)
 
 
-
 @cache_control(no_cache = True, must_revalidate = True, no_store = True)
 def order_details(request,id):
     content={
