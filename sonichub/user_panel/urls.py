@@ -14,6 +14,7 @@ urlpatterns = [
   path('address-list/<int:id>',views.address_list,name='address-list'),
   path('edit-address/<int:id>',views.edit_address,name='edit-address'),
   path('address-status-change/<int:id>',views.address_status_change,name='address-status-change'),
-  path('change-password/<int:id>',views.change_password,name='change-password')
+  path('change-password/<int:id>',views.change_password,name='change-password'),
+  
 
 ]

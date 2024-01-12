@@ -18,9 +18,7 @@
                 <div class="content-header">
                     <h2 class="content-title">Edit Product</h2>
                     <div>
-                       <a href="{% url 'product:product-list' %}" class="btn btn-md rounded font-sm hover-up">View Products</a>
-
-                            
+                       <a href="{% url 'product:product-list' %}" class="btn btn-md rounded font-sm hover-up">View Products</a>          
                     </div>
                 </div>
             </div>
@@ -38,20 +36,20 @@
                             <div class="col-lg-10">
                                <section class="content-body p-xl-4">
                                     <!-- Form  -->
-                                    <form method="post" action = '{% url "product:add-product" %}' enctype="multipart/form-data">
+                                    <form method="post" action = '{% url "product:edit-product" products.id %}' enctype="multipart/form-data">
                                         {% csrf_token %}
                                         <div class="row mb-4">
                                             <label class="col-lg-3 col-form-label" for="name">Product name*</label>
                                             <div class="col-lg-9">
                                              
-                                                <input type="text" name="product_name" id="name" class="form-control" placeholder="Type here" value="{{ form.name.value }}">
+                                                <input type="text" name="product_name" id="name" class="form-control" placeholder="Type here" value="{{ products.product_name }}">
                                             </div>
                                         </div>
                                         <div class="row mb-4">
                                             <label class="col-lg-3 col-form-label">Description*</label>
                                             <div class="col-lg-9">
                                                 
-                                                <textarea name="product_description" class="form-control" placeholder="Type here" rows="4">{{ form.description.value }}</textarea>
+                                                <textarea name="product_description" class="form-control"  value="{{ products.product_description}}" placeholder="Type here" rows="4">{{ products.product_description}}</textarea>
                                             </div>
                                         </div>
                                         <div class="row mb-4">
@@ -63,7 +61,7 @@
                                                 
                                                 <select size="5" name="brand" class="form-control select-multiple">
                                                     {% for brand in branddata %}
-                                                          <option value="{{ brand.id }}" {% if brand.id == brand.id %}selected{% endif %}>{{ brand.brand_name }}</option>
+                                                          <option value="{{brand.id }}" {% if brand.id == products.product_brand_id %}selected{% endif %}>{{ brand.brand_name }}</option>
                                                     {% endfor %}
                                                 </select>
                                             </div>
@@ -73,7 +71,7 @@
                                               
                                                 <select size="5" name="category" class="form-control select-multiple">
                                                     {% for category in categorydata %}
-                                                        <option value="{{ category.id }}" selected>{{ category.category_name }}</option>
+                                                        <option value="{{ category.id }}"{% if category.id == products.product_category_id %}selected{% endif %}>{{ category.category_name }}</option>
                                                     {% endfor %}
                                                 </select>
                                             </div>
@@ -83,47 +81,28 @@
                                             <label class="col-lg-6 col-form-label">Offer price*</label>
                                             <div class="col-lg-6">
                                              
-                                                <input type="number" name="price" id="priceInput" class="form-control" placeholder="Unit Price" value="{{ form.price}}">
+                                                <input type="number" name="price" id="priceInput" class="form-control" placeholder="Unit Price" value="{{ products.price}}">
                                             </div>
                                             <div class="col-lg-6">
                                             
-                                                <input type="number" name="offer_price" id="discountPriceInput" class="form-control" placeholder="Total Quantity" value="{{ form.offer_price }}">
+                                                <input type="number" name="offer_price" id="discountPriceInput" class="form-control"  value="{{ products.offer_price }}">
                                             </div>
                                         </div>
-                                        {% comment %} <div class="row">
-                                            <label class="col-lg-6 col-form-label"></label>
-                                            <label class="col-lg-6 col-form-label">Quantity</label>
-                                        </div> {% endcomment %}
-
-                                        
-                      
-
+                                     
                                         <div class="row mb-4">
                                             <label class="col-lg-2 col-form-label">Status</label>
                                             <div class="col-lg-4">
                                                 <label class="form-check my-2">
-                                                    <input type="checkbox" name="status" class="form-check-input"checked>
+                                                    <input type="checkbox" name="status" class="form-check-input"{% if products.is_active %}
+                                                    
+                                                    
+                                                    checked {% endif %}>
                                                     <span class="form-check-label">Enable this product</span>
                                                 </label>
                                             </div>
-                                            {% comment %} <div class="col-lg-6">
-                                              
-                                                <input type="number" name="stock" class="form-control" placeholder="Total Quantity" value="{{ form.qty.value }}">
-                                            </div> {% endcomment %}
+                                          
                                         </div>
-                                            <div class="card mb-4">
-                                        <div class="card-header">
-                                                <h4>Thumbnail</h4>
-                                            </div>
-                                            <div class="card-body">
-                                                <div class="input-group mb-3">
-                                                    <div class="custom-file">
-                                                        <input class="custom-file-input form-control" type="file" required="true" name="thumbnail_image"
-                                                            accept=".jpg,.jpeg,.webp,.png">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+                            
                                         <br>
                                         <button class="btn btn-primary" type="submit"> Continue to next</button>
                                    
@@ -134,21 +113,61 @@
                     </div>
                 </div>
             </div>
-
-                  </form>
-                    
-                </div>  
+       </form>               
+     </div>  
         </div>
     </section>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script>
+    
+    {% comment %} function previewImages(event) {
+            var input = event.target;
+            var previewContainer = document.getElementById('image-preview-container');
+            var uploadButton = document.getElementById('uploadButton');
+            previewContainer.innerHTML = ''; // Clear previous previews
 
-   <script>
-            document.querySelectorAll('[name^="product_images"]').forEach(function(element) {
-                var cropper = new Cropper(element, {
-                    aspectRatio: 1,  // Set aspect ratio as needed
-                    viewMode: 1,     // Set the view mode (optional)
-                    // Add more Cropper.js options as needed
-                });
-            });
-        </script> 
+            // Check if any file is selected
+            if (input.files && input.files.length > 0) {
+            for (var i = 0; i < input.files.length; i++) {
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                    // Create a new image element for each selected file
+                    var img = document.createElement('img');
+                    img.src = e.target.result;
+
+                    // Create a "Cancel" button for each image
+                    var cancelButton = document.createElement('button');
+                    
+                    cancelButton.innerHTML = 'Cancel';
+                    cancelButton.onclick = function () {
+                        // Remove the corresponding image and button when "Cancel" is clicked
+                        previewContainer.removeChild(img);
+                        previewContainer.removeChild(cancelButton);
+                        uploadButton.style.display = 'none';
+                    };
+
+                    // Append the image and "Cancel" button to the preview container
+                    previewContainer.appendChild(img);
+                    previewContainer.appendChild(cancelButton);
+                    uploadButton.style.display = 'block';
+                };
+
+                // Read the selected file as a data URL
+                reader.readAsDataURL(input.files[i]);
+            }
+        }
+        }
+        function uploadInnerForm() {
+            let form = $('#innerForm')
+            console.log(form.serializeArray())
+            let url = form.attr('action');
+            console.log(ur)
+        }   
+
+        
+    </script> {% endcomment %}
+
+   
 
 {% endblock content %}

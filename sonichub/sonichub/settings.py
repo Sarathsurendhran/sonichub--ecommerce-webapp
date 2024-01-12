@@ -165,3 +165,10 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:8000",
     # Add other origins as needed
 ]
+
+
+# RazorPay
+
+RAZORPAY_KEY="rzp_test_8XSNvVIgMjtH1b"
+RAZORPAY_KEY_SECRET="ZoD2SIWERdH30p5U62WspD5M"
+SECURE_CROSS_ORIGIN_OPENER_POLICY="same-origin-allow-popups"

@@ -5,7 +5,10 @@ from django.contrib.auth import login, logout, authenticate
 from django.views.decorators.cache import cache_control
 from order_managements.models import Order_Main_data,Order_Sub_data
 from django.http import JsonResponse,HttpResponse
-
+from brand_management.models import Brand
+from category_management.models import Category
+from product_management.models import Products
+from order_managements.models import Order_Main_data
 
 def admin_order_details(request,id):
    content = {
@@ -108,3 +111,72 @@ def block_unblock_user(request, id):
         messages.warning("There is no such user")
 
     return redirect("admin_panel:users_list")
+
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def user_name_search(request):
+    if request.method == 'POST':
+        try:
+            query = request.POST.get('query')
+            user_name = UserProfile.objects.filter(username__icontains=query)
+            if user_name.exists():
+                return render(request, "admin_side/admin-userslist.html", {"user_details":user_name})
+            else:
+                messages.warning(request,'Not Found')
+        except Exception as a:
+            messages.warning(request, "An Error Occured{a}")
+    return redirect("admin_panel:user_list")
+
+
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def brand_name_search(request):
+    if request.method == "POST":
+        try:
+            query = request.POST.get('query')
+            brand_name = Brand.objects.filter(brand_name__icontains=query)
+            if brand_name.exists():
+                return render(request, 'admin_side/brand-view.html',{'brandlist':brand_name})
+            else:
+                messages.warning(request,'No data Found')
+        except Exception as e:
+            messages.warning(request, "An error Occured:{e}")
+    return redirect("brand:brand-list")
+
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def category_name_search(request):
+    if request.method == 'POST':       
+        try:
+            query = request.POST.get('query')
+            category_name = Category.objects.filter(category_name__icontains=query)
+            
+            if category_name.exists():
+                return render(request, 'admin_side/admin-category-view.html', {"categories": category_name})
+            else:
+                messages.warning(request, 'No data Found')
+
+        except Exception as e:
+            messages.warning(request, f'An error occurred: {str(e)}')
+            print(e)
+
+    return redirect('category:category-list')
+
+
+
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def order_name_search(request):
+    if request.method == "POST":
+        try:
+            query = request.POST.get('query')
+            order_id = Order_Main_data.objects.filter(order_id__icontains=query)
+
+            if order_id.exists():
+                return render(request,'admin_side/order-list.html',{"order_main_data":order_id})
+            else:
+                messages.warning(request, 'No data Found')
+
+        except Exception as e:
+            messages.warning(request,"An Error Occured{e}")
+    return redirect("admin_panel:order-list")

@@ -1,0 +1,224 @@
+{% extends "admin_side/admin-base.html" %}
+{% load static %}
+{% block content %}
+<style>
+  .img-card {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    /* Adjust the number of columns as needed */
+    gap: 10px;
+    /* Adjust the gap between images */
+  }
+
+  .img-card img {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    /* Optional: Add rounded corners to images */
+  }
+
+  .cancelButtonBox {
+    position: relative;
+    box-shadow: rgba(17, 17, 26, 0.1) 0px 4px 16px, rgba(17, 17, 26, 0.1) 0px 8px 24px, rgba(17, 17, 26, 0.1) 0px 16px 56px;
+    
+}
+
+.cancelButtonBox>img {
+  width: 100%;
+  height: 150px;
+}
+
+.cancelButtonBox>button {
+  position: absolute;
+  z-index: 2;
+  right: 10px;
+  top: 10px;
+}
+
+
+
+
+
+</style>
+<section class="content-main">
+  </div>
+  <form method='post' action="{% url 'product:edit-images' id %}" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="card mb-4">
+      <div class="card-header">
+        <h4>Thumbnail</h4>
+      </div>
+
+      <div class="card-body">
+        <div class="input-group mb-3">
+          {% if not products.thumbnail %}
+          <div class="col-lg-3">
+            <div class="card mb-4">
+              <div class="card-header" id="thumbnail">
+                <h4>Thumbnail</h4>
+              </div>
+              <div class="card-body">
+                <div class="input-upload">
+                  <input class="form-control" type="file" id="image" name="thumbnail_image" multiple
+                    onchange="previewImages(event)">
+                </div>
+
+                <div id="errorimage" style="color: red;"></div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="ml-30" id="image-preview-container" style="width:120px; height:120px;"></div>
+          </div>
+          {% else %}
+          <div>
+            <img src={{products.thumbnail.url}} class="ml-30" style="width:120px; height:120px;" alt="">
+          </div>
+          <div class="ml-30 d-flex flex-column">
+            <a href="{% url " product:delete-thumbnail" products.id %}">
+              <button class="btn btn-info" type="button">change</button>
+            </a>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="card mb-4">
+      <div class="card-header">
+        <h4>Additional Images</h4>
+      </div>
+
+      <div class="card-body"> 
+          {% if not products.thumbnail %}
+          <div class="row">
+            <div class="col-lg-3">
+              <div class="card mb-4">
+                <div class="card-header" id="thumbnail">
+                  <h4>Additional Images</h4>
+                </div>
+                <div class="card-body">
+                  <div class="input-upload">
+                    <input class="form-control" type="file" id="image" name="thumbnail_image" multiple
+                      onchange="previewImagesadditional(event)">
+                  </div>
+
+                  <div id="errorimage" style="color: red;"></div>
+                </div>
+              </div>
+            </div>
+            <div class='col-lg-9'>
+              <div class="d-flex flex-row ml-30 gap-3" id="image-preview-container-additional"></div>
+            </div>
+          </div>
+          {% else %}
+          <div>
+            <img src={{products.thumbnail.url}} class="ml-30" style="width:120px; height:120px;" alt="">
+          </div>
+          <div class="ml-30 d-flex flex-column">
+            <a href="{% url " product:delete-thumbnail" products.id %}">
+              <button class="btn btn-info" type="button">change</button>
+            </a>
+          </div>
+          {% endif %} 
+      </div>
+      <div>
+        <button class="btn btn-primary ml-25 mb-10" type="submit">Continue to Next</button>
+      </div>
+
+    </div>
+
+  </form>
+  <div>
+
+</section>
+<script>
+
+  function previewImages(event) {
+    var input = event.target;
+    var previewContainer = document.getElementById('image-preview-container');
+    previewContainer.innerHTML = ''; // Clear previous previews
+
+    // Check if any file is selected
+    if (input.files && input.files.length > 0) {
+      for (var i = 0; i < input.files.length; i++) {
+        var reader = new FileReader();
+
+        reader.onload = function (e) {
+          // Create a new image element for each selected file
+          var img = document.createElement('img');
+          img.src = e.target.result;
+
+          // Create a "Cancel" button for each image
+          var cancelButton = document.createElement('button');
+          cancelButton.innerHTML = 'Cancel';
+          cancelButton.onclick = function () {
+            // Remove the corresponding image and button when "Cancel" is clicked
+            previewContainer.removeChild(img);
+            previewContainer.removeChild(cancelButton);
+          };
+
+          // Append the image and "Cancel" button to the preview container
+          previewContainer.appendChild(img);
+          previewContainer.appendChild(cancelButton);
+        };
+
+        // Read the selected file as a data URL
+        reader.readAsDataURL(input.files[i]);
+      }
+    }
+  }
+</script>
+
+<script>
+  function previewImagesadditional(event) {
+    var input = event.target;
+    var previewContainer = document.getElementById('image-preview-container-additional');
+    previewContainer.innerHTML = ''; // Clear previous previews
+
+    // Check if any file is selected
+    if (input.files && input.files.length > 0) {
+      for (var i = 0; i < input.files.length; i++) {
+        var reader = new FileReader();
+
+        reader.onload = function (e) {
+          // Create a new image element for each selected file
+          var img = document.createElement('img');
+          img.src = e.target.result;
+
+          let parentDiv = document.createElement("div");
+          parentDiv.classList.add("cancelButtonBox");
+
+          // Create a "Cancel" button for each image
+          var cancelButton = document.createElement('button');
+          cancelButton.innerHTML = 'X';
+          cancelButton.setAttribute("fileIndex", i);
+
+          cancelButton.onclick = function () {
+            // Remove the corresponding image and button when "Cancel" is clicked
+            previewContainer.removeChild(parentDiv);
+
+            // Remove the file from the input element
+            let index = parseInt(cancelButton.getAttribute("fileIndex"));
+            if (!isNaN(index)) {
+              var newFiles = Array.from(input.files);
+              newFiles.splice(index, 1);
+              input.files = newFiles;
+            }
+          };
+
+          parentDiv.appendChild(img);
+          parentDiv.appendChild(cancelButton);
+
+          // Append the image and "Cancel" button to the preview container
+          previewContainer.appendChild(parentDiv);
+        };
+
+        // Read the selected file as a data URL
+        reader.readAsDataURL(input.files[i]);
+      }
+    }
+  }
+</script>
+
+{% endblock content %}

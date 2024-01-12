@@ -20,11 +20,17 @@
         <div class="card-body shadow-lg">
           <div class="mb-3 d-flex flex-row">
             <div class=" d-flex flex-row">
+            {% if order_main.payment_status == True %}
+
             <h4><span class=" mr-3 badge  bg-info">{{order_main.order_status}}</span></h4>
               <span class="mt-2">{{order_main.date}}</span>
-              
+              {% else %}
+
+              <h4><span class=" mr-3 badge  bg-info">PAYMENT PENDING</span></h4>
+              <span class="mt-2">{{order_main.date}}</span>
+                       
             </div>
-  
+             {% endif %}
           </div>
           <table class="table table-borderless">
              <thead>
@@ -98,13 +104,16 @@
 
                <div class="d-flex justify-content-end">
 
-                  {% if order_main.order_status != 'Delivered' and order_main.order_status != 'Cancelled'%}
-                  <a class="btn btn-outline-danger me-2" id="cancelorder">Cancel Order</a>
+                  {% if order_main.order_status != 'Delivered' and order_main.order_status != 'Cancelled' %}
+                      {% if order_main.payment_status %}
+                          <a class="btn btn-outline-danger me-2" id="cancelorder">Cancel Order</a>
+                      {% else %}
+                          <a href="{% url 'order:online-payment' order_main.order_id %}" class="btn btn-outline-success me-2" >Pay Now</a>
+                      {% endif %}
+                  
+                      <a href="{% url 'order:order-list' user.id %}" class="btn btn-outline-primary">Back</a>
                   {% endif %}
 
-                  
-                  <a href="{% url 'order:order-list' user.id %}" class="btn btn-outline-primary">Back</a>    
-                   
                 </div>
               </form>
             </div>

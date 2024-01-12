@@ -241,6 +241,7 @@
                             {% if product.is_active %}
                                                       
                             {% if product.thumbnail.url %}
+                        
                                 <div class="col-lg-2 col-md-4 col-12 col-sm-6">
                                     <div class="product-cart-wrap mb-30">
                                         <div class="product-img-action-wrap">
@@ -306,6 +307,8 @@
                     <div class="slider-arrow slider-arrow-2 carausel-6-columns-arrow" id="carausel-6-columns-arrows"></div>
                     <div class="carausel-6-columns" id="carausel-6-columns">
                      {% for category in categories  %}
+                     {% if category.is_available %}
+                              
                         <div class="card-1">
                         
                             <figure class="img-hover-scale overflow-hidden">
@@ -314,6 +317,7 @@
                             </figure>
                            
                         </div>
+                          {% endif %}
                          {% endfor %}
                     </div>
                 </div>
@@ -330,9 +334,12 @@
                     </div>
                     <div class="carausel-6-columns text-center" id="carausel-6-columns-3">
                      {% for brand in brands  %} 
+                     {% if brand.status %}
+                     
                         <div class="d-inline-block brand-logo mx-3">
                             <img  src="{{brand.brand_image.url}}" alt="" class="img-fluid object-fit-cover" style="max-width: 100px; max-height: 100px;">
                         </div>
+                        {% endif %}
                     {% endfor %}
                     </div>  
                 </div>               

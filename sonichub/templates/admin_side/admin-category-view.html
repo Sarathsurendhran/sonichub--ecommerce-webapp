@@ -7,6 +7,12 @@
                 <h2 class="content-title card-title">Categories </h2>
                 <p>Add, edit or delete a category</p>
             </div>
+                 {% for message in messages %}
+                  <div class="alert alert-{{message.tags}} alert-dismissible fade show" role="alert">
+                      <strong></strong>{{message}}
+                      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                  </div>
+              {% endfor %}
             <div>
                 <a href="{% url 'category:add-category' %}" class="btn btn btn-primary">Create</a>
             </div>
@@ -16,16 +22,19 @@
         
          {% else %}
         <div class="card" >
-            <header class="card-header">
-                <div class="row gx-3">
-                    <div class="col-lg-4 col-md-6 me-auto">
-                        <label for="search"></label>
-                        <input type="text" placeholder="Search..." class="form-control" id="search">
-                    </div>
-                    <div class="col-lg-2 col-6 col-md-3"></div>
-                    <div class="col-lg-2 col-6 col-md-3"></div>
+            <header class="card-header ">
+            <div class="row ">
+            <form method="post" action="{% url 'admin_panel:category-name-search' %}"  class="d-flex" > 
+            {% csrf_token %}            
+                <div class="col-lg-4 col-md-4 me-2">
+                    <input type="text" name="query" placeholder="Search..." class="form-control">        
                 </div>
-            </header>
+                <div class="col-lg-1 col-md-2 col-6">
+                    <button type="submit" class="btn btn-outline-primary">Search</button>
+                </div>
+                </form>            
+            </div>
+            </header> 
             <div class="card-body" id="product-list">
                 <div class="row">
                     <div class="col-md-12">

@@ -3,6 +3,7 @@ from brand_management.models import Brand
 from django.contrib import messages
 from django.views.decorators.cache import cache_control
 import admin_panel
+from product_management.models import Products,Product_Variant
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def brand_list(request):
@@ -46,6 +47,7 @@ def add_brand(request):
       else:
         Brand.objects.create(brand_name = brand_name, brand_image= brand_image, status = status )
         messages.success(request, 'Brand Added Sucessfully')
+        return redirect('brand:brand-list')
         
     except Exception as e:
       messages.error(request, f"An Error Occured: {str(e)}")
@@ -117,13 +119,17 @@ def status_update(request, id):
   
   try:
     brand = Brand.objects.get(id = id)
+    products = Products.objects.filter(product_brand_id=id)
     if brand.status == True:
       brand.status = False
       brand.save()
+      products.update(is_active=False)
+      
     else:
       brand.status = True
       brand.save()
-
+      products.update(is_active=True)
+     
   except Exception:
     messages.warning(request, 'No Such Category')
   

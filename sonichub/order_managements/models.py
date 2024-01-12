@@ -13,6 +13,9 @@ class Order_Main_data(models.Model):
     payment_option = models.CharField(max_length=100, default="cash_on_delivary")
     order_id = models.CharField(max_length=100, default=1)
     is_active = models.BooleanField(default=True)
+    payment_status = models.BooleanField(default=False)
+    payment_id = models.CharField(max_length=50,default=1)
+
 
 
 class Order_Sub_data(models.Model):

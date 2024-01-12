@@ -3,7 +3,7 @@ from django.contrib import messages
 from django.views.decorators.cache import cache_control
 from .models import Category
 import re
-
+from product_management.models import Products
 
 @cache_control(no_cache = True, must_revalidate = True, no_store = True)
 def category_list(request):
@@ -47,6 +47,7 @@ def add_category(request):
               category_name = category_name, parent = parent, is_available = status)
          
          messages.success(request, 'Category Added Sucessfully')
+         return redirect('category:category-list')
           
          
     except Exception as e:
@@ -61,18 +62,26 @@ def add_category(request):
 def status_update(request, id):
   if not request.user.is_superuser:
     return redirect('admin_panel: admin_login')
-  
   try:
     category = Category.objects.get(id = id)
+    parent_id = Category.objects.filter(parent_id=id)
+    products = Products.objects.filter(product_category_id=id)
+    
     if category.is_available == True:
       category.is_available = False
       category.save()
+      parent_id.update(is_available=False)
+      products.update(is_active=False)
+
     else:
       category.is_available = True
       category.save()
+      products.update(is_active=True)
+      parent_id.update(is_available=True)
 
-  except Exception:
+  except Exception as e:
     messages.warning(request, 'No Such Category')
+    print("exception",e)
   
   return redirect('category:category-list')
    
@@ -115,6 +124,7 @@ def edit_category(request, id):
                 category_data.save()
 
                 messages.success(request, 'Category Updated Successfully')
+                return redirect('category:category-list')
 
         except Exception as e:
             messages.error(request, f"An Error Occurred: {str(e)}")

@@ -42,12 +42,20 @@
               <div class="detail-info">
                 <h2 class="title-detail">{{ products.product_name }}</h2>
                 <div class="product-detail-rating">
-                  <div class="pro-details-brand">
+
+                  <div class="pro-details-brand d-flex flex-column">
                     <span>Brand:
                       <a href="#">
                       <span>{{ products.product_brand.brand_name }}</span>
                       </a></span>
+                      <span>Category:
+                      <a href="#">
+                      <span>{{ products.product_category.category_name }}</span>
+                      </a></span>
                   </div>
+                  
+                    
+                 
                   <div class="product-rate-cover text-end">
                     <div class="product-rate d-inline-block">
                       <div class="product-rating" style="width:90%"></div>

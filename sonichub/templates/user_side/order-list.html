@@ -43,15 +43,29 @@
                                        <p class="card-text">Price: {{ order_sub_data.variant.product.offer_price}} X {{ order_sub_data.quantity }} </p>
 
                                     </div>
-                                    <div class="col-md-4">
+                                    <div class="col-md-4 ">
                                         <p class="card-text">
                                           {% if forloop.first %}
+                                          {% if order_sub_data.main_order.payment_status == True %}
+                                                               
                                             <span class="badge rounded-pill alert-success">{{ order_sub_data.main_order.order_status }}</span>
                                             <br>
                                             <span>{{ order_sub_data.main_order.date }}</span>
+                                            
+                                            {% else %}
+                                            <span class="badge alert-warning">PAYMENT PENDING</span>
+                                            <br>
+                                            <span>{{ order_sub_data.main_order.date }}</span>
+                                               <a href="{% url 'order:online-payment' order_sub_data.main_order.order_id %}" class="btn btn-outline-success me-2" >Pay Now</a>
+
                                              {% endif %}
+                                              {% endif %}
                                         </p> 
+                                       <div>
+                                   
                                     </div>
+                                    </div>
+                                   
                                 </div>
                             </div>
                         </div></a>

@@ -14,24 +14,31 @@
         <div>
             <h2 class="content-title card-title">Products List</h2>
         </div>
+         {% for message in messages %}
+                  <div class="alert alert-{{message.tags}} alert-dismissible fade show" role="alert">
+                      <strong></strong>{{message}}
+                      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                  </div>
+              {% endfor %}
         <div>
             <a  href="{% url 'product:add-product' %}" class="btn btn-primary btn-sm rounded">Create new</a>
         </div>
     </div>
 
     <div class="card mb-4">
-        <header class="card-header">
-            <div class="row align-items-center">
-                <div class="col-lg-4 col-md-6 me-auto">
-                    {% comment %} <form action="{% url 'product_mng:products_list' %}" method="get"> {% endcomment %}
-                        <input type="text" name="query" placeholder="Search..." class="form-control">
-                        
+        <header class="card-header ">
+            <div class="row ">
+            <form method="post" action="{% url 'product:search' %}"  class="d-flex" > 
+            {% csrf_token %}            
+                <div class="col-lg-4 col-md-4 me-2">
+                    <input type="text" name="query" placeholder="Search..." class="form-control">        
                 </div>
-                <div class="col-lg-4 col-md-2 col-6">
+                <div class="col-lg-1 col-md-2 col-6">
                     <button type="submit" class="btn btn-outline-primary">Search</button>
                 </div>
+                </form>
 
-                <div class="col-md-2 col-6">
+                {% comment %} <div class="col-md-2 col-6">
                     <input type="date" value="02.05.2021" class="form-control">
                 </div>
 
@@ -42,7 +49,7 @@
                         <option>Disabled</option>
                         <option>Show all</option>
                     </select>
-                </div>
+                </div> {% endcomment %}
             </div>
         </header> 
 
@@ -53,7 +60,9 @@
                                 <thead>
                                     <tr>
                                         <th class="text-middle">Image</th>
-                                        <th class="text-middle">Product</th>                                  
+                                        <th class="text-middle">Product</th>
+                                        <th class="text-middle">Price</th> 
+                                        <th class="text-middle">Added Date</th>                                 
                                         <th class="text-middle">Availability</th>
                                         <th class="text-middle">Action</th> 
                                         
@@ -62,8 +71,17 @@
                                 <tbody>
                                     {% for product in products %}
                                     <tr>
-                                        <td><img src="{{ product.thumbnail.url }}" class="img-sm img-thumbnail" alt="Thumbnail image"></td>
-                                        <td><a href="#"> <h6 class="mb-0">{{ product.product_name }}</h6></a></td>
+                                        <td>
+                                            {% if product.thumbnail %}
+                                                <img src="{{ product.thumbnail.url }}" class="img-sm img-thumbnail" alt="">
+                                            {% else %}
+                                                <span>No Image</span>
+                                            {% endif %}
+                                        </td>
+
+                                        <td><a href="#"> <h6 class="mb-0">{{ product.product_name|title }}</h6></a></td>
+                                        <td><a href="#"> <h6 class="mb-0">{{ product.offer_price }}</h6></a></td>
+                                        <td><a href="#"> <h6 class="mb-0">{{ product.created_at|date:"d-m-Y"  }}</h6></a></td>
 
                                         <td class="text-middle">
                                             <span class="badge rounded-pill {% if product.is_active %} alert-success {% else %} alert-danger {% endif %}">

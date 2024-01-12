@@ -25,6 +25,7 @@
           method="POST"
           class="w-100 rounded-1 p-4 border bg-white"
           action="{% url 'user_panel:add-address' user.id %}"
+          id="form"
         >
         {% csrf_token %}
           <div class="row">
@@ -36,6 +37,7 @@
                   name="name"
                   type="text"
                   class="form-control"
+                  id="username"
                   
                 />
               </label>
@@ -47,8 +49,10 @@
                   type="text"
                   class="form-control"
                   placeholder=""
+                  id="house_name"
                 />
               </label>
+              <span style="color:red;"></span>
 
               <label class="d-block mb-4">
                 <span class="form-label d-block">Street Name</span>
@@ -57,21 +61,25 @@
                   type="text"
                   class="form-control"
                   placeholder=""
+                  id="street_name"
                 />
               </label>
+               <span style="color:red;"></span>
 
               <label class="d-block mb-4">
                 <span class="form-label d-block">District</span>
-                <input name="district" type="text" class="form-control" placeholder="" />
+                <input name="district" type="text" class="form-control" placeholder="" id="district"/>
               </label>
+               <span style="color:red;"></span>
             </div>
 
             <div class="col-md-6">
               <!-- Right side fields -->
               <label class="d-block mb-4">
                 <span class="form-label d-block">State/Province</span>
-                <input name="state" type="text" class="form-control" placeholder="" />
+                <input name="state" type="text" class="form-control" placeholder="" id="state" />
               </label>
+               <span style="color:red;"></span>
 
                 <label class="d-block mb-4">
                 <span class="form-label d-block">Country</span>
@@ -80,13 +88,16 @@
                   type="text"
                   class="form-control"
                   placeholder=""
+                  id="country"
                 />
               </label>
+               <span style="color:red;"></span>
 
               <label class="d-block mb-4">
                 <span class="form-label d-block">Zip/Postal code</span>
-                <input name="pin_number" type="number" class="form-control" placeholder="" />
+                <input name="pin_number" type="number" class="form-control" placeholder="" id="pin_number"/>
               </label>
+               <span style="color:red;"></span>
 
             
 
@@ -97,13 +108,15 @@
                   type="number"
                   class="form-control"
                   placeholder=""
+                  id="phone"
                 />
               </label>
+               <span style="color:red;"></span>
             </div>
           </div>
 
           <div class="mb-3">
-            <button type="submit" class="btn btn-primary px-3 rounded-3">
+            <button type="submit" id="submit-button"  class="btn btn-primary px-3 rounded-3">
               Save
             </button>
           </div>
@@ -117,4 +130,164 @@
 
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 {% comment %} <script src="{% static 'js/profile.js' %}"></script> {% endcomment %}
+
+
+ {% comment %} <script>
+  $("#phone").on("input", function () {
+    let phone = $("#phone").val().trim();
+    if (phone.length > 10) $("#phone").val(phone.substring(0, 10));
+  });
+
+  $("#username").on("focus", function () {
+    $("#username").next().text("");
+    $("#username").removeClass("error");
+  });
+  
+  $("#house_name").on("focus", function () {
+    $("#house_name").next().text("");
+    $("#house_name").removeClass("error");
+  });
+
+  $("#street_name").on("focus", function () {
+    $("#street_name").next().text("");
+    $("#street_name").removeClass("error");
+  });
+
+  $("#district").on("focus", function () {
+    $("#district").next().text("");
+    $("#district").removeClass("error");
+  });
+  
+  $("#state").on("focus", function () {
+    $("#state").next().text("");
+    $("#state").removeClass("error");
+  });
+
+  $("#country").on("focus", function () {
+    $("#country").next().text("");
+    $("#country").removeClass("error");
+  });
+
+  $("#pin_number").on("focus", function () {
+    $("#pin_number").next().text("");
+    $("#pin_number").removeClass("error");
+  });
+
+  $("#phone").on("focus", function () {
+    $("#phone").next().text("");
+    $("#phone").removeClass("error");
+  });
+
+  
+
+  $(document).ready(function () {
+  
+    $("#submit-button").on("click", function (event) {
+       event.preventDefault()
+
+      let username = $("#username").val().trim();
+      let house_name = $("#house_name").val().trim();
+      let street_name = $("#street_name").val().trim();
+      let state = $("#state").val().trim();
+      let country = $("#country").val().trim();
+      let pin_number = $("#pin_number").val().trim();
+      let phone = $("#phone").val().trim();
+      let form = $("#signupform");
+
+      if (username === "") {
+        $("#username").next().text("Enter Valid User Name");
+        $("#username").addClass("error");
+      }
+
+      if (house_name === "") {
+        $("#house_name").next().text("Enter Valid House Name");
+        $("#house_name").addClass("error");
+      }
+
+      if (street_name === "") {
+        $("#street_name").next().text("Enter Valid Street Name");
+        $("#street_name").addClass("error");
+      }
+
+      if (state === "") {
+        $("#state").next().text("Enter Valid state Name");
+        $("#state").addClass("error");
+      }
+
+      if (country === "") {
+        $("#country").next().text("Enter Valid Country Name");
+        $("#country").addClass("error");
+      }
+
+      if (pin_number === "") {
+        $("#pin_number").next().text("Enter Valid Postel Code");
+        $("#pin_number").addClass("error");
+      }
+      
+
+      if (phone === "") {
+        $("#phone").next().text("Phone Number Cannot Be Empty");
+        $("#phone").addClass("error");
+      } else if (isNaN(phone) || phone.length < 10) {
+        $("#phone").next().text("Enter A Valid Phone Number");
+        $("#phone").addClass("error");
+      }
+
+     
+
+      if ($(".error").length === 0) {
+        console.log(form.serializeArray());
+        form.submit();
+      } 
+    });
+  });
+</script> {% endcomment %}
+
+{% comment %} <script>
+ $(document).ready(function() {
+ 
+  $("#phone").on("input", function () {
+    let phone = $("#phone").val().trim();
+    if (phone.length > 10) $("#phone").val(phone.substring(0, 10));
+  });
+
+  $("#username, #house_name, #street_name, #state, #country").on("input", function () {
+    let inputField = $(this);
+    let inputValue = inputField.val().trim();
+    
+    // Check if the input contains only alphabets and has a maximum length of 15 characters
+    if (!/^[a-zA-Z]{1,15}$/.test(inputValue)) {
+      inputField.next().text("Enter a valid value (alphabets only, max 15 characters)");
+      inputField.addClass("error");
+    } else {
+      inputField.next().text("");
+      inputField.removeClass("error");
+    }
+  });
+
+  $("#pin_number").on("input", function () {
+    let pinNumber = $("#pin_number").val().trim();
+    
+    if (!/^\d+$/.test(pinNumber)) {
+      $("#pin_number").next().text("Enter a valid postal code (numbers only)");
+      $("#pin_number").addClass("error");
+    } else {
+      $("#pin_number").next().text("");
+      $("#pin_number").removeClass("error");
+    }
+  });
+
+  $("#submit-button").on("click", function (event) {
+    let form = $("#form");
+    
+     event.preventDefault();
+
+    if ($(".error").length === 0) {
+      console.log(form.serializeArray());
+      form.submit();
+    } 
+  });
+ })
+</script> {% endcomment %}
+
 {% endblock content %}

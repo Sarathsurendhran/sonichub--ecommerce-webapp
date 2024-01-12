@@ -17,6 +17,8 @@ from django.contrib.auth.hashers import make_password, check_password
 from django.contrib.auth.decorators import login_required
 
 
+
+
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def change_password(request, id):
     if request.method == "POST":
@@ -112,9 +114,11 @@ def edit_profile(request, id):
     if not request.user.is_authenticated:
         return redirect("user_side:user_login")
     if request.method == "POST":
-        name = request.POST.get("name")
+        name = request.POST.get("username")
         email = request.POST.get("email")
         phone_number = request.POST.get("phone_number")
+
+        print(name,email,phone_number)
 
     try:
         if UserProfile.objects.filter(username=name).exclude(id=id).exists():

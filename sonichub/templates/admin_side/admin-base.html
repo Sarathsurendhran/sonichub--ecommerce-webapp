@@ -108,8 +108,8 @@
       </aside>
 
     <main class="main-wrap">
-        <header class="main-header navbar">
-            <div class="col-search">
+        <header class="main-header navbar d-flex justify-content-end">
+            {% comment %} <div class="col-search">
                 <form class="searchform">
                     <div class="input-group">
                         <input list="search_terms" type="text" class="form-control" placeholder="Search term">
@@ -123,8 +123,8 @@
                         <option value="Ahmed Hassan">
                     </datalist>
                 </form>
-            </div>
-            <div class="col-nav">
+            </div> {% endcomment %}
+            <div class="col-nav ">
                 <button class="btn btn-icon btn-mobile me-auto" data-trigger="#offcanvas_aside"> <i
                         class="material-icons md-apps"></i> </button>
                 <ul class="nav">
@@ -205,81 +205,3 @@
 
 
 </body>
-
-
-<!-- Mirrored from wp.alithemes.com/html/evara/evara-backend/index.html by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 01 Aug 2021 15:32:57 GMT -->
-
-</html>
-
-
-
-{% comment %} <nav>
-            {% with current_url_name=request.resolver_match.url_name %}
-                <ul class="menu-aside">
-                    <li class="menu-item{% if current_url_name == 'admin_dashboard' %} active {% endif %}">
-                        <a class="menu-link" href="{% url 'accounts:admin_dashboard' %}"> <i class="icon material-icons md-home"></i>
-                            <span class="text">Dashboard</span>
-                        </a>
-                    </li>
-                   
-                  
-                    <li class="menu-item has-submenu {% if current_url_name == 'admn_product_list' %} active {% endif %}">
-                        <a class="menu-link" href="#">
-                            <i class="icon material-icons md-shopping_bag"></i>
-                            <span class="text">Products</span>
-                        </a>
-                        <div class="submenu">
-                            <a href="{% url 'product:admn_product_list' %}">Products</a>
-                             <a href="{% url 'product:admn_variation_list' %}">Variation</a>
-
-                        </div>
-                    </li>
-                    
-                    <li class="menu-item{% if current_url_name == 'admn_product_category' %} active {% endif %}">
-                        <a class="menu-link" href="{% url 'category:admn_product_category' %}"> <i class="icon material-icons md-add_box"></i>
-                            <span class="text">Categories</span>
-                        </a>
-                    </li>
-                    <li class="menu-item{% if current_url_name == 'admn_product_order' %} active {% endif %}">
-                        <a class="menu-link" href="{% url 'orders:admn_product_order' %}"> <i class="icon material-icons md-shopping_cart"></i>
-                            <span class="text">Orders</span>
-                        </a>
-                    </li>
-                    <li class="menu-item  {% if current_url_name == 'admn_users_list' %} active {% endif %}">
-                        <a class="menu-link" href="{% url 'app:admn_users_list' %}"> <i class="icon material-icons md-store"></i>
-                            <span class="text">Users</span>
-                        </a>
-                       
-                    </li>
-                 
-
-
-                    <li class="menu-item {% if current_url_name == 'admn_sales_report' %} active {% endif %}">
-                        <a class="menu-link" href="{% url 'user:admn_sales_report' %}"> <i class="icon material-icons md-pie_chart"></i>
-                            <span class="text">Sales Report</span>
-                        </a>
-                        
-                    </li>
-
-
-                    <li class="menu-item{% if current_url_name == 'admn_brand_list' %} active {% endif %}">
-                        <a class="menu-link" href="{% url 'brand:admn_brand_list' %}">
-                            <i class="icon material-icons md-stars"></i>
-                            <span class="text">Brands</span>
-                        </a>
-                    </li>
-                    <li class="menu-item{% if current_url_name == 'admn_coupon_management' %} active {% endif %}">
-                        <a class="menu-link" href="{% url 'orders:admn_coupon_management' %}">
-                            <i class="icon material-icons md-local_offer"></i>
-                            <span class="text">Coupon</span>
-                        </a>
-                    </li>
-                   
-                </ul>
-                <hr>
-              
-                {% endwith %}
-
-            <br>
-            <br>
-        </nav> {% endcomment %}

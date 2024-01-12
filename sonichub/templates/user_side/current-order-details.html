@@ -20,7 +20,7 @@
           <div class="mb-3 d-flex justify-content-between">
             <div>
               <span class="me-3">{{order_main.date}}</span>
-              <span class="badge rounded-pill bg-info">SHIPPING</span>
+              <span class="badge  bg-info">{{order_main.order_status}}</span>
             </div>
             <div class="d-flex flex-column">
           
@@ -94,7 +94,7 @@
               </address>
 
                <div class="d-flex justify-content-end">
-               <a href="#" class="btn btn-outline-danger me-2">Cancel Order</a>
+               
                <a href="/" class="btn btn-outline-primary">Back to Home</a>    
                     {% comment %} <button type="button" class="btn btn-outline-danger">Cancel Order</button> {% endcomment %}
                 </div>
