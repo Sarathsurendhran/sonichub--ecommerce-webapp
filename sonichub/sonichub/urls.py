@@ -30,6 +30,7 @@ urlpatterns = [
     path('user/',include('user_panel.urls')),
     path('user/cart',include('cart_management.urls')),
     path('user/order',include('order_managements.urls')),
+    path('admin/coupon',include('coupon_management.urls'))
    
 ]
 

@@ -35,6 +35,7 @@
                 </tr>
             </thead>
             <tbody >
+           
              {% for data in order_sub  %}
               <tr>     
                 <td>
@@ -50,14 +51,17 @@
                 </td>
                 <td>{{data.quantity}}</td>
                 <td class="text-end">{{data.variant.product.offer_price}}</td>
+                 
                 
               </tr>
               {% endfor %}
+              
             </tbody>
             <tfoot>
               <tr>
                 <td colspan="2">Subtotal</td>
                 <td class="text-end">{{order_main.total_amount}}</td>
+               
               </tr>
               <tr>
                 <td colspan="2">Shipping</td>

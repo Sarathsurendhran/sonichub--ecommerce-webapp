@@ -1,46 +1,53 @@
-{% extends 'user_side/base-footer.html' %}
+{% extends 'user_side/base.html' %}
 
 {% block content %}
-<main class="main">
+{% comment %} <main class="main">
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <a class="navbar-brand" href="/"><span class="">Sonic Hub</span></a>
-    </nav>
-<section class="mt-100 mb-50">
+    </nav> {% endcomment %}
+<section class="mt-50 mb-50">
     <div class="container" style="max-width:1300px">
 
-        <!-- <div class="col-lg-6">
-            <div class="toggle_info">
-                <span><i class="fi-rs-label mr-10"></i><span class="text-muted">Have a coupon?</span> <a href="#coupon"
-                        data-bs-toggle="collapse" class="collapsed" aria-expanded="false">Click here to enter your
-                        code</a></span>
-            </div>
-            <div class="panel-collapse collapse coupon_form " id="coupon">
-                <div class="panel-body">
-                    <p class="mb-30 font-sm">If you have a coupon code, please apply it below.</p>
-                    <form method="post">
-                        <div class="form-group">
-                            <label for="coupon-field"></label>
-                            <input type="text" id="coupon-field" placeholder="Enter Coupon Code...">
-                            <span style="color: red" id="coupon-field-error"></span>
-                        </div>
-                        <div class="form-group">
-                            <button class="btn  btn-md" name="login" id="coupon-btn">Apply Coupon</button>
-                        </div>
-                    </form>
+            {% for message in messages %}
+                <div class="alert alert-{{message.tags}} alert-dismissible fade show" role="alert">
+                    <strong></strong>{{message}}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
-            </div>
-        </div> -->
-<!-- 
-        <div class="row">
+            {% endfor %} 
+     
+           <div class="col-lg-6 mb-15">
+                        <div class="toggle_info">
+                            <span><i class="fi-rs-label mr-10"></i><span class="text-muted">Have a coupon?</span> <a href="#coupon" data-bs-toggle="collapse" class="collapsed" aria-expanded="false">Click here to enter your code</a></span>
+                        </div>
+                        <div class="panel-collapse collapse coupon_form " id="coupon">
+                            <div class="panel-body">
+                                <p class="mb-30 font-sm">If you have a coupon code, please apply it below.</p>
+                                <form method="post" action="{% url 'order:checkout' user.id %}">
+                                {% csrf_token %}
+                                    <div class="form-group">
+                                        <label for="coupon-field"></label>
+                                        <input type="text" id="coupon-field" name="coupon code" placeholder="Enter Coupon Code...">
+                                        <span style="color: red" id="coupon-field-error"></span>
+                                    </div>
+                                    <div class="form-group">
+                                        <button class="btn  btn-md" name="login" id="coupon-btn">Apply Coupon</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+        {% comment %} <div class="row">
             <div class="col-12">
                 <div class="divider mt-50 mb-50"></div>
             </div>
-        </div> -->
+        </div>   {% endcomment %}
+
             <form method="post" id="formsubmit" action="{% url 'order:confirm-order' user.id %}">
             {% csrf_token %}
                 <div class="row">
                     <div class="col-md-6">
-                        <div class="order_review border border-dark">
+                        <div class="order_review border shadow-lg">
                             <div class="mb-20">
                                 {% if address %}
                                     <h4>Select Your address</h4>
@@ -89,7 +96,7 @@
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <div class="order_review border border-dark">
+                        <div class="order_review border border shadow-lg">   
                             <div class="mb-20"> <h4>Your Orders</h4> </div>
                             <div class="table-responsive order_table text-center">
                                 <table class="table">
@@ -121,7 +128,7 @@
                                             <th>SubTotal</th>
                                             <td class="product-subtotal" colspan="2">
                                                 <span class="bold pr-2"></span>
-                                                <span class="total-amount-no-discount" >₹ {{ total_price }}</span>
+                                                <span class="total-amount-no-discount" >₹ {{ subtotal }}</span>
                                             </td>
                                         </tr>
                                         <tr>    
@@ -131,8 +138,16 @@
                                         <tr>
                                             <th>Total</th>
                                             <td colspan="2" class="product-subtotal">
-                                                <span class="font-xl text-brand fw-900 pr-2"></span>
+                                                {% if coupon_id != None %}
+                                                
                                                 <span class="font-xl text-brand fw-900 total-amount-no-discount">₹ {{ total_price }}</span>
+                                                <span class="font-sm text-brand fw-500 pr-2"style="text-decoration: line-through;">{{subtotal}}</span>
+                                                
+                                                {% else %}
+                                                
+                                                <span class="font-sm text-brand fw-900 pr-2"></span>
+                                                <span class="font-xl text-brand fw-900 total-amount-no-discount">₹ {{ total_price }}</span>
+                                                {% endif %}
                                             </td>
                                         </tr>
                                         
@@ -145,24 +160,25 @@
                                 </div>
                                 <div class="payment_option">
                                     <div class="custome-radio">
-                                        <input class="form-check-input" required=""  type="radio" name="payment_option" id="exampleRadios3" checked="">
+                                        <input class="form-check-input" required=""  type="radio" value="cash on delivary" name="payment_option" id="exampleRadios3" checked="">
                                            
-                                        <label class="form-check-label" for="exampleRadios3" value="{{'cash on delivary'}}" aria-controls="bankTranfer">Cash On Delivery</label>
+                                        <label class="form-check-label" for="exampleRadios3"  aria-controls="bankTranfer">Cash On Delivery</label>
                                           
                                         <br><br>
-                                        <input class="form-check-input" required=""  value="{{'online payment'}}" type="radio" name="payment_option"
+                                        <input class="form-check-input" required=""  value="online payment" type="radio" name="payment_option"
                                             id="exampleRadios4">
                                         <label class="form-check-label" for="exampleRadios4" aria-controls="bankTranfer" >Online Payment
                                         </label><br><br>
-                                        <input class="form-check-input" required=""  value="{{'wallet payment'}}" type="radio" name="payment_option"
+                                        <input class="form-check-input" required=""  value="wallet payment" type="radio" name="payment_option"
                                             id="exampleRadios5">
                                         <label class="form-check-label" for="exampleRadios5" aria-controls="bankTranfer" >Wallet Payment
                                         </label>
                                     </div>
                                 </div>
                             </div>
-                             <input type="hidden" name="total_amount" value="{{ total_price }}">
+                             <input type="hidden" name="total_price" value="{{ total_price }}">
                               <input type="hidden" name="order_status" value="{{ 'Order Placed' }}">
+                              <input type="hidden" name="coupon_id" value="{{ coupon_id }}">
                                                          
                             <button type="submit" id="placeorder" class="btn btn-brand btn-lg mt-30">
                                 Place Order
@@ -184,6 +200,10 @@
     </main>
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
  <script>
     $(document).ready(function(){
         $("#placeorder").click(function(event){
@@ -241,4 +261,6 @@
     });
 </script>
 
+
+  
 {% endblock %}

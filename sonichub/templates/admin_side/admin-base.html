@@ -94,12 +94,12 @@
                 <a class="menu-link" href="#">
                     <i class="icon material-icons md-bar_chart"></i><span class="text">Purchase Report</span>
                 </a>
-            </li>
-            <li class="menu-item {% if current_url_name == 'coupons' %} active {% endif %}">
-                <a class="menu-link" href="#">
+            </li>{% endcomment %}
+            <li class="menu-item {% if current_url_name == 'view-coupon' %} active {% endif %}">
+                <a class="menu-link" href="{% url 'coupon:view-coupon' %}">
                     <i class="icon material-icons md-local_offer"></i><span class="text">Coupons</span>
                 </a>
-            </li> {% endcomment %}
+            </li> 
         </ul>
     {% endwith %}
 </nav>

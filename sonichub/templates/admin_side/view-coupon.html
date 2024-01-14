@@ -1,0 +1,121 @@
+{% extends 'admin_side/admin-base.html' %}
+{% load static  %}
+{% block content %}
+  <section class="content-main">
+    <div class="content-header">
+      <div>
+        <h2 class="content-title card-title">Coupons</h2>
+        <p>Add, edit or delete a Coupons</p>
+      </div>
+      <div>
+        <a type="button" class="btn btn btn-primary" href="{% url 'coupon:add-coupon' %}">Create</a>
+      </div>
+    </div>
+    {% if CouponList.contents %}
+      <h3>No Coupons found in the database.</h3>
+    {% endif %}
+    <div class="card" {% if CouponList.contents%}style="display: none;"{% endif %}>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th class="text-center">ID</th>
+                    <th class="text-center">Coupon Code</th>
+                    <th class="text-center">Discount</th>
+                    <th class="text-center">Minimum Amount Eligible</th>
+                    <th class="text-center">Expiry Status</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- Loop Start -->
+                  {% for coupon in coupons %}
+                    <tr>
+                      <td class="text-center fw-bolder">{{ forloop.counter }}</td>
+                      <td class="text-center"><span class="fw-bolder h6">{{ coupon.Coupon_code }}</span></td>
+                      <td class="text-center"><span class="fw-bolder h6">{{ coupon.discount }} %</span></td>
+                      <td class="text-center"><span class="fw-bolder h6">&#8377; {{ coupon.minimum_amount }}</span></td>
+                      <td class="text-center">
+                        <span class="fw-bolder h6"
+                              style="{% if coupon.expiry_date > current_date %} color: green; {% else %}color: red;{% endif %}">
+              
+                          {{ coupon.expiry_date|date:"d M Y" }}
+                        </span>
+                      </td>
+                      <td class="d-flex align-items-center justify-content-end">
+                        <a href="{% url 'coupon:edit-coupon' coupon.id %}" class="btn btn-info btn-square-md d-flex align-items-center me-2 mb-5">
+                          <i class="material-icons md-edit pr-1"></i>
+                        </a>
+                        <form action="{% url 'coupon:delete-coupon' coupon.id %}" method="post" class="delete-form">
+                          {% csrf_token %}
+                          <input type="hidden" name="couponID" value="{{ coupon.id }}">
+                          <button  class="btn btn-danger btn-square-md d-flex align-items-center mt-15 delete-btn">
+                            <i class="material-icons md-delete"></i>
+                          </button>
+                          <label for="couponID"></label>
+                        </form>
+                      </td>
+                    </tr>
+                  {% endfor %}
+                  <!-- Loop End -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        {% comment %} <!-- Pagination -->
+        <div class="pagination-area mt-30 mb-50">
+          <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-start">
+              {% for page in 0|default(CouponList.totalPages - 1) %}
+                <li class="page-item {% if page == CouponList.pageNo %}active{% endif %}">
+                  <a class="page-link" href="{% url 'dashboard:view_coupons' pageNo=page pageSize=CouponList.pageSize %}">
+                    {{ page + 1 }}
+                  </a>
+                </li>
+              {% endfor %}
+              <li class="page-item"><a class="page-link dot" href="#">...</a></li>
+              <li class="page-item">
+                <a class="page-link" {% if CouponList.hasNext %}
+                   href="{% url 'dashboard:view_coupons' pageNo=CouponList.totalPages|default(1) pageSize=CouponList.pageSize %}"
+                   {% endif %}>
+                  <i class="material-icons md-chevron_right"></i>
+                </a>
+              </li>
+            </ul>
+          </nav>
+        </div>
+        <!-- End of pagination --> {% endcomment %}
+      </div>
+    </div>
+  </section>
+   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js" integrity="sha384-cuYeSxntonz0PPNlHhBs68uyIAVpIIOZZ5JqeqvYYIcEL727kskC66kF92t6Xl2V" crossorigin="anonymous"></script>
+
+
+<script>
+$(".delete-btn").on('click',function(event){
+  event.preventDefault()
+  swal.fire({
+    title:'Delete',
+    icon:'warning',
+    text:'Are you sure?',
+    showCancelButton: true 
+    
+  }).then((result)=>{
+    if(result.isConfirmed){
+      $(this).closest(".delete-form").submit()
+    }
+  })
+  
+})
+
+</script>
+
+{% endblock content %}

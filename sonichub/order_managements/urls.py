@@ -11,7 +11,8 @@ urlpatterns = [
     path('order-details/<int:id>',views.order_details,name='order-details'),
     path('cancel-order/<str:order_id>/<int:user_id>',views.cancel_order,name='cancel-order'),
     path('online-payment/<str:order_id>',views.online_payment,name='online-payment'),
-    path('payment-success/<str:order_id>',views.payment_success,name='payment-success')    
+    path('payment-success/<str:order_id>',views.payment_success,name='payment-success'),
+      
     
     
 ]
