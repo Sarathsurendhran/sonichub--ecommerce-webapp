@@ -12,18 +12,61 @@ from django.core.mail import send_mail
 from django.utils.crypto import get_random_string
 from django.views.decorators.csrf import csrf_exempt
 from datetime import datetime, timedelta
-from django.http import JsonResponse
+from django.http import JsonResponse,HttpResponse
 from django.contrib.auth.hashers import make_password, check_password
 from django.contrib.auth.decorators import login_required
 from django.db.models import Sum
 from django.db import transaction
 from order_managements.models import Order_Main_data
 from cart_management.models import Cart
+from category_management.models import Category
+from django.db.models import Q
+
+
+
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def category_search(request, name):
+    
+        try:
+            products = Products.objects.filter(product_category__category_name__icontains=name)
+            print(products)
+            if products.exists():
+                return render(request, 'user_side/search-result.html',{"products":products})
+            else:
+                print('not found')
+                return render(request, 'user_side/search-result.html')
+        except Exception as e:
+            print(e)
+            return render(request, 'user_side/search-result.html')
+   
+
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def get_names(request):
+    if request.method == 'POST':
+        try:
+            query = request.POST.get('search_product')
+            products = Products.objects.filter(
+            Q(product_category__category_name__icontains=query) |
+            Q(product_name__icontains=query) |
+            Q(product_brand__brand_name__icontains=query)
+        )
+           
+            if products.exists():
+                return render(request, 'user_side/search-result.html',{"products":products})
+            else:
+                print('not found')
+                return render(request, 'user_side/search-result.html')
+        except Exception as e:
+            print(e)
+            return render(request, 'user_side/search-result.html')
+    return redirect("/")
+
 
 
 # calculating total wallet amount
-
-
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def wallet_balence(request, user_id):
     datas = Transaction.objects.filter(user=user_id)
     grand_total = 0

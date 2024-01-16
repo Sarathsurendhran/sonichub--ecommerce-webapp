@@ -309,11 +309,11 @@
                      {% for category in categories  %}
                      {% if category.is_available %}
                               
-                        <div class="card-1">
+                        <div class="card-1 d-flex justify-content-center shadow-sm ">
                         
                             <figure class="img-hover-scale overflow-hidden">
                                
-                                 <h5 class="category-title" ><a href="shop-grid-right.html">{{category.category_name}}</a></h5>
+                                 <h5 class="category-title" ><a href="{% url 'user_panel:category-search' category.category_name %}">{{category.category_name}}</a></h5>
                             </figure>
                            
                         </div>
@@ -336,7 +336,7 @@
                      {% for brand in brands  %} 
                      {% if brand.status %}
                      
-                        <div class="d-inline-block brand-logo mx-3">
+                        <div class="d-inline-block brand-logo mx-3 ">
                             <img  src="{{brand.brand_image.url}}" alt="" class="img-fluid object-fit-cover" style="max-width: 100px; max-height: 100px;">
                         </div>
                         {% endif %}

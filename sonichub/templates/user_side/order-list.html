@@ -27,7 +27,7 @@
                 <div class="col-md-12 card shadow-lg p-3 mb-2 bg-white rounded" >  
 
                     {% for order_sub_data in order_sub_data_instances %}
-                    <a href="{% url 'order:order-details' order_sub_data.main_order_id %}" style="text-decoration:none">
+                    {% comment %} <a href="{% url 'order:order-details' order_sub_data.main_order_id %}" style="text-decoration:none"> {% endcomment %}
                         <div class="row"  data-order-id="{{order_sub_data.main_order_id}}" >
                             <div class="col-md-1 order-md-1 mb-4">
                                 <img src="{{ order_sub_data.variant.product.thumbnail.url }}" class="card-img-top" alt="Thumbnail image">
@@ -37,13 +37,13 @@
                                 <div class="row">
                                     <div class="col-md-4">
                                         <h5 class="card-title">{{ order_sub_data.variant.product.product_name }}</h5>
-                                        <p class="card-text">Colour: {{ order_sub_data.variant.colour_name }}</p>
+                                        <p class="card-text">Colour : {{ order_sub_data.variant.colour_name }}</p>
                                     </div>
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
                                        <p class="card-text">Price: {{ order_sub_data.variant.product.offer_price}} X {{ order_sub_data.quantity }} </p>
 
                                     </div>
-                                    <div class="col-md-4 ">
+                                    <div class="col-md-5 ">
                                         <p class="card-text">
                                           {% if forloop.first %}
                                           {% if order_sub_data.main_order.payment_status == True %}
@@ -51,15 +51,18 @@
                                             <span class="badge rounded-pill alert-success">{{ order_sub_data.main_order.order_status }}</span>
                                             <br>
                                             <span>{{ order_sub_data.main_order.date }}</span>
-                                            
+                                          <a href="{% url 'order:order-details' order_sub_data.main_order_id %}" class="btn btn-outline-primary me-2" >View  Details</a>
+
                                             {% else %}
                                             <span class="badge alert-warning">PAYMENT PENDING</span>
-                                            <br>
-                                            <span>{{ order_sub_data.main_order.date }}</span>
+                                          
+                                            <span>{{ order_sub_data.main_order.date }}</span> <br> <br>
                                                <a href="{% url 'order:online-payment' order_sub_data.main_order.order_id %}" class="btn btn-outline-success me-2" >Pay Now</a>
+                                                <a href="{% url 'order:order-details' order_sub_data.main_order_id %}" class="btn btn-outline-primary me-2" >View  Details</a>
 
                                              {% endif %}
                                               {% endif %}
+
                                         </p> 
                                        <div>
                                    
@@ -68,7 +71,7 @@
                                    
                                 </div>
                             </div>
-                        </div></a>
+                        </div> 
                     {% endfor %}
                 </div>
             </div></a>
