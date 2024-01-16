@@ -23,6 +23,7 @@ def edit_coupon(request,id):
         data.discount=discount
         data.expiry_date=expirydate
         data.Coupon_code=coupon
+        data.is_active=True
         data.save()
         return redirect("coupon:view-coupon")
 
@@ -44,11 +45,18 @@ def view_coupon(request):
 
     current_date_time = datetime.now()
     current_date = current_date_time.date()
+
+    coupons = Coupon.objects.filter(expiry_date__lt=current_date)
+    for coupon in coupons:
+            coupon.is_active = False
+            coupon.save()
+    
     content={
         "coupons":Coupon.objects.all(),
         "current_date":current_date
     }
     return render(request,"admin_side/view-coupon.html",content)
+
 
 
 def generate_coupon(request):

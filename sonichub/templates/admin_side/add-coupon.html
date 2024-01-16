@@ -105,66 +105,61 @@ $('#generate-coupon').on('click',function(event){
 })
 </script>
 
+
 <script>
 $(document).ready(function(){
-  $("#form-submit").click(function(event){
+  $("#minimum-amount").on('focus', function(){ $('#amount-span').text("") })
+  $("#discount").on('focus', function(){$('discount-span').text("")})
+  $("#expiray-date").on('focus', function(){$('expiry-date').text("")})
+  $("#couponCode").on('focus', function(){$('couponCode').text("")})
+  
+  $('#form-submit').click(function(event){
      event.preventDefault()
-     let minimumamount = $("#minimum-amount").val()
-     let discount =$('#discount').val()
-      let date =$('#expiry-date').val()
-      console.log(date)
+     let minimumamount = parseInt($("#minimum-amount").val())
+     let discount = parseInt($('#discount').val());
+     let date =$('#expiry-date').val()
      let couponcode= $("#couponCode").val()
-
-
      let amount = minimumamount.toString()
-
+     let isEligibleForSubmission = true;
+     
      if (minimumamount < 500){
         $('#amount-span').text("The minimum amount must be set to 500 or higher.")
-     }else{
-      $("#amount-span").text("")
+        isEligibleForSubmission = false
      }
 
      if (amount.length > 5|| amount < 0 || minimumamount ==="" ){
         $("#amount-span").text("Enter valid amount")
-     }else{
-      $("#amount-span").text("")
+        isEligibleForSubmission = false
      }
-
-
 
      if(discount > 90){
       $("#discount-span").text("Discounts exceeding 90% are not permitted.")
-     }else{
-      $("#discount-span").text("")
+      isEligibleForSubmission = false
      }
 
      if (discount ===""|| discount < 0   ){
       $("#discount-span").text("Enter valid discount")
-     }else{
-      $("#discount-span").text("")
-       
+      isEligibleForSubmission = false
      }
+
      if (date ===""){
       $("#date-span").text("Please select date")
-     }else{
-      $("#date-span").text("")
+      isEligibleForSubmission = false
      }
 
      if(couponcode ===""){
       $("#coupon-span").text("Please select coupon")
-
-     }else{
-      $("#couponCode").text("")
+      isEligibleForSubmission = false
      }
-     if ($("#amount-span").text() === "" && $("#discount-span").text() === "" && $("#date-span").text() === "" && $("#coupon-span").text() === "") {
-            $("#add-coupon-form").submit();
-        }
-    
+
+     if (isEligibleForSubmission) 
+        $("#add-coupon-form").submit()    
   })
   
 })
 
 </script>
+
 
 
 

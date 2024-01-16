@@ -5,7 +5,7 @@ from brand_management.models import Brand
 from category_management.models import Category
 from django.views.decorators.cache import cache_control
 from user_authentication.models import UserProfile
-from user_panel.models import Address
+from user_panel.models import Address, Transaction
 from django.contrib import messages
 from django.http import Http404
 from django.core.mail import send_mail
@@ -15,8 +15,64 @@ from datetime import datetime, timedelta
 from django.http import JsonResponse
 from django.contrib.auth.hashers import make_password, check_password
 from django.contrib.auth.decorators import login_required
+from django.db.models import Sum
+from django.db import transaction
+from order_managements.models import Order_Main_data
+from cart_management.models import Cart
 
 
+# calculating total wallet amount
+
+
+def wallet_balence(request, user_id):
+    datas = Transaction.objects.filter(user=user_id)
+    grand_total = 0
+    for data in datas:
+        if data.transaction_type == "Credit":
+            grand_total += data.amount
+        else:
+            grand_total -= data.amount
+    return grand_total
+
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def wallet_payment(request, order_id, id):
+    order_main = Order_Main_data.objects.get(order_id=order_id)
+
+    user = UserProfile.objects.get(id=id)
+    wallet_amount = wallet_balence(request, id)
+
+    if order_main.total_amount > wallet_amount:
+        messages.warning(request, "Insufficient Balence!")
+        return redirect("order:checkout", user.id)
+
+    order_main.payment_status = True
+    order_main.save()
+
+    Transaction.objects.create(
+        user=user,
+        description="Placed Order  " + order_id,
+        amount=order_main.total_amount,
+        transaction_type="Debit",
+    )
+
+    #clearing the cart after payment
+    data = Cart.objects.filter(user=id)
+    data.delete()
+
+    return render(request, "user_side/order-success.html", {"order_id": order_id})
+
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def user_wallet(request, user_id):
+    total = wallet_balence(request, user_id)
+
+    content = {
+        "TransactionHistory": Transaction.objects.filter(user=user_id),
+        "wallet_total": total,
+    }
+
+    return render(request, "user_side/user-wallet.html", content)
 
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
@@ -31,9 +87,9 @@ def change_password(request, id):
             data.password = password
             data.save()
             request.session["email"] = data.email
-            return redirect('user_panel:update-mail-otp')
+            return redirect("user_panel:update-mail-otp")
         else:
-           messages.warning(request, "Current Password is not correct")
+            messages.warning(request, "Current Password is not correct")
 
     return render(request, "user_side/change-password.html")
 
@@ -118,7 +174,7 @@ def edit_profile(request, id):
         email = request.POST.get("email")
         phone_number = request.POST.get("phone_number")
 
-        print(name,email,phone_number)
+        print(name, email, phone_number)
 
     try:
         if UserProfile.objects.filter(username=name).exclude(id=id).exists():
@@ -144,10 +200,9 @@ def edit_profile(request, id):
 
 # wiillnbwbdzphfla
 @csrf_exempt
-#@login_required(login_url="user_side:user_login")
+# @login_required(login_url="user_side:user_login")
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def update_mail_otp(request):
-
     otp = get_random_string(length=4, allowed_chars="0123456789")
 
     now = datetime.now().time()
@@ -156,7 +211,13 @@ def update_mail_otp(request):
     request.session["otp"] = otp
     request.session["otp_time"] = time_as_string
 
-    send_mail("OTP for sign up", f"Hi {request.user} Your OTP is: {otp}", 'sonichubecommerce@outlook.com',[request.session['email']], fail_silently=False)
+    send_mail(
+        "OTP for sign up",
+        f"Hi {request.user} Your OTP is: {otp}",
+        "sonichubecommerce@outlook.com",
+        [request.session["email"]],
+        fail_silently=False,
+    )
 
     timenow = datetime.now()
     expire_time = timenow + timedelta(seconds=60)
@@ -195,8 +256,6 @@ def update_mail_verify_otp(request):
                 user = UserProfile.objects.get(email=request.session["email"])
 
                 if current_time <= expiration_time:
-                    
-
                     user.is_active = True
                     user.save()
 

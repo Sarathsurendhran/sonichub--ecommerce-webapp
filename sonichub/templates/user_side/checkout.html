@@ -138,7 +138,7 @@
                                         <tr>
                                             <th>Total</th>
                                             <td colspan="2" class="product-subtotal">
-                                                {% if coupon_id != None %}
+                                                {% if coupon_code != None %}
                                                 
                                                 <span class="font-xl text-brand fw-900 total-amount-no-discount">₹ {{ total_price }}</span>
                                                 <span class="font-sm text-brand fw-500 pr-2"style="text-decoration: line-through;">{{subtotal}}</span>
@@ -178,7 +178,7 @@
                             </div>
                              <input type="hidden" name="total_price" value="{{ total_price }}">
                               <input type="hidden" name="order_status" value="{{ 'Order Placed' }}">
-                              <input type="hidden" name="coupon_id" value="{{ coupon_id }}">
+                              <input type="hidden" name="coupon_code" value="{{ coupon_code }}">
                                                          
                             <button type="submit" id="placeorder" class="btn btn-brand btn-lg mt-30">
                                 Place Order

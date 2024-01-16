@@ -107,6 +107,9 @@
                 <a class="dropdown-item" href="{% url 'order:order-list' user.id %}">
                     <i class="fi fi-rs-box"></i> Orders
                 </a>
+                <a class="dropdown-item" href="{% url 'user_panel:user-wallet' user.id %}">
+                 My Wallet
+                </a>
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item text-danger" href="{% url 'user_panel:logout_user'%}">
                     <i class="material-icons md-exit_to_app"></i> Logout

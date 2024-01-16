@@ -40,7 +40,7 @@
                       <td class="text-center"><span class="fw-bolder h6">&#8377; {{ coupon.minimum_amount }}</span></td>
                       <td class="text-center">
                         <span class="fw-bolder h6"
-                              style="{% if coupon.expiry_date > current_date %} color: green; {% else %}color: red;{% endif %}">
+                              style="{% if coupon.expiry_date >= current_date %} color: green; {% else %}color: red;{% endif %}">
               
                           {{ coupon.expiry_date|date:"d M Y" }}
                         </span>

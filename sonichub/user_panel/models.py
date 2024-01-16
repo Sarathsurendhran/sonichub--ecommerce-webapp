@@ -13,3 +13,17 @@ class Address(models.Model):
     country = models.CharField(max_length=200, null=False, default="null")
     phone_number = models.CharField(max_length=40, null=False)
     status = models.BooleanField(default=True)
+
+
+
+class Transaction(models.Model):
+    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE, default=1)
+    date = models.DateTimeField(auto_now_add=True)
+    description = models.TextField(null=False)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    transaction_type = models.CharField(max_length=50)
+   
+
+
+
+

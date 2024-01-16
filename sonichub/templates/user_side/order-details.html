@@ -107,6 +107,7 @@
                   {% if order_main.order_status != 'Delivered' and order_main.order_status != 'Cancelled' %}
                       {% if order_main.payment_status %}
                           <a class="btn btn-outline-danger me-2" id="cancelorder">Cancel Order</a>
+                          <input type="hidden" name ="total_amount" value = "{{order_main.total_amount}}" >
                       {% else %}
                           <a href="{% url 'order:online-payment' order_main.order_id %}" class="btn btn-outline-success me-2" >Pay Now</a>
                       {% endif %}

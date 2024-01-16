@@ -1,0 +1,48 @@
+{% extends "user_side/base.html" %}
+{% load static  %}
+{% block content %}
+
+
+<section class="section-padding footer-mid container">
+    <div>
+        <h2 class="my-4">My Wallet</h2>
+    </div>
+    <div class="{% if Balance > 0 %}btn btn-success-light p-4 d-flex justify-content-start{% else %}btn btn-warning-light p-4 d-flex justify-content-start{% endif %}" style="width: 100%">
+        <div>
+            <span class="h1">{% if wallet_total > 0 %}&#8377; {{wallet_total}}{% else %}&#8377; 0.00{% endif %}</span><br>
+            
+            <span class="h6">Current Wallet Balance</span>
+        </div>
+    </div>
+    <div>
+        <h4 class="my-4">Transaction History</h4>
+    </div>
+    <div>
+        <table class="table">
+            <thead class="thead-light">
+                <tr>
+                    <th scope="col">Transaction ID</th>
+                    <th scope="col">Date and Time</th>
+                    <th scope="col">Description</th>
+                    <th scope="col">Amount</th>
+                    <th scope="col">Transaction Type</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if TransactionHistory %}
+                    {% for transaction in TransactionHistory %}
+                        <tr class="{% if transaction.transaction_type == 'Credit' %}table-success{% else %}table-danger{% endif %}">
+                            <th scope="row"><span>{{ transaction.id }}</span></th>
+                            <td><span>{{ transaction.date }}</span></td>
+                            <td><span>{{ transaction.description }}</span></td>
+                            <td><span>{{ transaction.amount }}</span></td>
+                            <td><span>{{ transaction.transaction_type }}</span></td>
+                        </tr>
+                    {% endfor %}
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+{% endblock content %}
