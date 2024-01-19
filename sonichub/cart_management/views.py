@@ -51,6 +51,15 @@ def add_to_cart(request):
         product_obj = Products.objects.get(id=product_id)
         variant_obj = Product_Variant.objects.get(id=variant_id)
 
+        availableQty = variant_obj.variant_stock
+      
+        print(variant_obj.colour_name,availableQty)
+
+        # if availableQty == 0:
+        #         return JsonResponse({"error": "Error: Item is out of stock"}, status=400)
+        
+        print("entered")
+
         with transaction.atomic():
             cart_obj, created = Cart.objects.get_or_create(
                 user=user_obj,
@@ -60,9 +69,12 @@ def add_to_cart(request):
             )
 
             currentQty = cart_obj.quantity
-            availableQty = variant_obj.variant_stock
+            print("current",currentQty)
+
+            
+
             if not created:
-                if currentQty + newQty > availableQty:
+                if currentQty + newQty > availableQty or availableQty == 0:
                     return JsonResponse({"error":"Error"}, status=400)
                 cart_obj.quantity += newQty
                 cart_obj.save()

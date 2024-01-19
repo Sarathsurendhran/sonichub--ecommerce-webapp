@@ -133,10 +133,19 @@
                       onclick="addToWishList(this.getAttribute('data-id'))"><i class="fi-rs-heart"></i></a>
                   </div>
 
-                  <ul class="product-meta font-sm color-grey mt-35 mb-30">
-                    <li>Availability
-                      :<span class="in-stock text-success ml-5">{{ products.stock }} Items In Stock</span></li>
-                  </ul>
+                 
+                  <ul class="product-meta font-md color-grey mt-35 mb-30">
+                    <li>
+                        Availability:
+                        {% for variant in variants %}
+                            {% if variant.variant_stock == 0 %}
+                                <span class="out-of-stock text-danger ml-5">{{ variant.colour_name|title }}: Out of Stock,</span>
+                            {% else %}
+                                <span class="in-stock text-success ml-5">{{ variant.colour_name|title }}: {{ variant.variant_stock }},</span>
+                            {% endif %}
+                        {% endfor %}
+                    </li>
+                </ul>
 
                 </div>
                 
@@ -263,29 +272,36 @@
                   </div>
                 </div>
             </section>
-                <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-                <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
-                <script src="{% static 'js/profile.js' %}"></script>
-
-      <script>
-      
-
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+  <script src="{% static 'js/profile.js' %}"></script>
+  <script>
         $('#addtocart').on('click', function () {
             var productId = '{{ products.id }}'
             var variantId = selectedColorDiv ? selectedColorDiv.dataset.id : null; 
             var quantity = document.getElementById("product-qty").value;  
+            let totalQty = selectedColorDiv.dataset.quantity;
           
-            $.ajax({
+            if ( totalQty <= 0 ) {
+              Swal.fire({
+                  icon: 'error',
+                  title: `Can't add to cart`,
+                  text: ' Product is Out of stock !',
+              });
+              return;
+            }         
+            if ( quantity <= 0 ) {
+              Swal.fire({
+                  icon: 'error',
+                  title: `Can't add to cart`,
+                  text: 'Please select a valid Quantity!',
+              }); 
+              return;
+            }
+            $.ajax({ 
                 type: 'POST',
                 url: '{% url "cart:add-to-cart" %}', 
-                data: {
-                    product: productId,
-                      csrfmiddlewaretoken: '{{ csrf_token }}',
-                      variant: variantId,
-                      quantity: quantity,
-                    
-                },
-    
+                data: { product: productId, csrfmiddlewaretoken: '{{ csrf_token }}', variant: variantId, quantity: quantity },
                 success: function (response) {
                     Swal.fire({
                         icon: 'success',
@@ -293,14 +309,13 @@
                         text: 'The item has been added to your cart.',
                     });
                 },
-                error:  function (response){
-
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Oops!',
-                        text: 'limit',
-                    });
-                }
+                error:  function (response){ 
+                  
+               Swal.fire({
+                  icon: 'error',
+                  title: `Can't add to cart`,
+                  text: `We don't have enough Quantity!`,
+              }); }
             });
         });
     </script>
@@ -310,11 +325,9 @@
     let selectedColorValue = null;
 
     function selectColor(colorDiv, colorValue) {
-        if (selectedColorDiv) {
+        if (selectedColorDiv) 
             selectedColorDiv.style.border = 'none';
-        }    
         colorDiv.style.border = '4px solid gray';
-        
         selectedColorDiv = colorDiv;
         selectedColorValue = colorValue;
 
@@ -332,8 +345,6 @@
             if (currentQty > maxQty) {
                 quantityInput.value = maxQty;
                 quantityDisplay.innerText = maxQty;
-
-                
             }
         }
     }
@@ -409,16 +420,9 @@ function addToWishList(dataid){
         icon:'error'
       })
     }
-
   }) 
-
 }
-
 </script>
-
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 <script src="{% static 'js/profile.js' %}"></script> 
-
-  
-            
 {% endblock %}

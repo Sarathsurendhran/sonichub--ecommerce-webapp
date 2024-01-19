@@ -183,6 +183,14 @@ def change_password(request, id):
 def shop_product(request, id):
     if not request.user.is_authenticated:
         return redirect("user_side:user_login")
+    
+    total_stock = 0
+    variants = Product_Variant.objects.filter(product=id)
+    for i in variants:
+        total_stock += i.variant_stock
+    
+    print(total_stock)
+
 
     context = {
         "products": Products.objects.get(id=id),
@@ -190,7 +198,7 @@ def shop_product(request, id):
         "brands": Brand.objects.all(),
         "categories": Category.objects.all(),
         "images": Product_images.objects.filter(product=id),
-    }
+    }   
 
     return render(request, "user_side/shop-product.html", context)
 

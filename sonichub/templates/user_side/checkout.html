@@ -7,41 +7,36 @@
     </nav> {% endcomment %}
 <section class="mt-50 mb-50">
     <div class="container" style="max-width:1300px">
-
-            {% for message in messages %}
-                <div class="alert alert-{{message.tags}} alert-dismissible fade show" role="alert">
-                    <strong></strong>{{message}}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            {% endfor %} 
-     
+        {% for message in messages %}
+        <div class="alert alert-{{message.tags}} alert-dismissible fade show" role="alert">
+            <strong></strong>{{message}}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %} 
+        <div class="row">        
+           <div class="col-lg-6 mb-15"></div>
            <div class="col-lg-6 mb-15">
-                        <div class="toggle_info">
-                            <span><i class="fi-rs-label mr-10"></i><span class="text-muted">Have a coupon?</span> <a href="#coupon" data-bs-toggle="collapse" class="collapsed" aria-expanded="false">Click here to enter your code</a></span>
-                        </div>
-                        <div class="panel-collapse collapse coupon_form " id="coupon">
-                            <div class="panel-body">
-                                <p class="mb-30 font-sm">If you have a coupon code, please apply it below.</p>
-                                <form method="post" action="{% url 'order:checkout' user.id %}">
-                                {% csrf_token %}
-                                    <div class="form-group">
-                                        <label for="coupon-field"></label>
-                                        <input type="text" id="coupon-field" name="coupon code" placeholder="Enter Coupon Code...">
-                                        <span style="color: red" id="coupon-field-error"></span>
-                                    </div>
-                                    <div class="form-group">
-                                        <button class="btn  btn-md" name="login" id="coupon-btn">Apply Coupon</button>
-                                    </div>
-                                </form>
+                <div class="toggle_info">
+                    <span>
+                        <i class="fi-rs-label mr-10"></i> <span class="text-muted">Have a coupon?</span> 
+                        <a href="#coupon" data-bs-toggle="collapse" class="collapsed" aria-expanded="false">Click here to enter your code</a>
+                    </span>
+                </div>
+                <div class="panel-collapse collapse coupon_form " id="coupon">
+                    <div class="panel-body">
+                        <p class="mb-30 font-sm">If you have a coupon code, please apply it below.</p>
+                        <form method="post" action="{% url 'order:checkout' user.id %}"> {% csrf_token %}
+                            <div class="form-group">
+                                <label for="coupon-field"></label>
+                                <input type="text" id="coupon-field" name="coupon code" placeholder="Enter Coupon Code...">
+                                <span style="color: red" id="coupon-field-error"></span>
                             </div>
-                        </div>
+                            <div class="form-group"> <button class="btn  btn-md" name="login" id="coupon-btn">Apply Coupon</button> </div>
+                        </form>
                     </div>
-
-        {% comment %} <div class="row">
-            <div class="col-12">
-                <div class="divider mt-50 mb-50"></div>
+                </div>
             </div>
-        </div>   {% endcomment %}
+        </div>
 
             <form method="post" id="formsubmit" action="{% url 'order:confirm-order' user.id %}">
             {% csrf_token %}

@@ -93,7 +93,7 @@
                                                     More
                                                 </a>
                                                 <div class="dropdown-menu dropdown-custom">
-                                                    <a class="dropdown-item" href="{% url 'product:edit-product' product.id  %}">Edit_Product</a>
+                                                    <a class="dropdown-item" href="{% url 'product:edit-product' product.id  %}">Edit Product</a>
                                                     <a class="dropdown-item" href="{% url 'product:variant-view' product.id  %}">Available variants</a>
                                                     <a class="dropdown-item" href="{% url 'product:status-change' product.id %}">{% if not product.is_active %}Enable {% else %}Disable{% endif %}</a> 
                                             </div> <!-- dropdown //end -->

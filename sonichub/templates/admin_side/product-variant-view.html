@@ -45,28 +45,24 @@
                                 </thead>
                                 <tbody >
                                     {% for variant in variants %}
-                                    <tr>
-                                    
+                                    <tr>                                    
                                         <td><div class="static-mode" style="width: 70px; height: 40px; background-color: {{variant.colour_code}}"></div>
-                                        <div class="edit-mode"><input type="color" id="edit-color-input" value="{{ variant.colour_code }}"></div>
+                                        <div class="edit-mode"><input class="form-control" type="color" id="edit-color-input" value="{{ variant.colour_code }}"></div>
                                         </td>
-
-                                        
                                         <td class="static-mode"><a href="#"> <h6 class="mb-0">{{variant.colour_name }}</h6></a></td>
-                                        <td class="edit-mode"><input type="text"  id="edit-name-input" value={{variant.colour_name}}></td>
+                                        <td class="edit-mode"><input type="text" class="form-control" id="edit-name-input" value={{variant.colour_name}}></td>
 
-                                        <td class="text-middle  static-mode">
+                                        <td class="   static-mode">
                                             <span class="badge  {% if variant.variant_stock %} alert-success {% else %} alert-danger {% endif %}">
                                                 {% if variant.variant_stock %} {{variant.variant_stock}} {% else %} Out Of Stock {% endif %} </span>
-
-                                            <td class="edit-mode"><input type="text" id="edit-stock-input"  value={{variant.variant_stock}}></td>
+                                            <td class="edit-mode"><input type="text" id="edit-stock-input" class="form-control" value={{variant.variant_stock}}></td>
                                         </td>
                                         
-                                        <td class="text-middle">
+                                        <td class=" ">
                                             <span  class="badge rounded-pill {% if variant.variant_status %} alert-success {% else %} alert-danger {% endif %}">
                                                 {% if variant.variant_status %} Active {% else %}Inactive {% endif %} </span>
                                         </td>
-                                        <td class="text-middle" >
+                                        <td class=" " >
                                             <div class="dropdown">
                                                 <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm text-secondary fw-bold font-sm"> 
                                                     More

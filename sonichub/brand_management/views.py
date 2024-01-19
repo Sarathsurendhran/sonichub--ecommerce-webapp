@@ -63,6 +63,10 @@ def edit_brand(request,id):
     
     try:
         brand_data = Brand.objects.get(id=id)
+        print(brand_data.id, brand_data.status, brand_data.brand_image, brand_data.brand_name)
+
+        if brand_data.brand_image == '':
+          pass
         
     except Brand.DoesNotExist:
         messages.error(request, 'Brand does not exist.')
@@ -76,23 +80,27 @@ def edit_brand(request,id):
       brand_image = request.FILES.get('brand_image')
       status = request.POST.get('status') == 'on'
 
+
       if brand_name == '':
         messages.warning(request, 'Brand Name Cannot Be Empty')
-        return redirect('brand:add-brand')
+        return redirect('brand:edit-brand',id)
       
-      if brand_image == '':
+      if not brand_image and not brand_data.brand_image:
         messages.warning(request, 'Brand Image Cannot Be Empty')
-        return redirect('brand:add-brand')
-      
+        return redirect('brand:edit-brand',id)
+
       if not brand_name.replace(" ", "").isalpha():
         messages.warning(request, 'Brand Name Should Only Contain Alphabetical Characters')
-        return redirect('brand:add-brand')
+        return redirect('brand:edit-brand',id)
+      
+      if not brand_image and brand_data.brand_image:
+         brand_image = brand_data.brand_image
       
       try:
 
         if Brand.objects.filter(brand_name=brand_name).exclude(id=id).exists():
           messages.warning(request, 'Brand Name Already Exsists')
-          return redirect('brand:add-brand')
+          return redirect('brand:edit-brand',id)
         else:
           brand_data.brand_name = brand_name
           brand_data.brand_image = brand_image

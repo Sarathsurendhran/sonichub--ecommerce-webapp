@@ -22,61 +22,48 @@
                 <div class="card">
                     <div class="card-body">
                         <div class="row gx-5">
-                            <div class="col-lg-10">
-                                <section class="content-body p-xl-4">
+                            <div class="col-12">
+                                <section class="content-body p-4">
                                     <!-- Form -->
                                     <form action="#" method="post" enctype="multipart/form-data"  onsubmit="return validateForm()">
                                         {% csrf_token %}
-                                        <section class="content-body p-xl-4">
-                                            <!-- Form -->
-                                            <div class="row">
-                                                <div class="col-lg-8 p-2" id="mediaUploadSection" style="display: none;">
-                                                    <div class="card mb-12">
-                                                        <div class="card-header">
-                                                            <h4>Media</h4>
-                                                        </div>
-                                                    
-                                                  <div class="card-body">
+                                            <div>                                               
+                                                <div class="p-3 border rounded-3 row">
+                                                    <div class="col-8">
+                                                        <div class="card-header"><h4>Media</h4></div>
+                                                        <div class="card-body">
                                                             <div class="input-upload">
-                                                               
-                                                                <input class="form-control" type="file" id="file" name="brand_image" accept="image/*">
+                                                                <input class="form-control" type="file" id="file" name="brand_image" accept="image/*" re>
                                                             </div>
                                                         </div>
-                                                    </div> 
-                                                </div>
-                                                
-                                                <div class="col-lg-4 p-2" >
-                                                <label for="#">Current Media</label>
-                                                    {% if brand_data.brand_image %}
-                                                    
-                                                    <img src={{brand_data.brand_image.url}} alt="">
-                                                     {% endif %}
-                                                      <button type="button" class="btn btn-secondary mt-2" id="changeMediaBtn">Change</button>
+                                                    </div>
+                                                    <div class="col-4">
+                                                        {% if brand_data.brand_image %} <img src={{brand_data.brand_image.url}} id="brand-img" alt="Brand Image"> {% endif %}
+                                                        <label for="brand-img"> <span class="pb-3 h6">Current Logo</span> </label>
+                                                    </div>                                           
                                                 </div>
                                             </div>
                                            
                                         </section>
-                                        <div class="row mb-4">
+                                        <div class="row mb-4 px-3">
                                             <label class="col-lg-3 col-form-label" for="name">Brand name*</label>
                                             <div class="col-lg-9">
-                              
                                                 <input type="text" class="form-control" id="id_name" name="brand_name" placeholder="Type here" value="{{ brand_data.brand_name }}">
-
                                             </div>
                                         </div>
-                                        <div class="row mb-4">
+                                        <div class="row mb-4 px-3">
                                             <label class="col-lg-3 col-form-label">Status</label>
                                             <div class="col-lg-9">
                                                 <label class="form-check my-2">
-                                            
                                                     <input type="checkbox"  class="form-check-input" name = 'status' checked>
-                                                
                                                     <span class="form-check-label">Enable this Brand</span>
                                                 </label>
                                             </div>
                                         </div>
                                         <br>
-                                        <button class="btn btn-primary" type="submit"> Continue to next</button>
+                                        <div class="d-flex justify-content-center">
+                                            <button class="btn btn-primary" type="submit">Continue to next</button>
+                                        </div>
                                     </form>
                                 </section>
                             </div>
@@ -86,36 +73,8 @@
             </div>
         </div>
     </section>
-<script>
-    let changeMediaBtn = document.getElementById('changeMediaBtn');
-    let mediaUploadSection = document.getElementById('mediaUploadSection');
-    let fileInput = document.getElementById('file');
-    let form = document.querySelector('form');
-
-    changeMediaBtn.addEventListener('click', function () {
-        mediaUploadSection.style.display = 'block';
-    });
-
-    form.addEventListener('submit', function (event) {
-        // Check if the Change button was clicked
-        if (mediaUploadSection.style.display === 'block') {
-            // Check if a new image is selected
-            if (fileInput.files.length === 0) {
-                // If no new image is selected, prevent form submission
-                event.preventDefault();
-                alert('Please select a new image or click Cancel to keep the current image.');
-            } else {
-                // Include the file input in the form data
-                let formData = new FormData(this);
-                formData.append('brand_image', fileInput.files[0]);
-                // Replace the original form data with the updated one
-                event.formData = formData;
-            }
-        }
-    });
-</script>
-
-
-
-
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script>
+        $( document ).ready( function() { $.ajax({ /* Call ajax requesyt to is image exist. */ }) });    
+    </script>
 {% endblock content %}

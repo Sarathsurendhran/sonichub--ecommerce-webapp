@@ -97,20 +97,9 @@
                                             {% comment %} {% endif %} {% endcomment %}
                                           </td>
                                         
-                                        {% comment %} <td><h6 class="mb-4 small-text">ok</h6></td> {% endcomment %}
                                         <td><h6 class="mb-4 small-text">{{ data.payment_option|title }}</h6></td>
 
                                         <td><a href="{% url 'admin_panel:admin-order-details' data.id %}" class="btn btn-light rounded btn-sm text-secondary fw-bold font-sm">Details</a></td> 
-
-
-                                        {% comment %} <td class="text-middle" >
-                                            <div class="dropdown">
-                                                <div class="dropdown-menu dropdown-custom">
-                                                    <a class="dropdown-item" href="{% url 'product:edit-product' product.id  %}">Edit_Product</a>
-                                                    <a class="dropdown-item" href="{% url 'product:variant-view' product.id  %}">Available variants</a>
-                                                    <a class="dropdown-item" href="{% url 'product:status-change' product.id %}">{% if not product.is_active %}Enable {% else %}Disable{% endif %}</a> 
-                                            </div> 
-                                        </td> {% endcomment %}
                                     </tr>
                                     {% endfor %}
                                 </tbody>

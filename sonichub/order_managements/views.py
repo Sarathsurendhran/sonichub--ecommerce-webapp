@@ -19,6 +19,10 @@ from django.db.models import Sum
 from user_panel.views import wallet_balence
 
 
+def stock_management(request):
+    pass
+
+
 def order_return(request):
     if request.method == "POST":
         id = request.user.id
@@ -132,7 +136,11 @@ def current_order_details(request, order_id):
 def confirm_order(request, id):
     if request.method == "POST":
         user = request.user.id
+
         data = Cart.objects.filter(user=id)
+        
+        for i in data:
+            print(i.quantity)
         if not data:
             return redirect("cart:product-cart")
 

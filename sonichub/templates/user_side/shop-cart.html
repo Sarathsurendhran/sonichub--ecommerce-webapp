@@ -324,7 +324,7 @@ function isValid(event) {
     if (enteredQty > maxQty) {
     Swal.fire({
       title: 'Invalid Quantity',
-      text: 'Maximum Quantity is '+maxQty+'\n'+'Please enter a quantity less than or equal to ' + maxQty,
+      text: 'We don\'t have enough quantity',
       icon: 'error',
     });
     return false; 
