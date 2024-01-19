@@ -52,10 +52,11 @@
                                 </a>
                                 <div class="card-header bg-white text-center">
 
-                                    {% if brand.brand_image is None %}
-                                    <img src="{% static 'admin-assets/imgs/items/No-Image.png' %}" alt="No Image">
-                                    {% else %}
+                                    {% if brand.brand_image %}
                                     <img src="{{ brand.brand_image.url }}" alt="Brand Image"/>
+                                    
+                                    {% else %}
+                                    <img src="{% static 'admin-assets/imgs/items/No-Image.png' %}" alt="No Image">
                                     {% endif %}
 
                                 </div>

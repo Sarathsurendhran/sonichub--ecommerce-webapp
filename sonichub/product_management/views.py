@@ -14,7 +14,160 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
 
 
+def edit_variant_status_change(request, id):
+    if not request.user.is_superuser:
+        return redirect("admin_panel: admin_login")
+
+    try:
+        product_variant = Product_Variant.objects.get(id=id)
+        if product_variant.variant_status == True:
+            product_variant.variant_status = False
+            product_variant.save()
+        else:
+            product_variant.variant_status = True
+            product_variant.save()
+
+    except Exception as e:
+        print(e)
+
+    return redirect("product:edit-variant-in-edit-product", product_variant.product.id)
+
+
+
+def thumbnail_update(request, id):
+    if request.method == "POST":
+        thumbnail = request.FILES.get("thumbnail_image")
+        if not thumbnail:
+            messages.warning(request, "Please select Image")
+            return redirect("product:edit-product", id)
+
+        data = Products.objects.get(id=id)
+        data.thumbnail = thumbnail
+        data.save()
+        return redirect("product:edit-product", id)
+
+
+def delete_thumbnail_add_image(request, id):
+    product_data = Products.objects.get(id=id)
+    product_data.thumbnail.delete()
+    return redirect("product:add-images", product_data.id)
+
+
+def delete_thumbnail_edit_image(request, id):
+    product_data = Products.objects.get(id=id)
+    product_data.thumbnail.delete()
+    return redirect("product:edit-images", product_data.id)
+
+
+def delete_images(request):
+    image_id = request.POST.get("image_id")
+    product = request.POST.get("product_id")
+    images = Product_images.objects.get(id=image_id)
+    images.delete()
+    return redirect("product:add-images", product)
+
+
+
+def delete_images_edit(request):
+    image_id = request.POST.get("image_id")
+    product = request.POST.get("product_id")
+    images = Product_images.objects.get(id=image_id)
+    images.delete()
+    return redirect("product:edit-images", product)
+
+
+# def delete_variant(request,variant_id,product):
+#     data = Product_Variant.objects.get(id=variant_id)
+#     data.delete()
+#     return redirect("product:variant-view",product)
+
+
+
+def edit_variant_in_edit_product(request,product):
+    if request.method == 'POST':
+        try:
+            color = request.POST.get("color")
+            name = request.POST.get("name")
+            stock = request.POST.get("stock")
+            variant_id = request.POST.get("variant_id")
+            print("variant_id:",variant_id,stock)
+
+            data = Product_Variant.objects.get(id=variant_id)
+            data.colour_code = color
+            data.colour_name = name
+            data.variant_stock = stock
+            data.save()
+            return JsonResponse({"success": True}, status=200)
+        except Exception as e:
+            print(e)
+            return JsonResponse({"error": True}, status=400)
+
+    content = {
+        "products": Products.objects.get(id=product),
+        "variants": Product_Variant.objects.filter(product_id=product).order_by('id').reverse(),
+    }
+
+    return render(request, "admin_side/edit-variants1.html", content)
+
+
+
+def edit_variant(request, variant_id):
+    try:
+        color = request.GET.get("color")
+        name = request.GET.get("name")
+        stock = request.GET.get("stock")
+        data = Product_Variant.objects.get(id=variant_id)
+        data.colour_code = color
+        data.colour_name = name
+        data.variant_stock = stock
+        data.save()
+        return JsonResponse({"success": True}, status=200)
+    except Exception as e:
+        print(e)
+        return JsonResponse({"error": True}, status=400)
+    
+
+
+def edit_thumbnail(request):
+    image = request.FILES.get("imageFiles")
+    product = request.POST.get("productId")
+    product_data = Products.objects.get(id=product)
+    product_data.thumbnail = image
+    product_data.save()
+    return redirect("product:edit-images", product)
+
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def edit_images(request, product):
+    product_id = Products.objects.get(id=product)
+    thumbnail = Products.objects.get(id=product)
+
+    if request.method == "POST":
+        image_files= request.FILES.getlist("imageFiles")
+
+        existing_images = Product_images.objects.filter(product=product)
+
+        for image in image_files:
+            Product_images.objects.create(product=product_id, images=image)
+
+
+        messages.success(request, "Image Added Sucessfully")
+
+        
+    content = {
+        "existing_images": Product_images.objects.filter(product=product_id)
+        .order_by("id")
+        .reverse(),
+        "product": product,
+        "thumbnail": Products.objects.get(id=product),
+    }
+    return render(request, "admin_side/edit-images1.html", content)
+
+
+
+
 def variant_view(request, id):
+    print("called")
     content = {
         "products": Products.objects.get(id=id),
         "variants": Product_Variant.objects.filter(product_id=id),
@@ -23,25 +176,56 @@ def variant_view(request, id):
     return render(request, "admin_side/product-variant-view.html", content)
 
 
+
+def add_thumbnail(request):
+    image = request.FILES.get("imageFiles")
+    product = request.POST.get("productId")
+    product_data = Products.objects.get(id=product)
+    product_data.thumbnail = image
+    product_data.save()
+    return redirect("product:add-images", product)
+
+
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def add_images(request, product):
-    if request.method == "POST":
-        images = request.FILES.getlist("images")
+    product_id = Products.objects.get(id=product)
+    thumbnail = Products.objects.get(id=product)
 
-        product_id = Products.objects.get(id=product)
+    if request.method == "POST":
+        images = request.FILES.getlist("imageFiles")
+
+        # product_id = Products.objects.get(id=product)
         for image in images:
             Product_images.objects.create(product=product_id, images=image)
 
-        messages.success(request, "Image Added Sucessfully")
-        return redirect("product:add-variant", product)
+        existing_images = Product_images.objects.filter(product=product_id)
+        image = existing_images
 
-    return render(request, "admin_side/add-images.html", {"product": product})
+        messages.success(request, "Image Added Sucessfully")
+        return render(
+            request,
+            "admin_side/add-images1.html",
+            {"product": product, "existing_images": existing_images},
+        )
+
+        # return redirect("product:add-variant", product)
+    content = {
+        "existing_images": Product_images.objects.filter(product=product_id)
+        .order_by("id")
+        .reverse(),
+        "product": product,
+        "thumbnail": Products.objects.get(id=product),
+    }
+    return render(request, "admin_side/add-images1.html", content)
+
+
 
 
 @csrf_exempt
 def add_variant(request, product):
     try:
         product = Products.objects.get(id=product)
+
     except Products.DoesNotExist:
         return JsonResponse({"status": "error", "message": "Product not found"})
 
@@ -58,7 +242,7 @@ def add_variant(request, product):
                     product=product,
                 )
 
-            return JsonResponse({"status": "success"})
+            return JsonResponse({"success": True}, status=200)
 
         except json.JSONDecodeError:
             return JsonResponse({"status": "error", "message": "Invalid JSON"})
@@ -96,14 +280,19 @@ def add_product(request):
         if offer_price == "":
             messages.warning(request, "Offer Price Cannot Be Empty")
             return redirect("product:add-product")
+        
+        if float(offer_price) > float(price):
+            messages.warning(request, "Offer Price Should be lessthan actual price")
+            return redirect("product:edit-product", id)
 
         if price.startswith("-") or offer_price.startswith("-"):
             messages.warning(request, "Please Enter positive values")
             return redirect("product:add-product")
 
-        if not product_name.replace(" ", "").isalpha():
-            messages.warning(request, "Product Name Only Allow Alphabetical Characters")
+        if not any(char.isalpha() for char in product_name):
+            messages.warning(request, "Product Name should contain at least one alphabetical character")
             return redirect("product:add-product")
+
 
         try:
             if Products.objects.filter(product_name=product_name).exists():
@@ -141,8 +330,10 @@ def product_list(request):
     if not request.user.is_superuser:
         return redirect("admin_panel:admin_login")
     content = {
-        "products": Products.objects.all().order_by("id"),
-        "variants": Product_Variant.objects.filter(id__isnull=False).order_by("id"),
+        "products": Products.objects.all().order_by("id").reverse(),
+        "variants": Product_Variant.objects.filter(id__isnull=False)
+        .order_by("id")
+        .reverse(),
     }
 
     return render(request, "admin_side/product-view.html", content)
@@ -180,7 +371,7 @@ def edit_product(request, id):
             messages.warning(request, "Offer Price Cannot Be Empty")
             return redirect("product:edit-product", id)
 
-        if offer_price > price:
+        if float(offer_price) > float(price):
             messages.warning(request, "Offer Price Should be lessthan acual price")
             return redirect("product:edit-product", id)
 
@@ -188,9 +379,9 @@ def edit_product(request, id):
             messages.warning(request, "Please Enter positive values")
             return redirect("product:edit-product", id)
 
-        if not product_name.replace(" ", "").isalpha():
-            messages.warning(request, "Product name only allow alphabetical characters")
-            return redirect("product:edit-product", id)
+        if not any(char.isalpha() for char in product_name):
+            messages.warning(request, "Product Name should contain at least one alphabetical character")
+            return redirect("product:add-product")
 
         try:
             if (
@@ -213,7 +404,7 @@ def edit_product(request, id):
                     product_data.save()
 
             messages.success(request, "Product Updated Sucessfully")
-            return redirect("product:edit-images", id=id)
+            return redirect("product:edit-images", product=id)
 
         except Exception as e:
             s = f"An Error Occured: {str(e)}"
@@ -228,19 +419,6 @@ def edit_product(request, id):
     }
 
     return render(request, "admin_side/edit-product.html", content)
-
-
-def thumbnail_update(request, id):
-    if request.method == "POST":
-        thumbnail = request.FILES.get("thumbnail_image")
-        if not thumbnail:
-            messages.warning(request, "Please select Image")
-            return redirect("product:edit-product", id)
-
-        data = Products.objects.get(id=id)
-        data.thumbnail = thumbnail
-        data.save()
-        return redirect("product:edit-product", id)
 
 
 def status_change(request, id):
@@ -281,18 +459,6 @@ def variant_status_change(request, id):
     return redirect("product:variant-view", product_variant.product_id)
 
 
-def delete_thumbnail(request, id):
-    product_data = Products.objects.get(id=id)
-    product_data.thumbnail.delete()
-    return redirect("product:edit-product", id)
-
-
-def edit_images(request, id):
-    print(id)
-
-    return render(request, "admin_side/edit-images.html", {"id": id})
-
-
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def search(request):
     if request.method == "POST":
@@ -301,11 +467,9 @@ def search(request):
         if product_name.exists():
             content = {
                 "products": product_name,
-                
             }
 
             return render(request, "admin_side/product-view.html", content)
         else:
-            
-            messages.warning(request,'No data')
+            messages.warning(request, "No data")
             return redirect("product:product-list")

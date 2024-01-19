@@ -1,5 +1,6 @@
 from django.db import models
 from user_authentication.models import UserProfile
+from product_management.models import Product_Variant
 
 
 class Address(models.Model):
@@ -15,15 +16,14 @@ class Address(models.Model):
     status = models.BooleanField(default=True)
 
 
-
 class Transaction(models.Model):
     user = models.ForeignKey(UserProfile, on_delete=models.CASCADE, default=1)
     date = models.DateTimeField(auto_now_add=True)
     description = models.TextField(null=False)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     transaction_type = models.CharField(max_length=50)
-   
 
 
-
-
+class Wishlist(models.Model):
+    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    variant = models.ForeignKey(Product_Variant, on_delete=models.CASCADE)

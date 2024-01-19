@@ -1,4 +1,4 @@
-{% extends "user_side/base-footer.html" %}
+{% extends "user_side/base.html" %}
 {% load static %}
 {% block title %} Order list {% endblock %}
 {% block content %}
@@ -10,9 +10,9 @@
 </style>
 
 
-<nav class="navbar navbar-expand-lg navbar-light bg-success shadow-lg">
+{% comment %} <nav class="navbar navbar-expand-lg navbar-light bg-success shadow-lg">
     <a class="navbar-brand" href="/"><h3><span class="text-white">Sonic Hub</span></a></h3>
-</nav>  
+</nav>   {% endcomment %}
 <section class="content-main">
     <div class="content-header">
         <div class="container mt-50">
@@ -23,7 +23,7 @@
    
         {% for order_id, order_sub_data_instances in grouped_order_data.items%}
         
-            <div class="row mb-3" style="cursor: pointer;">
+            <div class="row mb-3" >
                 <div class="col-md-12 card shadow-lg p-3 mb-2 bg-white rounded" >  
 
                     {% for order_sub_data in order_sub_data_instances %}
@@ -47,9 +47,13 @@
                                         <p class="card-text">
                                           {% if forloop.first %}
                                           {% if order_sub_data.main_order.payment_status == True %}
-                                                               
-                                            <span class="badge rounded-pill alert-success">{{ order_sub_data.main_order.order_status }}</span>
+                                               {% if order_sub_data.main_order.order_status == 'Cancelled' %}
+                                                <span class="badge  alert-danger">{{ order_sub_data.main_order.order_status }}</span>
+                                                <br>
+                                               {% else %}                
+                                            <span class="badge  alert-success">{{ order_sub_data.main_order.order_status }}</span>
                                             <br>
+                                             {% endif %}
                                             <span>{{ order_sub_data.main_order.date }}</span>
                                           <a href="{% url 'order:order-details' order_sub_data.main_order_id %}" class="btn btn-outline-primary me-2" >View  Details</a>
 

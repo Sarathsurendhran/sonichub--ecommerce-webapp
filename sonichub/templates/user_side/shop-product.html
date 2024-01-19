@@ -54,8 +54,6 @@
                       </a></span>
                   </div>
                   
-                    
-                 
                   <div class="product-rate-cover text-end">
                     <div class="product-rate d-inline-block">
                       <div class="product-rating" style="width:90%"></div>
@@ -130,7 +128,8 @@
                       onclick="buyNow(this.getAttribute('data-id'))" id="button-buy-now" class="button ">
                       Buy Now
                     </button>
-                    <a aria-label="Add To Wishlist" class="action-btn hover-up" data-id="{{ ProductDetails.id }}"
+
+                    <a aria-label="Add To Wishlist" class="action-btn hover-up" data-id="{{products.id }}"
                       onclick="addToWishList(this.getAttribute('data-id'))"><i class="fi-rs-heart"></i></a>
                   </div>
 
@@ -268,126 +267,158 @@
                 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
                 <script src="{% static 'js/profile.js' %}"></script>
 
-                <script>
-                
+      <script>
+      
 
-                  $('#addtocart').on('click', function () {
-                      var productId = '{{ products.id }}'
-                      var variantId = selectedColorDiv ? selectedColorDiv.dataset.id : null; 
-                      var quantity = document.getElementById("product-qty").value;  
+        $('#addtocart').on('click', function () {
+            var productId = '{{ products.id }}'
+            var variantId = selectedColorDiv ? selectedColorDiv.dataset.id : null; 
+            var quantity = document.getElementById("product-qty").value;  
+          
+            $.ajax({
+                type: 'POST',
+                url: '{% url "cart:add-to-cart" %}', 
+                data: {
+                    product: productId,
+                      csrfmiddlewaretoken: '{{ csrf_token }}',
+                      variant: variantId,
+                      quantity: quantity,
                     
-                      $.ajax({
-                          type: 'POST',
-                          url: '{% url "cart:add-to-cart" %}', 
-                          data: {
-                              product: productId,
-                               csrfmiddlewaretoken: '{{ csrf_token }}',
-                               variant: variantId,
-                               quantity: quantity,
-                              
-                          },
-              
-                          success: function (response) {
-                              Swal.fire({
-                                  icon: 'success',
-                                  title: 'Added to Cart!',
-                                  text: 'The item has been added to your cart.',
-                              });
-                          },
-                          error:  function (response){
+                },
+    
+                success: function (response) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Added to Cart!',
+                        text: 'The item has been added to your cart.',
+                    });
+                },
+                error:  function (response){
 
-                              Swal.fire({
-                                  icon: 'error',
-                                  title: 'Oops!',
-                                  text: 'limit',
-                              });
-                          }
-                      });
-                  });
-              </script>
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops!',
+                        text: 'limit',
+                    });
+                }
+            });
+        });
+    </script>
 
-          <script>
-              let selectedColorDiv = null;
-              let selectedColorValue = null;
+<script>
+    let selectedColorDiv = null;
+    let selectedColorValue = null;
 
-              function selectColor(colorDiv, colorValue) {
-                  if (selectedColorDiv) {
-                      selectedColorDiv.style.border = 'none';
-                  }    
-                  colorDiv.style.border = '4px solid gray';
-                  
-                  selectedColorDiv = colorDiv;
-                  selectedColorValue = colorValue;
+    function selectColor(colorDiv, colorValue) {
+        if (selectedColorDiv) {
+            selectedColorDiv.style.border = 'none';
+        }    
+        colorDiv.style.border = '4px solid gray';
+        
+        selectedColorDiv = colorDiv;
+        selectedColorValue = colorValue;
 
-                  updateQuantity(); 
-              }
+        updateQuantity(); 
+    }
 
-              function updateQuantity() {
-                  const quantityInput = document.getElementById("product-qty");
-                  const quantityDisplay = document.getElementById("quantityDisplay");
+    function updateQuantity() {
+        const quantityInput = document.getElementById("product-qty");
+        const quantityDisplay = document.getElementById("quantityDisplay");
 
-                  if (quantityInput && quantityDisplay) {
-                      const currentQty = parseInt(quantityInput.value, 10);
-                      const maxQty = selectedColorDiv.dataset.quantity;
+        if (quantityInput && quantityDisplay) {
+            const currentQty = parseInt(quantityInput.value, 10);
+            const maxQty = selectedColorDiv.dataset.quantity;
 
-                      if (currentQty > maxQty) {
-                          quantityInput.value = maxQty;
-                          quantityDisplay.innerText = maxQty;
+            if (currentQty > maxQty) {
+                quantityInput.value = maxQty;
+                quantityDisplay.innerText = maxQty;
 
-                          
-                      }
-                  }
-              }
+                
+            }
+        }
+    }
 
-              window.onload = function () {
-                  const firstColorDiv = document.getElementById('defaultColor'); 
-                  selectColor(firstColorDiv, firstColorDiv.dataset.color); 
-              };
-          </script>
+    window.onload = function () {
+        const firstColorDiv = document.getElementById('defaultColor'); 
+        selectColor(firstColorDiv, firstColorDiv.dataset.color); 
+    };
+</script>
 
-          <script>
-              function incrementQty() {
-                  const quantityInput = document.getElementById("product-qty");
-                  const quantityDisplay = document.getElementById("quantityDisplay");
+<script>
+    function incrementQty() {
+        const quantityInput = document.getElementById("product-qty");
+        const quantityDisplay = document.getElementById("quantityDisplay");
 
-                  if (quantityInput && quantityDisplay) {
-                      const currentQty = parseInt(quantityInput.value, 10);
+        if (quantityInput && quantityDisplay) {
+            const currentQty = parseInt(quantityInput.value, 10);
 
-                      if (currentQty < selectedColorDiv.dataset.quantity) {
-                          quantityInput.value = currentQty + 1;
-                          quantityDisplay.innerText = quantityInput.value;
-                      }
-                  }
-              }
+            if (currentQty < selectedColorDiv.dataset.quantity) {
+                quantityInput.value = currentQty + 1;
+                quantityDisplay.innerText = quantityInput.value;
+            }
+        }
+    }
 
-              function decrementQty() {
-                  const quantityInput = document.getElementById("product-qty");
-                  const quantityDisplay = document.getElementById("quantityDisplay");
+    function decrementQty() {
+        const quantityInput = document.getElementById("product-qty");
+        const quantityDisplay = document.getElementById("quantityDisplay");
 
-                  if (quantityInput && quantityDisplay) {
-                      const currentQty = parseInt(quantityInput.value, 10);
+        if (quantityInput && quantityDisplay) {
+            const currentQty = parseInt(quantityInput.value, 10);
 
-                      if (currentQty > 1) {
-                          quantityInput.value = currentQty - 1;
-                          quantityDisplay.innerText = quantityInput.value;
-                      }
-                  }
-              }
+            if (currentQty > 1) {
+                quantityInput.value = currentQty - 1;
+                quantityDisplay.innerText = quantityInput.value;
+            }
+        }
+    }
 
-              document.addEventListener("DOMContentLoaded", function () {
-                  const quantityInput = document.getElementById("product-qty");
-                  const quantityDisplay = document.getElementById("quantityDisplay");
+    document.addEventListener("DOMContentLoaded", function () {
+        const quantityInput = document.getElementById("product-qty");
+        const quantityDisplay = document.getElementById("quantityDisplay");
 
-                  if (quantityInput && quantityDisplay) {
-                      quantityDisplay.innerText = quantityInput.value;
-                  }
-              });
+        if (quantityInput && quantityDisplay) {
+            quantityDisplay.innerText = quantityInput.value;
+        }
+    });
 
-          </script>
+</script>
 
-          <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script>
+function addToWishList(dataid){
+  var variantId = selectedColorDiv ? selectedColorDiv.dataset.id : null;
+
+  $.ajax({
+    type:'POST',
+    url:"{% url 'user_panel:wish-list' %}",
+    data:{
+      variant_id:variantId,
+      csrfmiddlewaretoken:'{{ csrf_token }}'
+    },
+    success:function(response){
+       Swal.fire({
+        title:'Added to wishlist',
+        icon:'success',
+
+      })
+
+    },
+    error: function(response){
+      Swal.fire({
+        title:'Something went wrong!',
+        icon:'error'
+      })
+    }
+
+  }) 
+
+}
+
+</script>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 <script src="{% static 'js/profile.js' %}"></script> 
 
-            
+  
             
 {% endblock %}

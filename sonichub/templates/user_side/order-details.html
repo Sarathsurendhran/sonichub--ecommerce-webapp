@@ -1,11 +1,11 @@
-{% extends "user_side/base-footer.html" %}
+{% extends "user_side/base.html" %}
 {% load static  %}
 {% block content %}
 
 
- <nav class="navbar navbar-expand-lg navbar-light bg-success   shadow-lg ">
+ {% comment %} <nav class="navbar navbar-expand-lg navbar-light bg-success   shadow-lg ">
         <a class="navbar-brand" href="/"><span class="text-white">Sonic Hub</span></a>
-    </nav>  
+    </nav>   {% endcomment %}
 <div class="container-fluid ">
 <div class="container">
   <!-- Title -->
@@ -98,25 +98,35 @@
                 {{order_main.address.district}}, {{order_main.address.state}},{{order_main.address.pin_number}}<br>
                 <span>Phone Number: {{order_main.address.phone_number}}</span>
               </address>
+                <form method="post" action="{% url 'order:cancel-order' order_main.order_id order_main.user_id %}" id="cancelorderform">
+                    {% csrf_token %}
 
-              <form method="post" action="{% url 'order:cancel-order' order_main.order_id order_main.user_id %}" id="cancelorderform">
-                {% csrf_token %}
+                    <div class="d-flex justify-content-end">
+                        {% if order_main.order_status != 'Delivered' and order_main.order_status != 'Cancelled' and order_main.order_status != 'Returned' %}
+                            {% if order_main.payment_status %}
+                                <a class="btn btn-outline-danger me-2" id="cancelorder">Cancel Order</a>
+                                <input type="hidden" name="total_amount" value="{{ order_main.total_amount }}">
+                            {% else %}
+                                <a href="{% url 'order:online-payment' order_main.order_id %}" class="btn btn-outline-success me-2">Pay Now</a>
+                            {% endif %}  
+                        {% endif %}
 
-               <div class="d-flex justify-content-end">
+                        {% if order_main.order_status != 'Delivered' %}              
+                        <a href="{% url 'order:order-list' user.id %}" class="btn btn-outline-primary">Back</a>
+                        {% endif %}
+                    </div>
+                </form>
 
-                  {% if order_main.order_status != 'Delivered' and order_main.order_status != 'Cancelled' %}
-                      {% if order_main.payment_status %}
-                          <a class="btn btn-outline-danger me-2" id="cancelorder">Cancel Order</a>
-                          <input type="hidden" name ="total_amount" value = "{{order_main.total_amount}}" >
-                      {% else %}
-                          <a href="{% url 'order:online-payment' order_main.order_id %}" class="btn btn-outline-success me-2" >Pay Now</a>
-                      {% endif %}
-                  
-                      <a href="{% url 'order:order-list' user.id %}" class="btn btn-outline-primary">Back</a>
-                  {% endif %}
+                <form method="post" action="{% url 'order:order-return' %}" id="returnorderform">
+                {% csrf_token %}  
+                    {% if order_main.order_status == 'Delivered' %}
+                        <a class="btn btn-outline-info me-2" id="returnorder">Return Order</a>
+                        <a href="{% url 'order:order-list' user.id %}" class="btn btn-outline-primary">Back</a>
+                        <input type="hidden" name="total_amount" value="{{ order_main.total_amount }}">
+                        <input type="hidden" name="order_id" value="{{ order_main.order_id }}">
+                    {% endif %}
+                </form>
 
-                </div>
-              </form>
             </div>
           </div>
         </div>
@@ -163,6 +173,33 @@ $(document).ready(function(){
   
 })
 
+</script>
+
+<script>
+$(document).ready(function(){
+
+  $("#returnorder").on('click', function(){
+    Swal.fire({
+      title:"Are you sure?",
+      text:'You won\'t be able to revert this!',
+      icon:'warning',
+      showCancelButton:true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, do it!',
+
+    }).then((result)=> {
+      if(result.isConfirmed){
+        Swal.fire({
+          title:"Returned",
+          icon:"success",
+          text:"Your order has been returned",
+        })
+        $("#returnorderform").submit()
+      }
+    })
+  })
+})
 </script>
 
 {% endblock content %}

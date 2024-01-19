@@ -1,0 +1,312 @@
+{% extends "admin_side/admin-base.html" %} {% load static %} {% block content %}
+
+<section class="content-main">
+  {% for message in messages %}
+  <div
+    class="alert alert-{{message.tags}} alert-dismissible fade show"
+    role="alert"
+  >
+    <strong></strong>{{message}}
+    <button
+      type="button"
+      class="btn-close"
+      data-bs-dismiss="alert"
+      aria-label="Close"
+    ></button>
+  </div>
+  {% endfor %}
+
+  <div class="container mb-3">
+    <div class="card-body">
+      <div class="col-lg-6">
+        {% comment %} <form
+          id="variantForm"
+          method="post"
+          action="{% url 'product:add-variant' product %}"
+        > {% endcomment %}
+          {% csrf_token %}
+
+          <div class="card mb-4">
+            <div class="card-header">
+              <h4>Variants</h4>
+            </div>
+            <div class="card-body">
+              <div>
+                <div class="form-group">
+                  <label for="dropdown" class="mb-3">Select Color</label
+                  >&nbsp;
+                  <div class="input-group">
+                    <input
+                      type="color"
+                      id="favcolor"
+                      name="favcolor"
+                      class="form-control form-control-color"
+                      value="#ff0000"
+                    />
+
+                    <label class="input-group-text" for="favcolor"></label>
+                  </div>
+                </div>
+
+                <br />
+                <div class="form-group">
+                  <input
+                    type="hidden"
+                    name="color_names"
+                    id="colorNamesInput"
+                  />
+
+                  <label for="colorName">Color Name</label><br />
+                  <span id="color-name"></span>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="colorName"
+                    name="colour_name"
+                    placeholder="Enter Color Name"
+                  />
+                  <br />
+                </div>
+
+                <div id="quantity-status"></div>
+
+                <br />
+                <input
+                  type="checkbox"
+                  name="variant_status"
+                  class="form-check-input"
+                  checked
+                />
+                <span class="form-check-label">Enable this product</span>
+                <br />
+                <br />
+
+                <div class="form-group">
+                  <label for="quantity">Quantity</label>
+                  <input
+                    type="number"
+                    name="variant_stock"
+                    class="form-control"
+                    placeholder="Total Quantity"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" id="submitBtn" class="btn btn-primary">
+            Submit
+          </button>
+          &nbsp;&nbsp;<button
+            type="button"
+            class="btn btn-light"
+            id="addVariantBtn"
+          >
+            Add Another Variant
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="container mb-3">
+    <div class="card-body">
+      <div class="col-lg-6">
+      {% for variant in variants %}
+
+      <div style="height:30px; width:30px; background-color:{{variant.colour_code}}"></div>
+      <span>{{variant.colour_name}}</span>
+      <div>quantity:{{variant.variant_stock}}</div>
+      
+      {% endfor %}
+      </div>
+    </div>
+</div>
+
+
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<style>
+  .form-control-color {
+    max-width: 180px;
+    max-height: 50px;
+    padding: 0;
+    border: none;
+    border-radius: 7px;
+    padding: 12px;
+  }
+
+  .input-group-text {
+    background-color: transparent;
+    border: none;
+  }
+</style>
+
+<script>
+  $("#addVariantBtn").click(function () {
+    var colorValue = $("#favcolor").val().trim();
+    var colorName = $("#colorName").val().trim();
+    var quantityValue = $("input[name='variant_stock']").val().trim();
+    var statusChecked = $("input[name='variant_status']").is(":checked");
+
+    if (colorValue === "" || colorName === "" || quantityValue === "") {
+      alert("Please fill in all fields before adding another variant.");
+      return;
+    }
+
+    if (!/^[a-zA-Z]+$/.test(colorName)) {
+      alert("Color name should contain only characters.");
+      return;
+    }
+
+    if (isNaN(quantityValue) || quantityValue <= 0) {
+      alert("Quantity should be a positive number.");
+      return;
+    }
+
+    var colorValues = $.map($(".form-control-color"), function (element) {
+        return element.value.trim();
+      });
+  
+      var colorNames = $.map($("input[name='colour_name']"), function (element) {
+        return element.value.trim();
+      });
+  
+      var quantityValues = $.map(
+        $("input[name='variant_stock']"),
+        function (element) {
+          return element.value.trim();
+        }
+      );
+  
+      var statusValues = $.map(
+        $("input[name='variant_status']"),
+        function (element) {
+          return element.checked ? "Enabled" : "Disabled";
+        }
+      );
+  
+      var variants = colorValues.map(function (color, index) {
+        return {
+          color_code: color,
+          color_name: colorNames[index],
+          variant_stock: quantityValues[index],
+          variant_status: statusValues[index] === "Enabled",
+        };
+      });
+    
+    $.ajax({
+        type: "POST",
+        url: addVariantUrl,  
+        contentType: "application/json; charset=utf-8",
+        data: JSON.stringify({ variants: variants }),
+        success: function (response) {
+
+            var variantDisplay =
+            '<div class="variant-container">' +
+            '<span class="badge badge-info" style="margin-right: 10px;">' +
+            "Colour code:&nbsp;&nbsp; " +
+            colorValue +
+            "&nbsp;&nbsp;&nbsp;&nbsp;" +
+            "Colour name: &nbsp;&nbsp;" +
+            colorName +
+            "</span>" +
+            '<span class="badge badge-secondary" style="margin-right: 10px;">' +
+            "Quantity: &nbsp;&nbsp;" +
+            quantityValue +
+            "&nbsp;&nbsp;&nbsp;&nbsp;" +
+            "Status: &nbsp;&nbsp;" +
+            (statusChecked ? "Enabled" : "Disabled") +
+            "</span>" +
+            "</div>";
+      
+          $("#quantity-status").append(variantDisplay);
+      
+          $("#favcolor").val("#ff0000");
+          $("#colorName").val("");
+          $("input[name='variant_stock']").val("");
+          $("input[name='variant_status']").prop("checked", true);
+            
+            
+        },
+        error: function (error) {
+            
+            alert('Something Went Wrong!')
+        }
+    });  
+    
+  });
+
+var addVariantUrl = "{% url 'product:edit-variant' product %}";
+  $("#submitBtn").click(function () {
+    var colorValue = $("#favcolor").val().trim();
+    var colorName = $("#colorName").val().trim();
+    var quantityValue = $("input[name='variant_stock']").val().trim();
+ 
+
+    if (colorValue === "" || colorName === "" || quantityValue === "") {
+      alert("Please fill in all fields before submitting the form.");
+      return false;
+    }
+
+    var colorValues = $.map($(".form-control-color"), function (element) {
+        return element.value.trim();
+      });
+  
+      var colorNames = $.map($("input[name='colour_name']"), function (element) {
+        return element.value.trim();
+      });
+  
+      var quantityValues = $.map(
+        $("input[name='variant_stock']"),
+        function (element) {
+          return element.value.trim();
+        }
+      );
+  
+      var statusValues = $.map(
+        $("input[name='variant_status']"),
+        function (element) {
+          return element.checked ? "Enabled" : "Disabled";
+        }
+      );
+  
+      var variants = colorValues.map(function (color, index) {
+        return {
+          color_code: color,
+          color_name: colorNames[index],
+          variant_stock: quantityValues[index],
+          variant_status: statusValues[index] === "Enabled",
+        };
+      });
+
+      var formData = {
+        variants: variants,
+        submitClicked: true 
+    };
+
+
+    $.ajax({
+        type: "POST",
+        url: addVariantUrl,  
+        contentType: "application/json; charset=utf-8",
+        data: JSON.stringify(formData),
+        success: function (response) {
+
+          window.location.href = "{% url 'product:product-list' %}";  
+           
+        },
+        error: function (error) {
+            
+            console.error(error);
+            alert('Something Went Wrong!')
+        }
+    });  
+    
+    return false;  
+}); 
+</script>
+
+{% endblock content %}

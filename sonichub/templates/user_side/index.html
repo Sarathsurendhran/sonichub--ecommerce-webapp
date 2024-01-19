@@ -226,68 +226,49 @@
         <!------------------ products section starts-------------------- -->
 
         <section class="product-tabs pt-25 pb-20 wow fadeIn animated">
-            <div class="container">
-                <div class="row">
-
-                    <!--End nav-tabs---------------->
-                    <!------------ product details section starts---- -->
-
-                        
+        
+            <div class="container"> 
+                <div class="row"> 
+                <h3 class="section-title mb-20"><span>Popular</span> Products</h3>    
                     <div class="tab-content wow fadeIn animated" id="myTabContent">
                         <div class="tab-pane fade show active" id="tab-one" role="tabpanel" aria-labelledby="tab-one">
-                    {% comment %} product loop starts.... {% endcomment %}
-                    <div class="row product-grid-4">
-                        {% for product in products  %}
-                            {% if product.is_active %}
-                                                      
-                            {% if product.thumbnail.url %}
-                        
-                                <div class="col-lg-2 col-md-4 col-12 col-sm-6">
-                                    <div class="product-cart-wrap mb-30">
-                                        <div class="product-img-action-wrap">
-                                            <div class="product-img product-img-zoom">
-                                                <a href="{% url 'user_panel:shop-product' product.id %}">
-
-                                                    <img class="default-img" style="max-width: 200px" style="max-height: 200px;" src="{{product.thumbnail.url}}"
-                                                        alt="">
-                                                    
-                                                </a>
+                            {% comment %} product loop starts.... {% endcomment %}
+                            <div class="row product-grid-4">
+                                {% for product in products  %}
+                                    {% if product.is_active %}                                                     
+                                    {% if product.thumbnail.url %}                       
+                                        <div class="col-12 col-sm-6 col-md-6 col-lg-3">
+                                            <div class="product-cart-wrap mb-30">
+                                                <div class="product-img-action-wrap">
+                                                    <div class="product-img product-img-zoom">
+                                                        <a href="{% url 'user_panel:shop-product' product.id %}">
+                                                            <img class="default-img" style="max-width: 100%"  src="{{product.thumbnail.url}}" alt="">
+                                                        </a>
+                                                    </div>                                                    
+                                                    <div class="product-action-1">
+                                                        <a aria-label="Add To Wishlist" class="action-btn hover-up" data-id="{{product.id }}" onclick="addToWishList(this.getAttribute('data-id'))"><i class="fi-rs-heart"></i></a>
+                                                    </div>
+                                                    <div class="product-badges product-badges-position product-badges-mrg"> <span class="hot">Hot</span> </div>
+                                                </div>
+                                                <div class="product-content-wrap">
+                                                    <div class="product-category">
+                                                        <a href="shop-grid-right.html">{{product.product_category_id.category_name}}</a>
+                                                    </div>
+                                                    <h2><a href="{% url 'user_panel:shop-product' product.id %}" class="h5">{{product.product_name}}</a></h2>
+                                                    <div class="rating-result" title="90%"> <span> <span>90%</span> </span> </div>
+                                                    <div class="product-price">
+                                                        <span>{{product.offer_price}}</span>
+                                                        <span class="old-price">{{product.price}}</span>
+                                                    </div>
+                                                    <div class="product-action-1 show">
+                                                        <a data-product-id="{{ product.id }}" aria-label="Add To Cart" class="action-btn hover-up addToCartBtn"><i class="fi-rs-shopping-bag-add"></i></a>  
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div class="product-action-1">
-
-                                                <a aria-label="Add To Wishlist" class="action-btn hover-up"
-                                                    href="shop-wishlist.html"><i class="fi-rs-heart"></i></a>
-
-                                            </div>
-                                            <div class="product-badges product-badges-position product-badges-mrg">
-                                                <span class="hot">Hot</span>
-                                            </div>
-                                        </div>
-                                        <div class="product-content-wrap">
-                                            <div class="product-category">
-                                                <a href="shop-grid-right.html">{{product.product_category_id.category_name}}</a>
-                                            </div>
-                                            <h2><a href="{% url 'user_panel:shop-product' product.id %}">{{product.product_name}}</a></h2>
-                                            <div class="rating-result" title="90%">
-                                                <span>
-                                                    <span>90%</span>
-                                                </span>
-                                            </div>
-                                            <div class="product-price">
-                                                <span>{{product.offer_price}}</span>
-                                                <span class="old-price">{{product.price}}</span>
-                                            </div>
-                                            <div class="product-action-1 show">
-                                                <a data-product-id="{{ product.id }}" class="addToCartBtn"   aria-label="Add To Cart" class="action-btn hover-up"><i class="fi-rs-shopping-bag-add"></i></a>  
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                
-                                 {% endif %}
-                            {% endif %}
-                    {% endfor %}
+                                        </div>                            
+                                    {% endif %}
+                                    {% endif %}
+                                {% endfor %}
                             </div>
                             <!-- En tab three (New added) -->
                         </div>
@@ -316,7 +297,7 @@
                                  <h5 class="category-title" ><a href="{% url 'user_panel:category-search' category.category_name %}">{{category.category_name}}</a></h5>
                             </figure>
                            
-                        </div>
+                        </div> 
                           {% endif %}
                          {% endfor %}
                     </div>
@@ -335,10 +316,13 @@
                     <div class="carausel-6-columns text-center" id="carausel-6-columns-3">
                      {% for brand in brands  %} 
                      {% if brand.status %}
+                     {% if brand.brand_image %}
                      
-                        <div class="d-inline-block brand-logo mx-3 ">
+                    
+                     <div class="d-inline-block brand-logo mx-3 ">
                             <img  src="{{brand.brand_image.url}}" alt="" class="img-fluid object-fit-cover" style="max-width: 100px; max-height: 100px;">
                         </div>
+                        {% endif %}
                         {% endif %}
                     {% endfor %}
                     </div>  
@@ -428,6 +412,41 @@ $(".addToCartBtn").on('click', function(event) {
         }
     });
 });
+
+</script>
+
+
+<script>
+function addToWishList(dataid){
+  
+  console.log(dataid)
+  $.ajax({
+    type:'POST',
+    url:"{% url 'user_panel:add-to-wishlist' %}",
+    data:{
+      product:dataid,
+      csrfmiddlewaretoken:'{{ csrf_token }}'
+    },
+    success:function(response){
+       Swal.fire({
+        title:'Added to wishlist',
+        icon:'success',
+
+      })
+
+    },
+     error: function(xhr, status, error) {
+      console.error('AJAX request failed:', status, error);
+      Swal.fire({
+        title: 'Something went wrong!',
+        icon: 'error',
+        text: 'Please try again later.',
+    })
+    }
+
+  }) 
+
+}
 
 </script>
 {% endblock %}

@@ -4,7 +4,7 @@ from brand_management.models import Brand
 from user_authentication.models import UserProfile
 
 class Products(models.Model):
-  product_name = models.CharField(max_length = 40, null = False)
+  product_name = models.CharField(max_length = 100, null = False)
   product_description = models.TextField(max_length = 5000, null = False)
   product_category = models.ForeignKey(Category, on_delete = models.SET_NULL, null = True)
   product_brand = models.ForeignKey(Brand, on_delete = models.SET_NULL, null = True)

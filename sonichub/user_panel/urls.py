@@ -18,7 +18,10 @@ urlpatterns = [
   path('user-wallet/<int:user_id>',views.user_wallet,name='user-wallet'),
   path('wallet-payment/<str:order_id>/<int:id>',views.wallet_payment,name='wallet-payment'),
   path('get-names',views.get_names,name='get-names'),
-  path('category-search/<str:name>',views.category_search,name="category-search")
+  path('category-search/<str:name>',views.category_search,name="category-search"),
+  path('wish-list',views.wish_list,name="wish-list"),
+  path('remove-wishlist/<int:id>',views.remove_wishlist,name='remove-wishlist'),
+  path('add-to-wishlist',views.add_to_wishlist,name='add-to-wishlist')
   
 
 ]

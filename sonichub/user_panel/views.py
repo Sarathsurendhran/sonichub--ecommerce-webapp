@@ -3,16 +3,21 @@ from django.contrib.auth import login, authenticate, logout
 from product_management.models import Products, Product_Variant, Product_images
 from brand_management.models import Brand
 from category_management.models import Category
-from django.views.decorators.cache import cache_control
+from django.views.decorators.cache import cache_control, never_cache
 from user_authentication.models import UserProfile
-from user_panel.models import Address, Transaction
+from user_panel.models import Address, Transaction, Wishlist
 from django.contrib import messages
-from django.http import Http404
+from django.http import Http404, HttpResponseForbidden
 from django.core.mail import send_mail
 from django.utils.crypto import get_random_string
 from django.views.decorators.csrf import csrf_exempt
 from datetime import datetime, timedelta
-from django.http import JsonResponse,HttpResponse
+from django.http import (
+    JsonResponse,
+    HttpResponse,
+    HttpResponseForbidden,
+    HttpResponseBadRequest,
+)
 from django.contrib.auth.hashers import make_password, check_password
 from django.contrib.auth.decorators import login_required
 from django.db.models import Sum
@@ -23,50 +28,87 @@ from category_management.models import Category
 from django.db.models import Q
 
 
+def add_to_wishlist(request):
+    if request.method == "POST":
+        try:
+            product = request.POST.get("product")
+            user = request.user.id
+            user_id = UserProfile.objects.get(id=user)
+            product_id = Products.objects.get(id=product)
+            variant = Product_Variant.objects.filter(
+                product=product_id, variant_status=True
+            ).first()
+            Wishlist.objects.create(user=user_id, variant=variant)
+            return JsonResponse({"status": "success"}, status=200)
+        except Exception as e:
+            return JsonResponse({"status": "error"}, status=403)
+
+
+def remove_wishlist(request, id):
+    if request.method == "POST":
+        data = Wishlist.objects.get(id=id)
+        data.delete()
+        return redirect("user_panel:wish-list")
+    messages.warning(request, "something went wrong!")
+    return redirect("user_panel:wish-list")
+
+
+def wish_list(request):
+    user_id = UserProfile.objects.get(id=request.user.id)
+    if request.method == "POST":
+        variant = request.POST.get("variant_id")
+        variant_id = Product_Variant.objects.get(id=variant)
+        Wishlist.objects.create(user=user_id, variant=variant_id)
+    content = {"wishlist": Wishlist.objects.filter(user=user_id)}
+    return render(request, "user_side/wish-list.html", content)
 
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def category_search(request, name):
-    
-        try:
-            products = Products.objects.filter(product_category__category_name__icontains=name)
-            print(products)
-            if products.exists():
-                return render(request, 'user_side/search-result.html',{"products":products})
-            else:
-                print('not found')
-                return render(request, 'user_side/search-result.html')
-        except Exception as e:
-            print(e)
-            return render(request, 'user_side/search-result.html')
-   
+    try:
+        products = Products.objects.filter(
+            product_category__category_name__icontains=name
+        )
+        print(products)
+        if products.exists():
+            return render(
+                request, "user_side/search-result.html", {"products": products}
+            )
+        else:
+            print("not found")
+            return render(request, "user_side/search-result.html")
+    except Exception as e:
+        print(e)
+        return render(request, "user_side/search-result.html")
 
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def get_names(request):
-    if request.method == 'POST':
+    if request.method == "POST":
         try:
-            query = request.POST.get('search_product')
+            query = request.POST.get("search_product")
             products = Products.objects.filter(
-            Q(product_category__category_name__icontains=query) |
-            Q(product_name__icontains=query) |
-            Q(product_brand__brand_name__icontains=query)
-        )
-           
+                Q(product_category__category_name__icontains=query)
+                | Q(product_name__icontains=query)
+                | Q(product_brand__brand_name__icontains=query)
+            )
+
             if products.exists():
-                return render(request, 'user_side/search-result.html',{"products":products})
+                return render(
+                    request, "user_side/search-result.html", {"products": products}
+                )
             else:
-                print('not found')
-                return render(request, 'user_side/search-result.html')
+                print("not found")
+                return render(request, "user_side/search-result.html")
         except Exception as e:
             print(e)
-            return render(request, 'user_side/search-result.html')
+            return render(request, "user_side/search-result.html")
     return redirect("/")
 
 
-
 # calculating total wallet amount
-@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+
+
 def wallet_balence(request, user_id):
     datas = Transaction.objects.filter(user=user_id)
     grand_total = 0
@@ -78,7 +120,6 @@ def wallet_balence(request, user_id):
     return grand_total
 
 
-@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def wallet_payment(request, order_id, id):
     order_main = Order_Main_data.objects.get(order_id=order_id)
 
@@ -99,19 +140,20 @@ def wallet_payment(request, order_id, id):
         transaction_type="Debit",
     )
 
-    #clearing the cart after payment
+    # clearing the cart after payment
     data = Cart.objects.filter(user=id)
     data.delete()
 
     return render(request, "user_side/order-success.html", {"order_id": order_id})
 
 
-@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def user_wallet(request, user_id):
     total = wallet_balence(request, user_id)
 
     content = {
-        "TransactionHistory": Transaction.objects.filter(user=user_id),
+        "TransactionHistory": Transaction.objects.filter(user=user_id)
+        .order_by("id")
+        .reverse(),
         "wallet_total": total,
     }
 
@@ -254,9 +296,13 @@ def update_mail_otp(request):
     request.session["otp"] = otp
     request.session["otp_time"] = time_as_string
 
+    site_name = "Sonichub"
+    subject = f"OTP for Data Update on {site_name}"
+    message = f"Hi {request.user},\n\nThanks for updating your data on {site_name}.\n\nYour OTP for the update is: {otp}\n\nPlease use this OTP to confirm the changes.\n\nBest regards,\nThe {site_name} Team"
+
     send_mail(
-        "OTP for sign up",
-        f"Hi {request.user} Your OTP is: {otp}",
+        subject,
+        message,
         "sonichubecommerce@outlook.com",
         [request.session["email"]],
         fail_silently=False,

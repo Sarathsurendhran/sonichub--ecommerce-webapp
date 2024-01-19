@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from user_panel.models import Address,Transaction
+from user_panel.models import Address, Transaction
 from cart_management.models import Cart
 from order_managements.models import Order_Main_data, Order_Sub_data
-from user_panel.models import Address,Transaction
+from user_panel.models import Address, Transaction
 from user_authentication.models import UserProfile
 from django.utils import timezone
 from product_management.models import Product_Variant
@@ -16,7 +16,27 @@ from django.conf import settings
 from coupon_management.models import Coupon, Users_Coupon
 from django.contrib import messages
 from django.db.models import Sum
+from user_panel.views import wallet_balence
 
+
+def order_return(request):
+    if request.method == "POST":
+        id = request.user.id
+        amount = request.POST.get("total_amount")
+        order_id = request.POST.get("order_id")
+        main_order = Order_Main_data.objects.get(order_id=order_id)
+        user_id = UserProfile.objects.get(id=id)
+        main_order.order_status = "Returned"
+        main_order.save()
+
+        Transaction.objects.create(
+            description="Returned Order " + order_id,
+            amount=amount,
+            transaction_type="Credit",
+            user=user_id,
+        )
+
+    return redirect("order:order-list", id)
 
 
 # payment success function for online order
@@ -27,7 +47,7 @@ def payment_success(request, order_id):
     main_order_obj.save()
 
     id = request.user.id
-    #clearing the cart after payment
+    # clearing the cart after payment
     data = Cart.objects.filter(user=id)
     data.delete()
 
@@ -47,28 +67,28 @@ def online_payment(request, order_id):
     return render(request, "user_side/online-payment-summary.html", context)
 
 
-
 def cancel_order(request, order_id, user_id):
     if request.method == "POST":
         data = Order_Main_data.objects.get(order_id=order_id)
         data.order_status = "Cancelled"
         data.save()
 
-        if data.payment_option == 'online payment' or data.payment_option == 'wallet payment':
-            amount = request.POST.get('total_amount')
+        if (
+            data.payment_option == "online payment"
+            or data.payment_option == "wallet payment"
+        ):
+            amount = request.POST.get("total_amount")
             user = UserProfile.objects.get(id=user_id)
-            
+
             transaction_data = Transaction.objects.create(
                 user=user,
-                description="Cancelled Order " +" "+ order_id,
+                description="Cancelled Order " + order_id,
                 amount=amount,
                 transaction_type="Credit",
-               
             )
 
-        print(user_id)
+       
         return redirect("order:order-list", user_id)
-
 
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
@@ -129,8 +149,6 @@ def confirm_order(request, id):
         total_price = request.POST.get("total_price")
         coupon_code = request.POST.get("coupon_code")
 
-
-
         # coupon recheck...
         if coupon_code is not None and coupon_code != "None":
             try:
@@ -154,6 +172,14 @@ def confirm_order(request, id):
                 print(e)
                 messages.warning(request, "Enter valid coupon")
                 return redirect("order:checkout", user)
+            
+
+        wallet_amount = wallet_balence(request, id)  
+        
+        if payment_option == "wallet payment":  
+            if total_price > wallet_amount:
+                messages.warning(request, "Insufficient Balence!")
+                return redirect("order:checkout",id)
 
         current_date = timezone.now().date()
         formatted_date = current_date.strftime("%Y%m%d")
@@ -166,7 +192,7 @@ def confirm_order(request, id):
             order_status=order_status,
             address=address_id,
             user=user_id,
-            payment_option=payment_option
+            payment_option=payment_option,
         )
         order_id = "#" + str(formatted_date) + str(user) + str(main_order.id)
         main_order.order_id = order_id
@@ -180,16 +206,13 @@ def confirm_order(request, id):
                 main_order=main_order_id,
                 user=user_id,
                 variant=product.variant,
-
             )
 
-   
         if payment_option == "online payment":
             return redirect("order:online-payment", order_id)
-        
-        if payment_option == 'wallet payment':
-            return redirect("user_panel:wallet-payment",order_id, id)
-        
+
+        if payment_option == "wallet payment":
+            return redirect("user_panel:wallet-payment", order_id, id)
 
         # clearing the cart
         data.delete()
@@ -200,9 +223,8 @@ def confirm_order(request, id):
             coupon.is_active = False
             coupon.save()
 
-
         # creating razorpay object
-            
+
         total_price_float = float(total_price)
 
         client = razorpay.Client(
@@ -218,15 +240,12 @@ def confirm_order(request, id):
         main_order_id.payment_id = payment["id"]
         main_order_id.save()
 
-
-        
         main_order_id.payment_status = True
         main_order_id.save()
 
         context = {"order_id": order_id, "address": address_id, "subtotal": sub_total}
 
         return render(request, "user_side/order-success.html", context)
-
 
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)

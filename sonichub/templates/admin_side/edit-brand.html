@@ -25,20 +25,21 @@
                             <div class="col-lg-10">
                                 <section class="content-body p-xl-4">
                                     <!-- Form -->
-                                    <form action="#" method="post" enctype="multipart/form-data">
+                                    <form action="#" method="post" enctype="multipart/form-data"  onsubmit="return validateForm()">
                                         {% csrf_token %}
                                         <section class="content-body p-xl-4">
                                             <!-- Form -->
                                             <div class="row">
-                                                <div class="col-lg-8 p-2">
+                                                <div class="col-lg-8 p-2" id="mediaUploadSection" style="display: none;">
                                                     <div class="card mb-12">
                                                         <div class="card-header">
                                                             <h4>Media</h4>
                                                         </div>
-                                                        <div class="card-body">
+                                                    
+                                                  <div class="card-body">
                                                             <div class="input-upload">
-                                                                <img src="{% static 'admin-assets/imgs/theme/upload.svg' %}" alt="">
-                                                                <input class="form-control" type="file" id="file" name="brand_image" accept="image/*" value = "{{brand_data.brand_image}}"  required>
+                                                               
+                                                                <input class="form-control" type="file" id="file" name="brand_image" accept="image/*">
                                                             </div>
                                                         </div>
                                                     </div> 
@@ -46,10 +47,14 @@
                                                 
                                                 <div class="col-lg-4 p-2" >
                                                 <label for="#">Current Media</label>
+                                                    {% if brand_data.brand_image %}
+                                                    
                                                     <img src={{brand_data.brand_image.url}} alt="">
+                                                     {% endif %}
+                                                      <button type="button" class="btn btn-secondary mt-2" id="changeMediaBtn">Change</button>
                                                 </div>
                                             </div>
-                                            
+                                           
                                         </section>
                                         <div class="row mb-4">
                                             <label class="col-lg-3 col-form-label" for="name">Brand name*</label>
@@ -81,5 +86,36 @@
             </div>
         </div>
     </section>
+<script>
+    let changeMediaBtn = document.getElementById('changeMediaBtn');
+    let mediaUploadSection = document.getElementById('mediaUploadSection');
+    let fileInput = document.getElementById('file');
+    let form = document.querySelector('form');
+
+    changeMediaBtn.addEventListener('click', function () {
+        mediaUploadSection.style.display = 'block';
+    });
+
+    form.addEventListener('submit', function (event) {
+        // Check if the Change button was clicked
+        if (mediaUploadSection.style.display === 'block') {
+            // Check if a new image is selected
+            if (fileInput.files.length === 0) {
+                // If no new image is selected, prevent form submission
+                event.preventDefault();
+                alert('Please select a new image or click Cancel to keep the current image.');
+            } else {
+                // Include the file input in the form data
+                let formData = new FormData(this);
+                formData.append('brand_image', fileInput.files[0]);
+                // Replace the original form data with the updated one
+                event.formData = formData;
+            }
+        }
+    });
+</script>
+
+
+
 
 {% endblock content %}

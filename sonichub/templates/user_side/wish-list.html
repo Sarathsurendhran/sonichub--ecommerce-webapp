@@ -1,0 +1,137 @@
+{% extends 'user_side/base.html' %}
+{% load static  %}
+
+{% block content %}
+  <main class="main">
+  {% if wishlist %}
+  {% for message in messages %}
+                <div class="alert alert-{{message.tags}} alert-dismissible fade show" role="alert">
+                    <strong></strong>{{message}}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+    <div class="page-header breadcrumb-wrap">
+      <div class="container">
+        <h2>My Wish List</h2>
+      </div>
+    </div>
+    {% else %}
+    <div class="page-header breadcrumb-wrap" >
+      <div class="container">
+        <h2>Your WishList is Empty</h2>
+      </div>
+    </div>
+      {% endif %}
+    <section class="mt-50 mb-50" >
+      <div class="container">
+        <div class="row">
+          <div class="col-12">
+            <div class="table-responsive">
+              <table class="table shopping-summery text-center clean">
+                <thead>
+                  <tr class="main-heading">
+                    <th scope="col">Image</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Price</th>
+                    <th scope="col">Remove</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- CART LOOP STARTS -->
+                  {% for data in wishlist %}
+                    <tr>
+                      <td class="image product-thumbnail">
+                        {% if data.variant.product.thumbnail.url %}
+                          <img alt="" src="{{ data.variant.product.thumbnail.url}}">
+                        {% else %}
+                          <img alt="NoImage" src="{% static 'admin-assets/imgs/items/No-Image.png' %}">
+                        {% endif %}
+                      </td>
+                      <td class="product-des product-name">
+                       {% if data.variant.variant_status %}
+
+                          <h5 class="product-name">
+                            <a href="{% url 'user_panel:shop-product' data.variant.product.id %}"><span>{{ data.variant.product.product_name|title}}</span></a>
+                          </h5>
+                      {% else %}
+                          <div class="d-flex flex-column justify-content-center">
+                            <div>
+                              <h5 class="product-name">
+                                <a href="{% url 'user_panel:shop-product' data.variant.product.id %}"><span>{{  data.variant.product.product_name|title }}</span></a>
+                              </h5>
+                            </div>
+                            <div>
+                              <h5 class="h5 mt-15" style="color: red">Out of Stock</h5>
+                            </div>
+                          </div>
+                        {% endif %}
+                      </td>
+                      <td class="price" data-title="Price">
+                        <span class="h6 px-1">
+                          ₹{{ data.variant.product.offer_price }}
+                        </span>
+                      </td>
+
+                      <td class="action" data-title="Remove">
+                        <form method="post" action="{% url 'user_panel:remove-wishlist' data.id %}" onsubmit="return false">
+                          {% csrf_token %}
+                          <button class="btn border-0" onclick="confirmDelete(this.form)">
+                            <i class="fi-rs-trash"></i>
+                          </button>
+                        </form>
+                      </td>
+                    </tr>
+                  {% endfor %}
+                  <!-- CART LOOP END -->
+                  {% comment %} <tr>
+                    <td colspan="6" class="text-end">
+                      <form method="post" action="#" onsubmit="return false">
+                        {% csrf_token %}
+                        <button class="text-muted btn border-0" onclick="confirmClear(this.form)">
+                          <i class="fi-rs-cross-small"></i>Clear Cart
+                        </button>
+                      </form>
+                    </td>
+                  </tr> {% endcomment %}
+                </tbody>
+              </table>
+            </div>
+            <div class="wishlist-action text-end">
+              <a class="btn" href="/">
+                <i class="fi-rs-shopping-bag mr-10"></i>Continue Shopping
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+  <script src="{% static 'js/profile.js' %}"></script>
+
+  <script>
+  function confirmDelete(form){
+    Swal.fire({
+      title:'Are you sure?',
+      icon:'warning',
+      text: 'This action cannot be undone. Do you want to proceed?',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, delete it!'
+    }).then((result)=>{
+      if(result.isConfirmed){
+        Swal.fire({
+          title:'Deleted',
+          icon:'success',
+          didClose:()=>{
+              form.submit()
+          }
+        })
+      }
+    })
+
+  }
+  </script>
+{% endblock content %}

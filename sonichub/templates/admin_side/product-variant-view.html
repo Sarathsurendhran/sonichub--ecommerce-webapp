@@ -9,6 +9,13 @@
     }
 </style>
 
+<style>
+    .edit-mode {
+        display: none;
+    }
+</style>
+
+
 <section class="content-main">
     <div class="content-header">
         {% comment %} <div>
@@ -20,30 +27,7 @@
      
     </div>
     <div class="card mb-4">
-        <header class="card-header">
-            <div class="row align-items-center">
-                <div class="col-lg-4 col-md-6 me-auto">
-                    <form action="#" method="get">
-                        <input type="text" name="query" placeholder="Search..." class="form-control">                 
-                </div>
-                <div class="col-lg-4 col-md-2 col-6">
-                    <button type="submit" class="btn btn-outline-primary">Search</button>
-                </div>
-
-                <div class="col-md-2 col-6">
-                    <input type="date" value="02.05.2021" class="form-control">
-                </div>
-
-                <div class="col-md-2 col-6">
-                    <select class="form-select">
-                        <option selected>Status</option>
-                        <option>Active</option>
-                        <option>Disabled</option>
-                        <option>Show all</option>
-                    </select>
-                </div>
-            </div>
-        </header> <!-- card-header end// -->
+       <div class="d-flex justify-content-end ml-30 mt-10 mb-10"><a href="{% url 'product:add-variant' products.id %}" class="btn btn-outline-info">Add Variants</a></div>
 
         <div class="card-body">
             
@@ -52,7 +36,7 @@
                                 <thead>
                                     <tr>
                                         <th> Variant Colours</th>
-                                        <th>Variant Name</th>
+                                        <th>Colour Name</th>
                                         <th>Stock</th>                                   
                                         <th class="text-middle">Status</th>
                                         <th class="text-middle">Action</th> 
@@ -62,16 +46,22 @@
                                 <tbody >
                                     {% for variant in variants %}
                                     <tr>
-                                        
-                                        <td>
-                                             <div style="width: 70px; height: 40px; background-color: {{variant.colour_code}}"></div>
+                                    
+                                        <td><div class="static-mode" style="width: 70px; height: 40px; background-color: {{variant.colour_code}}"></div>
+                                        <div class="edit-mode"><input type="color" id="edit-color-input" value="{{ variant.colour_code }}"></div>
                                         </td>
 
-                                        <td><a href="#"> <h6 class="mb-0">{{ products.product_name }}</h6></a></td>
-                                          <td class="text-middle">
+                                        
+                                        <td class="static-mode"><a href="#"> <h6 class="mb-0">{{variant.colour_name }}</h6></a></td>
+                                        <td class="edit-mode"><input type="text"  id="edit-name-input" value={{variant.colour_name}}></td>
+
+                                        <td class="text-middle  static-mode">
                                             <span class="badge  {% if variant.variant_stock %} alert-success {% else %} alert-danger {% endif %}">
                                                 {% if variant.variant_stock %} {{variant.variant_stock}} {% else %} Out Of Stock {% endif %} </span>
+
+                                            <td class="edit-mode"><input type="text" id="edit-stock-input"  value={{variant.variant_stock}}></td>
                                         </td>
+                                        
                                         <td class="text-middle">
                                             <span  class="badge rounded-pill {% if variant.variant_status %} alert-success {% else %} alert-danger {% endif %}">
                                                 {% if variant.variant_status %} Active {% else %}Inactive {% endif %} </span>
@@ -83,11 +73,14 @@
                                                 </a>
                                                 <div class="dropdown-menu dropdown-custom">
                                                     {% comment %} <a class="dropdown-item" href="#">View detail</a> {% endcomment %}
-                                                    <a class="dropdown-item" href="#">Edit</a>
+                                                    <a class="dropdown-item  edit-action" href="#">Edit</a>
+                                                    {% comment %} <a class="dropdown-item " href="{% url 'product:delete-variant' variant.id variant.product.id %}" >Delete</a> {% endcomment %}
+
                                                     <a class="dropdown-item" href="{% url 'product:variant-status-change' variant.id %}" id="update" data-variant-id="{{ variant.id }}" onclick="update(this)">
                                                     <input type="hidden"  id="variant-status-change-url" value="{% url 'product:variant-status-change' variant.id %}">
 
                                                       {% if not variant.variant_status %}Enable {% else %}Disable{% endif %}</a>
+                                                      <input type="hidden" id = "variant_id" value={{variant.id}}>
                                                 </div>
                                             </div> <!-- dropdown //end -->
                                         </td>
@@ -118,6 +111,64 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js" integrity="sha384-cuYeSxntonz0PPNlHhBs68uyIAVpIIOZZ5JqeqvYYIcEL727kskC66kF92t6Xl2V" crossorigin="anonymous"></script>
 
 
+
+
+<script>
+    $(document).ready(function () {
+        $('.edit-action').click(function () {
+            var row = $(this).closest('tr');
+            
+           
+
+            var buttonText = ($(this).text() === 'Edit') ? 'Submit' : 'Edit';
+            $(this).text(buttonText);
+
+             row.find('.static-mode, .edit-mode').toggle();
+
+              if (buttonText === 'Edit') {
+                var colorValue = row.find('#edit-color-input').val();
+                var nameValue = row.find('#edit-name-input').val();
+                var stockValue = row.find('#edit-stock-input').val();
+                var variant_id = row.find('#variant_id').val();
+
+                console.log(variant_id)
+
+                var data = {
+                    color: colorValue,
+                    name: nameValue,
+                    stock: stockValue,
+                    variant_id: variant_id,
+                    product:{{products.id}}
+                    
+                    
+                };
+               
+                let url =  "/admin/productedit-variant/" + variant_id
+                $.ajax({
+                    type: 'GET',
+                    url: url,
+                    data: data,
+                    success: function (response) {
+                     window.location.reload()
+                        console.log('Update successful:', response);
+                    },
+                    error: function (error) {
+
+                        alert("Something went wrong!")
+                    }
+                });
+            }
+
+        });
+
+
+    });
+
+   
+</script>
+
+
+
 {% comment %} <script>
 
 
@@ -139,5 +190,8 @@
       })
   }
 </script> {% endcomment %}
+
+
+
 
 {% endblock content %}

@@ -9,7 +9,7 @@ from product_management.models import Products,Product_Variant
 def brand_list(request):
   if not request.user.is_superuser:
     return redirect('admin_panel:admin_login')
-  brandlist = Brand.objects.all().order_by('id')
+  brandlist = Brand.objects.all().order_by('id').reverse()
   content = {
     'brandlist':brandlist
   }

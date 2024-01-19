@@ -34,8 +34,8 @@ def order_status_change(request):
 def order_list(request):
     
     content={
-        "order_main_data":Order_Main_data.objects.all(),
-        "order_sub_data":Order_Sub_data.objects.all()
+        "order_main_data":Order_Main_data.objects.all().order_by('id').reverse(),
+        "order_sub_data":Order_Sub_data.objects.all().order_by("id").reverse()
     } 
     return render(request,'admin_side/order-list.html',content)
 
