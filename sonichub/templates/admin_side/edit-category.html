@@ -9,7 +9,7 @@
         <div class="content-header">
             <div>
                 <h2 class="content-title card-title">Categories </h2>
-                <p>Edit the category</p>
+                <p>Add, edit or delete a category</p>
             </div>
             <div>
                {% comment %} <a href="{% url 'category:add_category' %}" class="btn btn-primary">Go Back</a> {% endcomment %}
@@ -19,7 +19,7 @@
         <div class="card" >
             <div class="card-body">
                  <div class="container mt-4">
-                    <h4>Edit Category</h4><hr>
+                    <h4>Add New Category</h4><hr>
                      <div class="row">
                                     
                       {% for message in messages %}
@@ -45,7 +45,7 @@
                                 </div>
                                 <div class="col-4">
                                     <select id="id_status" name="status" class="form-select custom-select-options">
-
+                                      
                                          {% if category_data.is_available %}
                                               <option value="1" class="fw-bolder" selected>Active</option>
                                               <option value="0" class="fw-bolder">Inactive</option>
@@ -53,19 +53,17 @@
                                               <option value="1" class="fw-bolder">Active</option>
                                               <option value="0" class="fw-bolder" selected>Inactive</option>
                                          {% endif %}
-                        
                                     </select>
                                     <label for="status"></label>
                                 </div>
                                 <div class="col-4">
 
-                  
-                                   
-                                  <select id="id_parent-category" name="parent" class="form-select custom-select-options" >
-          
-                                      <option value="0" class="fw-bolder" >No Parent</option>
-                                      {% for data in category_parent_data %}
-                                          <option value="{{ data.id }}">{{ data.category_name }}</option>
+                                  <select id="id_parent-category" name="parent" class="form-select custom-select-options">
+                                   <option value="0" class="fw-bolder" >No Parent</option>
+                                     {% for data in category_parent_data %}
+
+                                        <option value="{{ data.id }}" {% if category_data.parent_id == data.id %}selected{% endif %}>{{ data.category_name }}</option>
+
                                           
                                       {% endfor %}
                                   </select>
@@ -73,21 +71,116 @@
                                 </div>
                             </div>
                           </div>
-                          <div class="container">
-                            <div class="row">
-                              <div class="col-5"></div>
-                              <div class="col-5"></div>
-                              <div class="col-2 d-flex flex-column-reverse">
-                                <button type="submit" class="btn btn-brand">Update</button>
-                              </div>
-                            </div>
-                          </div>
+
+                              {% comment %} category offer section {% endcomment %}
+
+                             <div class="pb-2 d-flex justify-content-center align-items-center">
+                                 <label>
+                                     <span class="px-3">Do you want to add <span class="bold">Offer</span> for this Category</span>
+                                    <input type="checkbox" id="show-offer-input" class="form-check-input" {% if checkbox_checked %}checked{% endif %}>
+
+                                 </label>
+                             </div>
+                             <div class="row" id="offer-input"> 
+                                
+                                 <div class="col-4">
+                                     <label for="offer-input-minimum"><h5>Minimum Price Eligible</h5></label>
+                                     <input type="number" id="offer-input-minimum" class="form-control"
+                                            placeholder="Minimum Amount Eligible for discount" name="minimum_amount" value="{{category_data.minimum_amount}}">
+                                     <span id="offer-input-minimum-error" style="color: red"></span>
+                                 </div>
+                                 <div class="col-4">
+                                     <label for="offer-input-percentage"><h5>Offer Percentage</h5></label>
+                                     <input name = "discount" type="number" id="offer-input-percentage" class="form-control" placeholder="Discount percentage" value="{{category_data.discount}}">
+                                    <span id="offer-input-percentage-error" style="color: red"></span>
+                                 </div>
+                                 <div class="col-4 ">
+                                     <label for="offer-input-expiryDate"><h5>Expiry Date</h5></label>
+                                     <input name="date" type="date" id="offer-input-expiryDate" class="form-control" min="{{current_date}}" value="{{category_data.expirydate |date:'Y-m-d' }}">
+                                     <span id="offer-input-expiryDate-error" style="color: red"></span>
+                                 </div>
+                               
+                             </div>
+                             
+                           <button type="submit" class="btn btn-brand mt-20">Upload</button>
                       </form> 
                  </div>
             </div>
         </div>
     </section>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 
+<script>
+  $(document).ready(function(){
+    
+    if ($("#show-offer-input").is(":checked")) {
+      $("#offer-input").show();
+      attachValidation();
+    } else {
+      $("#offer-input").hide();
+      $("#add-category-form").off("submit");
+    }
+
+    $("#show-offer-input").on('change', function(){
+      if ($(this).is(":checked")){
+        $("#offer-input").show();
+        
+        attachValidation();
+      } else {
+        $("#offer-input").hide();
+        
+        $("#add-category-form").off("submit");
+      }
+    });
+
+    function attachValidation() {
+      $("#offer-input-minimum, #offer-input-percentage, #offer-input-expiryDate").on('focus', function() {
+        $(`#${$(this).attr('id')}-error`).text("");
+      });
+
+      $('#add-category-form').submit(function(event){
+        event.preventDefault();
+
+        let minimum_amount = parseInt($('#offer-input-minimum').val());
+        let discount = parseInt($("#offer-input-percentage").val());
+        let date = $("#offer-input-expiryDate").val();
+        let amount = minimum_amount.toString();
+        let is_eligible = true;
+
+        if(minimum_amount < 400){
+          $("#offer-input-minimum-error").text("The minimum amount must be set to 400 or higher.");
+          is_eligible = false;
+        }
+
+        if (amount.length > 0 && (amount.length > 5 || amount < 0 || isNaN(minimum_amount))) {
+          $("#offer-input-minimum-error").text("Enter a valid input!");
+          is_eligible = false;
+        }
+
+        if(discount > 90){
+          $("#offer-input-percentage-error").text("Discounts exceeding 90% are not permitted.");
+          is_eligible = false;
+        }
+
+        if(discount < 0 || isNaN(discount)){
+          $("#offer-input-percentage-error").text("Enter a valid input!");
+          is_eligible = false;
+        }
+
+        if(date === ""){
+          $("#offer-input-expiryDate-error").text("Enter a valid input!");
+          is_eligible = false;
+        }
+
+        if(is_eligible){
+          $("#add-category-form").off("submit").submit();
+        }
+      });
+    }
+  });
+</script>
 
 
 {% endblock content %}

@@ -21,7 +21,8 @@ urlpatterns = [
   path('category-search/<str:name>',views.category_search,name="category-search"),
   path('wish-list',views.wish_list,name="wish-list"),
   path('remove-wishlist/<int:id>',views.remove_wishlist,name='remove-wishlist'),
-  path('add-to-wishlist',views.add_to_wishlist,name='add-to-wishlist')
+  path('add-to-wishlist',views.add_to_wishlist,name='add-to-wishlist'),
+  # path('referral-link',views.referral_link_generation,name='referral-link')
   
 
 ]

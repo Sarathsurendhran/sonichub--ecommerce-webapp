@@ -47,7 +47,11 @@
                                     <th>Name</th>
                                     <th>Status</th>
                                     <th>Parent-ID</th>
+                                     <th >Minum Eligible Price</th>
+                                    <th >Discount</th>
+                                    <th >Expiry Date</th>
                                     <th >Action</th>
+                                   
                                     
                                 </tr>
                                 </thead>
@@ -56,28 +60,43 @@
                                 {% for category in categories%}
                                     <tr>
                                         <td></td>
-                                        <td><h4>{{ forloop.counter }}</h4></td>
-                                        <td><h4>{{ category.category_name }}</h4></td>
+                                        <td><h6>{{ forloop.counter }}</h6></td>
+                                        <td><h6>{{ category.category_name }}</h6></td>
                                         <td>
                                             <form method="post" action="{% url 'category:category-status-update' category.id %}" onsubmit="return false;">
                                                 {% csrf_token %}
                                                 {% if category.is_available %} 
-                                                    <button type="submit" class="rounded-pill alert-success" onclick="confirmUpdate(this.form)">Active</button>
+                                                    <button type="submit" class=" alert-success" onclick="confirmUpdate(this.form)">Active</button>
                                                 {% else %}
                         
-                                                    <button type="submit" class="rounded-pill alert-danger" onclick="confirmUpdate(this.form)">InActive</button>
+                                                    <button type="submit" class=" alert-danger" onclick="confirmUpdate(this.form)">InActive</button>
                                                 {% endif %}
                                             </form>
                                         </td>
                                         <td>
                                             {% if category.parent == None    %} 
-                                                <h4>No Parent</h4>
+                                                <h6>No Parent</h6>
                                             {% else %}
-                                                <h4> {{category.parent}}</h4>
+                                                <h6> {{category.parent}}</h6>
                                             {% endif %}
                                         </td>
-                                        <td class="">
-                                            <a href="{% url 'category:edit-category' category.id %}" class="btn btn btn-primary">Edit info</a>
+                                       <td style="background-color: {% if category.minimum_amount is None %}#FFD6D6{% else %}#D6FFD6{% endif %};"><h6>{{ category.minimum_amount|default:"N/A" }}</h6></td>
+                                       <td style="background-color: {% if category.discount is None %}#FFD6D6{% else %}#D6FFD6{% endif %};">
+                                            <h6>
+                                                {% if category.discount %}
+                                                    {{ category.discount }}%
+                                                {% else %}
+                                                    {{ category.discount | default:"N/A" }}
+                                                {% endif %}
+                                            </h6>
+                                        </td>
+
+                                        <td style="background-color: {% if category.expirydate is None %}#FFD6D6{% else %}#D6FFD6{% endif %};"><h6>{{ category.expirydate|default:"N/A" }}</h6></td>
+
+
+
+                                        <td >
+                                            <a href="{% url 'category:edit-category' category.id %}" class="btn btn btn-primary">Edit</a>
                                         </td>
                                         
                                     </tr>

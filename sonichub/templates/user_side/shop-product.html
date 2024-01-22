@@ -51,7 +51,18 @@
                       <span>Category:
                       <a href="#">
                       <span>{{ products.product_category.category_name }}</span>
-                      </a></span>
+                      </a>
+                     </span>
+
+
+                    {% if products.product_category.discount is not None  and  products.offer_price|floatformat:2   >= products.product_category.minimum_amount %}
+                        <span style="display: inline-block;" class="mt-10">
+                            <i class="fi fi-rs-ticket" style="color: green;"></i>
+                            <h5 style="color: green; display: inline;"> Extra {{ products.product_category.discount }} % off on this category</h5>
+                        </span>
+                    {% endif %}
+
+
                   </div>
                   
                   <div class="product-rate-cover text-end">
@@ -63,20 +74,20 @@
                 </div>
                 <div class="clearfix product-price-cover row">
                   <div class="product-price primary-color float-left">
-                 <h4 style="font-size: 1.2em; margin-bottom: 5px;">Offer Price</h4>
+                 <h4 style="font-size: 1.2em; margin-bottom: 5px;">Special Price</h4>
                   <br>
                   <ins><span class="text-brand offer-price">₹ {{ products.offer_price }}</span></ins>
                    <ins><span class="old-price  ml-10 orginal-price" style="text-decoration: line-through; margin-right: 15px;">₹ {{ products.price }}</span></ins>
                     
                    
-                {% comment %} <span id="save-price" class="save-price font-md color3 ml-15"></span>
+               {% comment %} <span id="save-price" class="save-price font-md color3 ml-15"></span>
                 </div>
                   <div class="p-2">
                     <span class="h6 primary-color"></span>
                     <span id="category-offer" class="h4 text-success"></span>
                     <span class="h6 primary-color"></span>
                   </div>
-                </div> {% endcomment %}
+                </div>  {% endcomment %}
 
                 {% comment %} <div class="bt-1 border-color-1 mt-15 mb-15"></div>
                 <div class="short-desc mb-30">
@@ -84,7 +95,7 @@
                 </div> {% endcomment %}
                 <div class="product_sort_info font-xs mb-30 mt-3  0">
                   <ul>
-                    <li class="mb-10"><i class="fi-rs-crown mr-5"></i> 1 Year AL Jazeera Brand Warranty</li>
+                    <li class="mb-10"><i class="fi-rs-crown mr-5"></i> 1 Year {{ products.product_brand.brand_name }} Brand Warranty</li>
                     <li class="mb-10"><i class="fi-rs-refresh mr-5"></i> 30 Day Return Policy</li>
                     <li><i class="fi-rs-credit-card mr-5"></i> Cash on Delivery available</li>
                   </ul>

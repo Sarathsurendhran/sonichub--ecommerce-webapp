@@ -27,7 +27,6 @@ from cart_management.models import Cart
 from category_management.models import Category
 from django.db.models import Q
 
-
 def add_to_wishlist(request):
     if request.method == "POST":
         try:
@@ -184,13 +183,8 @@ def shop_product(request, id):
     if not request.user.is_authenticated:
         return redirect("user_side:user_login")
     
-    total_stock = 0
     variants = Product_Variant.objects.filter(product=id)
-    for i in variants:
-        total_stock += i.variant_stock
-    
-    print(total_stock)
-
+ 
 
     context = {
         "products": Products.objects.get(id=id),

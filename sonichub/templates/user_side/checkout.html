@@ -1,10 +1,35 @@
 {% extends 'user_side/base.html' %}
 
 {% block content %}
-{% comment %} <main class="main">
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="/"><span class="">Sonic Hub</span></a>
-    </nav> {% endcomment %}
+
+
+<!-- Modal -->
+<div class="modal fade" id="coupon-show-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
+        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+
+        <div class="card">
+            <div class="card-body">
+                This is some text within a card body.
+            </div>
+        </div>
+        
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 <section class="mt-50 mb-50">
     <div class="container" style="max-width:1300px">
         {% for message in messages %}
@@ -19,10 +44,10 @@
                 <div class="toggle_info">
                     <span>
                         <i class="fi-rs-label mr-10"></i> <span class="text-muted">Have a coupon?</span> 
-                        <a href="#coupon" data-bs-toggle="collapse" class="collapsed" aria-expanded="false">Click here to enter your code</a>
+                        <a href="#coupon" data-bs-toggle="collapse" class="collapsed" aria-expanded="false" id="apply-coupon">Click here to enter your code</a>
                     </span>
                 </div>
-                <div class="panel-collapse collapse coupon_form " id="coupon">
+                <div class="panel-collapse collapse coupon_form" id="coupon">
                     <div class="panel-body">
                         <p class="mb-30 font-sm">If you have a coupon code, please apply it below.</p>
                         <form method="post" action="{% url 'order:checkout' user.id %}"> {% csrf_token %}
@@ -31,7 +56,12 @@
                                 <input type="text" id="coupon-field" name="coupon code" placeholder="Enter Coupon Code...">
                                 <span style="color: red" id="coupon-field-error"></span>
                             </div>
+
                             <div class="form-group"> <button class="btn  btn-md" name="login" id="coupon-btn">Apply Coupon</button> </div>
+                                                        <!-- Button trigger modal -->
+                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#coupon-show-modal">
+                           Show Avilable Coupons
+                            </button>
                         </form>
                     </div>
                 </div>
@@ -133,7 +163,7 @@
                                         <tr>
                                             <th>Total</th>
                                             <td colspan="2" class="product-subtotal">
-                                                {% if coupon_code != None %}
+                                                {% if coupon_code != None or offer_applied %}
                                                 
                                                 <span class="font-xl text-brand fw-900 total-amount-no-discount">₹ {{ total_price }}</span>
                                                 <span class="font-sm text-brand fw-500 pr-2"style="text-decoration: line-through;">{{subtotal}}</span>
@@ -148,6 +178,22 @@
                                         
                                     </tbody>
                                 </table>
+
+                             {% if offer_applied %}
+                                <span style="display: inline-block;">
+                                    <i class="fi fi-rs-ticket" style="color: green;"></i>
+                                    <h5 style="color: green; display: inline;"> Extra {{ category_discount }} % off on this category</h5>
+                                </span>
+                            {% endif %}
+
+                            {% if coupon_code %}
+                                <span>
+                                    <i class="fi fi-rs-ticket" style="color: green;"></i>
+                                    <h5 style="color: green; display: inline;">{{coupon_code}} Coupon Applied</h5>
+                                </span>
+                            {% endif %}
+
+
                             </div>
                             <div class="payment_method">
                                 <div class="mb-25">
@@ -254,8 +300,21 @@
             }
         });
     });
+    $('#apply-coupon').on( 'click', function() {
+        $('#apply-coupon').toggle();
+    })
 </script>
 
 
+
+<script>
+
+$(document).ready(function () {
+    $('#coupon-show-modal').on('show.bs.modal', function (e) {
+        $('.modal-backdrop').remove();
+    });
+});
+
+</script>
   
 {% endblock %}

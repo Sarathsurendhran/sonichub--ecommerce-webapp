@@ -4,74 +4,37 @@
 {% block content %}
 
 
-    
-    <div class="modal fade custom-modal" id="quickViewModal" tabindex="-1" aria-labelledby="quickViewModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog">
+
+
+
+<!-- REFERRAL MODAL -->
+<div class="modal fade" id="referralModal" tabindex="-1" aria-labelledby="referralModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
             <div class="modal-content">
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-6 col-sm-12 col-xs-12">
-                            <div class="detail-gallery">
-                                <span class="zoom-icon"><i class="fi-rs-search"></i></span>
-                                <!-- MAIN SLIDES -->
-                                <div class="product-image-slider">
-                                    <figure class="border-radius-10">
-                                        <img src="{% static 'images/shop/product-16-2.jpg' %}" alt="product image">
-                                    </figure>
-                                    <figure class="border-radius-10">
-                                        <img src="{% static 'images/shop/product-16-1.jpg' %}" alt="product image">
-                                    </figure>
-                                    <figure class="border-radius-10">
-                                        <img src="{% static 'images/shop/product-16-3.jpg' %}" alt="product image">
-                                    </figure>
-                                    <figure class="border-radius-10">
-                                        <img src="{% static 'images/shop/product-16-4.jpg' %}" alt="product image">
-                                    </figure>
-                                    <figure class="border-radius-10">
-                                        <img src="{% static 'images/shop/product-16-5.jpg' %}" alt="product image">
-                                    </figure>
-                                    <figure class="border-radius-10">
-                                        <img src="{% static 'images/shop/product-16-6.jpg' %}" alt="product image">
-                                    </figure>
-                                    <figure class="border-radius-10">
-                                        <img src="{% static 'images/shop/product-16-7.jpg' %}" alt="product image">
-                                    </figure>
-                                
-                                </div>
-                                <!-- THUMBNAILS -->
-                                <div class="slider-nav-thumbnails pl-15 pr-15">
-                                    <img src="{% static 'images/shop/thumbnail-3.jpg' %}" alt="product image">
-                                    {% comment %} <div><img src="{% static 'images/shop/thumbnail-4.jpg' %}" alt="product image"></div>
-                                    <div><img src="{% static 'images/shop/thumbnail-5.jpg' %}" alt="product image"></div>
-                                    <div><img src="{% static 'images/shop/thumbnail-6.jpg' %}" alt="product image"></div>
-                                    <div><img src="{% static 'images/shop/thumbnail-7.jpg' %}" alt="product image"></div>
-                                    <div><img src="{% static 'images/shop/thumbnail-8.jpg' %}" alt="product image"></div>
-                                    <div><img src="{% static 'images/shop/thumbnail-9.jpg' %}" alt="product image"></div> {% endcomment %}
-                                </div>
-                            </div>
-                            <!-- End Gallery -->
-                            <div class="social-icons single-share">
-                                <ul class="text-grey-5 d-inline-block">
-                                    <li><strong class="mr-10">Share this:</strong></li>
-                                    <li class="social-facebook"><a href="#"><img
-                                                src="{% static 'images/theme/icons/icon-facebook.svg' %}" alt=""></a></li>
-                                    <li class="social-twitter"> <a href="#"><img
-                                                src="{% static 'images/theme/icons/icon-twitter.svg' %}" alt=""></a></li>
-                                    <li class="social-instagram"><a href="#"><img
-                                                src="{% static 'images/theme/icons/icon-instagram.svg' %}" alt=""></a></li>
-                                    <li class="social-linkedin"><a href="#"><img
-                                                src="{% static 'images/theme/icons/icon-pinterest.svg' %}" alt=""></a></li>
-                                </ul>
-                            </div>
-                            
+                <div class="p-5">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="h3 bold">Share</span>
+                        <div class="dot d-flex justify-content-center align-items-center">
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                    </div>
+                    <div class="py-2">Invite friends to get 301<br>Invite friends to SonicHub and get ₹301. They get *100!</div>
+                    <div>
+                        <span class="h6 bold">Invite Link</span>
+                        <div class="border rounded d-flex flex-row align-items-center mt-2">
+                            <label for="referral-link"></label>
+                            <input id="referral-link" type="text" value="" class="form-control border border-0"
+                                   placeholder="Get Referral link from here" disabled>
+                            <button class="btn" onclick="copyToClipBoard()"><i></i>copy</button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
+<!-- REFERRAL MODAL -->  
 
     <div class="mobile-header-active mobile-header-wrapper-style">
         <div class="mobile-header-wrapper-inner">
@@ -227,7 +190,7 @@
 
         <section class="product-tabs pt-25 pb-20 wow fadeIn animated">
         
-            <div class="container"> 
+            <div class="container">     
                 <div class="row"> 
                 <h3 class="section-title mb-20"><span>Popular</span> Products</h3>    
                     <div class="tab-content wow fadeIn animated" id="myTabContent">
@@ -449,6 +412,58 @@ function addToWishList(dataid){
 }
 
 </script>
+
+
+
+
+<script>
+
+$(document).ready(function () {
+    $('#referralModal').on('show.bs.modal', function (e) {
+        $('.modal-backdrop').remove();
+    });
+});
+
+</script>
+
+<script>
+let url;
+$(document).ready(function(){
+  $('#Referralbutton').on('click', function(){
+
+    $.ajax({
+      type:'POST',
+      url:"{% url 'user_side:generate-referral-link'  %}",
+      data:{
+        csrfmiddlewaretoken:"{{csrf_token}}"
+      },
+      success:function(response){
+        $('#referral-link').val(response.response)
+        console.log(response)
+        url = response.response;
+      },
+      error:function(response) { 
+        console.log(response)
+      }
+
+    })
+
+  })
+
+})
+function copyToClipBoard(){
+    navigator.clipboard.writeText(url)
+    .then( 
+        function() {
+            Swal.fire('Copying to clipboard was successful!');
+        }, 
+        function(err) {
+            console.error('Async: Could not copy text: ', err);
+        }
+    );
+}
+</script>
+
 {% endblock %}
 
 

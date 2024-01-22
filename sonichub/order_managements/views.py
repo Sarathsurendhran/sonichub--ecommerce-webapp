@@ -17,10 +17,49 @@ from coupon_management.models import Coupon, Users_Coupon
 from django.contrib import messages
 from django.db.models import Sum
 from user_panel.views import wallet_balence
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from category_management.models import Category
 
 
-def stock_management(request):
-    pass
+
+def category_offer(request, total_price, id):
+  
+    try:
+        data = Cart.objects.filter(user=id)
+
+        for i in data:
+            if i.product.product_category.minimum_amount <= str(total_price):
+               
+                discount = int(i.product.product_category.discount)
+                total_discount = float(total_price) * (discount / 100)
+                total_price = float(total_price) - total_discount
+                
+                return total_price
+       
+    except Exception as e:
+        print("exception:",e)
+
+
+
+# signal for stock management
+@receiver(post_save, sender=Order_Main_data)
+def reduce_stock_on_order_creation(sender, instance, created, **kwargs):
+    print("signal called")
+
+    if instance.payment_status == True: 
+        print("entered inside if")
+
+        for order_sub_data in Order_Sub_data.objects.filter(main_order=instance):
+            update_stock(order_sub_data.variant, -order_sub_data.quantity)
+
+
+def update_stock(variant, quantity_change):
+    variant.variant_stock += quantity_change
+    variant.save()
+
+
+
 
 
 def order_return(request):
@@ -256,16 +295,30 @@ def confirm_order(request, id):
         return render(request, "user_side/order-success.html", context)
 
 
+
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def checkout(request, id):
     data = Cart.objects.filter(user=id)
+    coupons = Coupon.objects.filter()
+
     total_price = 0
     sub_total = 0
     coupon_code = None
+    offer_applied = False
+    discount = 0
+
     for i in data:
         if i.variant.variant_status:
             total_price += i.quantity * i.product.offer_price
             sub_total = total_price
+        try:
+            if i.product.product_category.minimum_amount <= str(total_price):
+                total_price = category_offer(request, total_price, id)
+                offer_applied = True
+                category_discount = i.product.product_category.discount
+
+        except Exception as e:
+            pass
 
     if request.method == "POST":
         try:
@@ -276,6 +329,8 @@ def checkout(request, id):
                 is_active=True,
                 expiry_date__gte=timezone.now().date(),
             )
+
+            
 
             if total_price > coupon.minimum_amount:
                 discount = float(coupon.discount)
@@ -290,11 +345,17 @@ def checkout(request, id):
             print(e)
             messages.warning(request, "Enter valid coupon")
 
+       
+
     content = {
         "address": Address.objects.filter(user=id, status=True),
         "products": data,
         "total_price": total_price,
         "coupon_code": coupon_code,
         "subtotal": sub_total,
+        "offer_applied":offer_applied,
+        "discount":discount,
+        "category_discount":category_discount
+        
     }
     return render(request, "user_side/checkout.html", content)

@@ -167,7 +167,6 @@ def edit_images(request, product):
 
 
 def variant_view(request, id):
-    print("called")
     content = {
         "products": Products.objects.get(id=id),
         "variants": Product_Variant.objects.filter(product_id=id),

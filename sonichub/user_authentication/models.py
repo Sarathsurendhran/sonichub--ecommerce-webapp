@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+import uuid
 
 class CustomUserManager(BaseUserManager):
   def create_user(self, email, password = None, **extra_fields):
@@ -32,14 +33,12 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(max_length=40, unique=True, blank=False)
     email = models.EmailField(unique=True)
     phone_number = models.CharField(max_length=15, blank=False, unique=True)
-
-    
     is_active = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
     is_blocked = models.BooleanField(default=False)
     date_joined = models.DateTimeField(auto_now_add=True)
-
-
+    referral_codes = models.UUIDField(default=uuid.uuid4, editable=False)
+   
 
     objects = CustomUserManager()
 
