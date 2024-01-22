@@ -15,6 +15,10 @@
 
     <div class="col-lg-10">
      <h2 class="h5 mb-0"><a href="#" class="text-muted">ORDER ID: </a>{{order_main.order_id}}</h2>
+     {% if  order_main.order_status == 'Delivered' %}
+    
+      <a class = "btn btn-sm mb-10 mt-5" href="{% url 'order:generate-pdf' order_main.order_id %}?format=pdf" target="_blank">Download Invoice</a>
+      {% endif %}
       <!-- Details -->
       <div class="card mb-3">
         <div class="card-body shadow-lg">
@@ -111,7 +115,8 @@
                             {% endif %}  
                         {% endif %}
 
-                        {% if order_main.order_status != 'Delivered' %}              
+                        {% if order_main.order_status != 'Delivered' %} 
+                                     
                         <a href="{% url 'order:order-list' user.id %}" class="btn btn-outline-primary">Back</a>
                         {% endif %}
                     </div>

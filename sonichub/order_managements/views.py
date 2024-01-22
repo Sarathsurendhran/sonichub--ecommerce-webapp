@@ -20,26 +20,46 @@ from user_panel.views import wallet_balence
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from category_management.models import Category
+from django.template.loader import get_template
+from xhtml2pdf import pisa
+from django.template.loader import render_to_string
+
+def generate_pdf(request, order_id):
+    order_main = Order_Main_data.objects.get(order_id=order_id)
+    order_sub_data = Order_Sub_data.objects.filter(main_order_id=order_main.id)
+
+    content = {
+        "order_main": order_main,
+        "order_sub_data": order_sub_data,
+    }
+
+    html_content = render_to_string("user_side/invoice.html", content)
+    pdf_response = HttpResponse(content_type='application/pdf')
+    pdf_response['Content-Disposition'] = f'filename="{id}_details.pdf"'
+
+    pisa_status = pisa.CreatePDF(html_content, dest=pdf_response)
+
+    if pisa_status.err:
+        return HttpResponse('Error creating PDF')
+
+    return pdf_response
 
 
 
 def category_offer(request, total_price, id):
-  
     try:
         data = Cart.objects.filter(user=id)
 
         for i in data:
             if i.product.product_category.minimum_amount <= str(total_price):
-               
                 discount = int(i.product.product_category.discount)
                 total_discount = float(total_price) * (discount / 100)
                 total_price = float(total_price) - total_discount
-                
-                return total_price
-       
-    except Exception as e:
-        print("exception:",e)
 
+                return total_price
+
+    except Exception as e:
+        print("exception:", e)
 
 
 # signal for stock management
@@ -47,7 +67,7 @@ def category_offer(request, total_price, id):
 def reduce_stock_on_order_creation(sender, instance, created, **kwargs):
     print("signal called")
 
-    if instance.payment_status == True: 
+    if instance.payment_status == True:
         print("entered inside if")
 
         for order_sub_data in Order_Sub_data.objects.filter(main_order=instance):
@@ -57,9 +77,6 @@ def reduce_stock_on_order_creation(sender, instance, created, **kwargs):
 def update_stock(variant, quantity_change):
     variant.variant_stock += quantity_change
     variant.save()
-
-
-
 
 
 def order_return(request):
@@ -97,7 +114,8 @@ def payment_success(request, order_id):
     return render(request, "user_side/order-success.html", {"order_id": order_id})
 
 
-def online_payment(request, order_id):
+def online_payment(request, order_id, coupon_code):
+
     order_instance = get_object_or_404(Order_Main_data, order_id=order_id)
     if order_instance.payment_status:
         return redirect("order:current-order-details", order_id)
@@ -130,7 +148,6 @@ def cancel_order(request, order_id, user_id):
                 transaction_type="Credit",
             )
 
-       
         return redirect("order:order-list", user_id)
 
 
@@ -140,6 +157,7 @@ def order_details(request, id):
         "order_main": Order_Main_data.objects.get(id=id),
         "order_sub_data": Order_Sub_data.objects.filter(main_order_id=id),
     }
+    
     return render(request, "user_side/order-details.html", content)
 
 
@@ -177,7 +195,7 @@ def confirm_order(request, id):
         user = request.user.id
 
         data = Cart.objects.filter(user=id)
-        
+
         for i in data:
             print(i.quantity)
         if not data:
@@ -197,36 +215,35 @@ def confirm_order(request, id):
         coupon_code = request.POST.get("coupon_code")
 
         # coupon recheck...
-        if coupon_code is not None and coupon_code != "None":
-            try:
-                coupon = Coupon.objects.get(
-                    Coupon_code=coupon_code,
-                    is_active=True,
-                    expiry_date__gte=timezone.now().date(),
-                    minimum_amount__lt=sub_total,
-                )
+        # if coupon_code is not None and coupon_code != "None":
+        #     try:
+        #         coupon = Coupon.objects.get(
+        #             Coupon_code=coupon_code,
+        #             is_active=True,
+        #             expiry_date__gte=timezone.now().date(),
+        #             minimum_amount__lt=sub_total,
+        #         )
 
-                if sub_total > coupon.minimum_amount:
-                    discount = float(coupon.discount)
-                    amount = float(total_price) * (discount / 100)
-                    total_price = round(float(total_price) - amount, 2)
+        #         if sub_total > coupon.minimum_amount:
+        #             discount = float(coupon.discount)
+        #             amount = float(total_price) * (discount / 100)
+        #             total_price = round(float(total_price) - amount, 2)
 
-                else:
-                    messages.warning(request, "Invalid coupon")
-                    return redirect("order:checkout", user)
+        #         else:
+        #             messages.warning(request, "Invalid coupon")
+        #             return redirect("order:checkout", user)
 
-            except Exception as e:
-                print(e)
-                messages.warning(request, "Enter valid coupon")
-                return redirect("order:checkout", user)
-            
+        #     except Exception as e:
+        #         print(e)
+        #         messages.warning(request, "Enter valid coupon")
+        #         return redirect("order:checkout", user)
 
-        wallet_amount = wallet_balence(request, id)  
-        
-        if payment_option == "wallet payment":  
+        wallet_amount = wallet_balence(request, id)
+
+        if payment_option == "wallet payment":
             if total_price > wallet_amount:
                 messages.warning(request, "Insufficient Balence!")
-                return redirect("order:checkout",id)
+                return redirect("order:checkout", id)
 
         current_date = timezone.now().date()
         formatted_date = current_date.strftime("%Y%m%d")
@@ -256,10 +273,10 @@ def confirm_order(request, id):
             )
 
         if payment_option == "online payment":
-            return redirect("order:online-payment", order_id)
+            return redirect("order:online-payment", order_id, coupon_code)
 
         if payment_option == "wallet payment":
-            return redirect("user_panel:wallet-payment", order_id, id)
+            return redirect("user_panel:wallet-payment", order_id, id, coupon_code)
 
         # clearing the cart
         data.delete()
@@ -295,17 +312,19 @@ def confirm_order(request, id):
         return render(request, "user_side/order-success.html", context)
 
 
-
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def checkout(request, id):
     data = Cart.objects.filter(user=id)
-    coupons = Coupon.objects.filter()
+    coupons = Coupon.objects.filter(
+        is_active=True, expiry_date__gte=timezone.now().date()
+    )
 
     total_price = 0
     sub_total = 0
     coupon_code = None
     offer_applied = False
     discount = 0
+    category_discount =  None
 
     for i in data:
         if i.variant.variant_status:
@@ -330,8 +349,6 @@ def checkout(request, id):
                 expiry_date__gte=timezone.now().date(),
             )
 
-            
-
             if total_price > coupon.minimum_amount:
                 discount = float(coupon.discount)
                 amount = float(total_price) * (discount / 100)
@@ -345,17 +362,15 @@ def checkout(request, id):
             print(e)
             messages.warning(request, "Enter valid coupon")
 
-       
-
     content = {
         "address": Address.objects.filter(user=id, status=True),
         "products": data,
         "total_price": total_price,
         "coupon_code": coupon_code,
         "subtotal": sub_total,
-        "offer_applied":offer_applied,
-        "discount":discount,
-        "category_discount":category_discount
-        
+        "offer_applied": offer_applied,
+        "discount": discount,
+        "category_discount": category_discount,
+        "coupons":coupons
     }
     return render(request, "user_side/checkout.html", content)
