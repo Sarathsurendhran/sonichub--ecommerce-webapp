@@ -18,6 +18,9 @@ class Products(models.Model):
   updated_at = models.DateTimeField(auto_now_add = True)
 
 
+  def percentage_discount(self):
+     return int(((self.price - self.offer_price) / self.price) * 100)
+
     
   def __str__(self):
       return f"{self.product_brand.brand_name}-{self.product_name}"

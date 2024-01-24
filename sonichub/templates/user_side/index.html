@@ -218,7 +218,7 @@
                                                         <a href="shop-grid-right.html">{{product.product_category_id.category_name}}</a>
                                                     </div>
                                                     <h2><a href="{% url 'user_panel:shop-product' product.id %}" class="h5">{{product.product_name}}</a></h2>
-                                                    <div class="rating-result" title="90%"> <span> <span>90%</span> </span> </div>
+                                                    <div class="rating-result text-success" title="90%"><strong><span>{{product.percentage_discount}}% off</span></strong> </div>
                                                     <div class="product-price">
                                                         <span>{{product.offer_price}}</span>
                                                         <span class="old-price">{{product.price}}</span>

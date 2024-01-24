@@ -3,9 +3,7 @@
 {% block content %}
 
 
- {% comment %} <nav class="navbar navbar-expand-lg navbar-light bg-success   shadow-lg ">
-        <a class="navbar-brand" href="/"><span class="text-white">Sonic Hub</span></a>
-    </nav>   {% endcomment %}
+ 
 <div class="container-fluid ">
 <div class="container">
   <!-- Title -->
@@ -16,18 +14,19 @@
     <div class="col-lg-10">
      <h2 class="h5 mb-0"><a href="#" class="text-muted">ORDER ID: </a>{{order_main.order_id}}</h2>
      {% if  order_main.order_status == 'Delivered' %}
-    
       <a class = "btn btn-sm mb-10 mt-5" href="{% url 'order:generate-pdf' order_main.order_id %}?format=pdf" target="_blank">Download Invoice</a>
       {% endif %}
       <!-- Details -->
       <div class="card mb-3">
         <div class="card-body shadow-lg">
-          <div class="mb-3 d-flex flex-row">
-            <div class=" d-flex flex-row">
+          <div class="mb-3 ">
+            <div >
             {% if order_main.payment_status == True %}
-
-            <h4><span class=" mr-3 badge  bg-info">{{order_main.order_status}}</span></h4>
-              <span class="mt-2">{{order_main.date}}</span>
+            <div class="d-flex justify-content-between m-2">
+            <h4><span class=" mr-3  {% if order_main.order_status == 'Cancelled' %} badge bg-danger {% else %} badge bg-info {% endif %}" >{{order_main.order_status|upper}}</span></h4>
+              <p><span class="mt-2">{{order_main.date}}</span></p>
+            </div>
+            
               {% else %}
 
               <h4><span class=" mr-3 badge  bg-info">PAYMENT PENDING</span></h4>
@@ -41,13 +40,14 @@
                 <tr>
                     <th>Product</th>
                     <th>Quantity</th>
-                    <th class="text-end">Price</th>
+                    <th>Price</th>
+                    <th class="text-end">Action</th>
                 </tr>
             </thead>
             {% for order in order_sub_data  %}
             
             <tbody >
-              <tr>     
+              <tr {% if not order.is_active %} style = "background-color:#ffcccc;" {% endif %}>     
                 <td>
                   <div class="d-flex mb-2">
                     <div>
@@ -61,6 +61,13 @@
                 </td>
                 <td>{{order.quantity}}</td>
                 <td class="text-end">{{order.variant.product.offer_price}}</td>
+                {% if order_main.order_status != 'Delivered' and order_main.order_status != 'Cancelled' and order_main.order_status != 'Returned' %}
+                {% if order.is_active %}
+                 <td class="text-end"> <a href="{% url 'order:cancel-individual-product' order.id %}" class="btn btn-md" >Cancel</a></td>               
+                {% else %}
+                  <td class=" text-end"><h4><span class=" mr-3 badge  bg-danger ">Cancelled</span></h4></td>               
+                {% endif %}
+                {% endif %}
               </tr>
             </tbody>
             {% endfor %}
@@ -141,7 +148,7 @@
 </div>
   </div>
 <!-- Add these lines in the head section of your HTML -->
-
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js" integrity="sha384-cuYeSxntonz0PPNlHhBs68uyIAVpIIOZZ5JqeqvYYIcEL727kskC66kF92t6Xl2V" crossorigin="anonymous"></script>

@@ -23,6 +23,74 @@ from category_management.models import Category
 from django.template.loader import get_template
 from xhtml2pdf import pisa
 from django.template.loader import render_to_string
+from decimal import Decimal
+
+
+def cancel_individual_product(request, order_sub_id):
+    data = Order_Sub_data.objects.get(id=order_sub_id)
+    data.is_active = False
+    data.save()
+
+    user_id = UserProfile.objects.get(id=request.user.id)
+
+    order_main = Order_Main_data.objects.get(id=data.main_order.id)
+
+    find_sub_total = Order_Sub_data.objects.filter(main_order=order_main.id)
+    sub_total = 0
+
+    order_sub_data = Order_Sub_data.objects.filter(
+        main_order=order_main.id, is_active=False
+    ).count()
+    order_sub_data_total = Order_Sub_data.objects.filter(
+        main_order=order_main.id
+    ).count()
+
+    if order_sub_data == order_sub_data_total:
+        order_main.order_status = "Cancelled"
+        order_main.save()
+
+        return redirect("order:order-details", order_main.id)
+    
+    # credit cash on wallet on cancel individual product
+    
+    if (
+            order_main.payment_option == "online payment"
+            or order_main.payment_option == "wallet payment"
+        ):
+
+
+        price = data.variant.product.offer_price
+        offer_discount = data.variant.product.product_category.discount
+        
+        if offer_discount:
+            discount_total = float(price) * (offer_discount / 100)
+            price = float(price) - discount_total
+
+        Transaction.objects.create(
+                description="Cancelled Product    " +  data.variant.product.product_name,
+                amount=price,
+                transaction_type="Credit",
+                user=user_id,
+            )    
+
+    for i in find_sub_total:
+        if not i.is_active:
+            continue
+
+        unit_price = i.variant.product.offer_price
+        if i.variant.product.product_category.discount:
+            category_discount = int(i.variant.product.product_category.discount)
+            total_discount = float(unit_price) * (category_discount / 100)
+            unit_price = float(unit_price) - total_discount
+
+        if i.variant.variant_status:
+            sub_total += float(unit_price)
+            
+    order_main.total_amount = sub_total
+    order_main.save()
+
+    return redirect("order:order-details", order_main.id)
+
 
 def generate_pdf(request, order_id):
     order_main = Order_Main_data.objects.get(order_id=order_id)
@@ -34,49 +102,15 @@ def generate_pdf(request, order_id):
     }
 
     html_content = render_to_string("user_side/invoice.html", content)
-    pdf_response = HttpResponse(content_type='application/pdf')
-    pdf_response['Content-Disposition'] = f'filename="{id}_details.pdf"'
+    pdf_response = HttpResponse(content_type="application/pdf")
+    pdf_response["Content-Disposition"] = f'filename="{id}_details.pdf"'
 
     pisa_status = pisa.CreatePDF(html_content, dest=pdf_response)
 
     if pisa_status.err:
-        return HttpResponse('Error creating PDF')
+        return HttpResponse("Error creating PDF")
 
     return pdf_response
-
-
-
-def category_offer(request, total_price, id):
-    try:
-        data = Cart.objects.filter(user=id)
-
-        for i in data:
-            if i.product.product_category.minimum_amount <= str(total_price):
-                discount = int(i.product.product_category.discount)
-                total_discount = float(total_price) * (discount / 100)
-                total_price = float(total_price) - total_discount
-
-                return total_price
-
-    except Exception as e:
-        print("exception:", e)
-
-
-# signal for stock management
-@receiver(post_save, sender=Order_Main_data)
-def reduce_stock_on_order_creation(sender, instance, created, **kwargs):
-    print("signal called")
-
-    if instance.payment_status == True:
-        print("entered inside if")
-
-        for order_sub_data in Order_Sub_data.objects.filter(main_order=instance):
-            update_stock(order_sub_data.variant, -order_sub_data.quantity)
-
-
-def update_stock(variant, quantity_change):
-    variant.variant_stock += quantity_change
-    variant.save()
 
 
 def order_return(request):
@@ -101,21 +135,23 @@ def order_return(request):
 
 # payment success function for online order
 def payment_success(request, order_id):
-    order_id = "#" + order_id
-    main_order_obj = Order_Main_data.objects.get(order_id=order_id)
-    main_order_obj.payment_status = True
-    main_order_obj.save()
+    try:
+        order_id = "#" + order_id
+        main_order_obj = Order_Main_data.objects.get(order_id=order_id)
+        main_order_obj.payment_status = True
+        main_order_obj.save()
 
-    id = request.user.id
-    # clearing the cart after payment
-    data = Cart.objects.filter(user=id)
-    data.delete()
+        id = request.user.id
+        # clearing the cart after payment
+        data = Cart.objects.filter(user=id)
+        data.delete()
+    except Exception as e:
+        print(e)
 
     return render(request, "user_side/order-success.html", {"order_id": order_id})
 
 
-def online_payment(request, order_id, coupon_code):
-
+def online_payment(request, order_id):
     order_instance = get_object_or_404(Order_Main_data, order_id=order_id)
     if order_instance.payment_status:
         return redirect("order:current-order-details", order_id)
@@ -138,6 +174,7 @@ def cancel_order(request, order_id, user_id):
             data.payment_option == "online payment"
             or data.payment_option == "wallet payment"
         ):
+            
             amount = request.POST.get("total_amount")
             user = UserProfile.objects.get(id=user_id)
 
@@ -157,14 +194,12 @@ def order_details(request, id):
         "order_main": Order_Main_data.objects.get(id=id),
         "order_sub_data": Order_Sub_data.objects.filter(main_order_id=id),
     }
-    
+
     return render(request, "user_side/order-details.html", content)
 
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def order_list(request, id):
-    print(id)
-
     order_main_data = (
         Order_Main_data.objects.filter(user_id=id).order_by("id").reverse()
     )
@@ -193,14 +228,9 @@ def current_order_details(request, order_id):
 def confirm_order(request, id):
     if request.method == "POST":
         user = request.user.id
-
         data = Cart.objects.filter(user=id)
-
-        for i in data:
-            print(i.quantity)
         if not data:
             return redirect("cart:product-cart")
-
         # finding total
         sub_total = 0
 
@@ -247,7 +277,6 @@ def confirm_order(request, id):
 
         current_date = timezone.now().date()
         formatted_date = current_date.strftime("%Y%m%d")
-        r_string = get_random_string(length=2)
         address_id = Address.objects.get(id=address)
         user_id = UserProfile.objects.get(id=id)
 
@@ -273,7 +302,7 @@ def confirm_order(request, id):
             )
 
         if payment_option == "online payment":
-            return redirect("order:online-payment", order_id, coupon_code)
+            return redirect("order:online-payment", order_id)
 
         if payment_option == "wallet payment":
             return redirect("user_panel:wallet-payment", order_id, id, coupon_code)
@@ -324,20 +353,30 @@ def checkout(request, id):
     coupon_code = None
     offer_applied = False
     discount = 0
-    category_discount =  None
+    category_discount = None
 
     for i in data:
         if i.variant.variant_status:
-            total_price += i.quantity * i.product.offer_price
-            sub_total = total_price
-        try:
-            if i.product.product_category.minimum_amount <= str(total_price):
-                total_price = category_offer(request, total_price, id)
-                offer_applied = True
-                category_discount = i.product.product_category.discount
+            sub_total = float(sub_total) + i.quantity * float(i.product.offer_price)
 
-        except Exception as e:
-            pass
+    for i in data:
+        if not i.variant.variant_status:
+            continue
+
+        unit_price = i.variant.product.offer_price
+        category_discount = i.variant.product.product_category.discount
+
+        if (
+            i.product.product_category.minimum_amount is not None
+            and float(i.product.product_category.minimum_amount) <= unit_price
+        ):
+            if category_discount:
+                offer_applied = True
+                unit_price = float(unit_price) - float(unit_price) * (
+                    category_discount / 100
+                )
+
+        total_price = float(total_price) + i.quantity * float(unit_price)
 
     if request.method == "POST":
         try:
@@ -365,12 +404,13 @@ def checkout(request, id):
     content = {
         "address": Address.objects.filter(user=id, status=True),
         "products": data,
-        "total_price": total_price,
+        "total_price": round(total_price, 2),
         "coupon_code": coupon_code,
         "subtotal": sub_total,
         "offer_applied": offer_applied,
         "discount": discount,
         "category_discount": category_discount,
-        "coupons":coupons
+        "coupons": coupons,
+        "datas": data,
     }
     return render(request, "user_side/checkout.html", content)

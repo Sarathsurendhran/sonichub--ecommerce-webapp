@@ -189,13 +189,17 @@
                                         
                                     </tbody>
                                 </table>
-
-                             {% if offer_applied %}
-                                <span style="display: inline-block;">
-                                    <i class="fi fi-rs-ticket" style="color: green;"></i>
-                                    <h5 style="color: green; display: inline;"> Extra {{ category_discount }} % off on this category</h5>
-                                </span>
-                            {% endif %}
+                                   
+                                {% for data in datas %}
+                                  {% if data.variant.product.product_category.discount %}
+                            
+                                        <span style="display: inline-block;">
+                                            <i class="fi fi-rs-ticket" style="color: green;"></i>
+                                            <h5 style="color: green; display: inline;">{{data.variant.product.product_category.category_name}} Category Offer  Extra {{ data.variant.product.product_category.discount }} % off </h5>
+                                        </span>
+                                        {% endif %}
+                                {% endfor %}
+                                
 
                             {% if coupon_code %}
                                 <span>
@@ -231,6 +235,7 @@
                              <input type="hidden" name="total_price" value="{{ total_price }}">
                               <input type="hidden" name="order_status" value="{{ 'Order Placed' }}">
                               <input type="hidden" name="coupon_code" value="{{ coupon_code }}">
+                              <input type="hidden" name="category_discount" value="{{ category_discount }}">
                                                          
                             <button type="submit" id="placeorder" class="btn btn-brand btn-lg mt-30">
                                 Place Order

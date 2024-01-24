@@ -128,7 +128,7 @@ input:focus::-moz-placeholder {
 }
 
 a {
-  color: #088178;
+  color: #ffffff;
 }
 
 a:hover {
@@ -630,7 +630,7 @@ h4 {
 
 /*TYPOGRAPHY*/
 body {
-  color: #4f5d77;
+  color: #050505;
   font-family: "Lato", sans-serif;
   font-size: 14px;
   line-height: 24px;
@@ -731,7 +731,7 @@ strong,
 }
 
 .section-title span {
-  color: #088178;
+  color: #020080;
 }
 
 h3.section-title {
@@ -882,17 +882,17 @@ button.submit, button[type='submit'] {
   padding: 12px 40px;
   color: #ffffff;
   border: none;
-  background-color: #ac2eff;
-  border: 1px solid #b33fbb;
+  background-color: #000000;
+  border: 1px solid #000000;
   border-radius: 5px;
 }
 
 button.submit:hover, button[type='submit']:hover {
-  background-color: #046963 !important;
+  background-color: #020080 !important;
 }
 
 .btn-brand:hover {
-  background-color: #046963 !important;
+  background-color: #020080 !important;
 }
 
 .btn-login {
@@ -927,8 +927,8 @@ button.submit:hover, button[type='submit']:hover {
   padding: 12px 30px;
   border-radius: 4px;
   color: #fff;
-  border: 1px solid #b700e8;
-  background-color: #b700e8;
+  border: 1px solid #000000;
+  background-color: #000000;
   cursor: pointer;
   -webkit-transition: all 300ms linear 0s;
   transition: all 300ms linear 0s;
@@ -936,7 +936,7 @@ button.submit:hover, button[type='submit']:hover {
 }
 
 .btn:hover, .button:hover {
-  background-color: #046963;
+  background-color: #020080;
 }
 
 .btn.btn-sm, .button.btn-sm {
@@ -3473,7 +3473,7 @@ table .product-thumbnail img {
   height: 40px;
   line-height: 44px;
   border-radius: 50px;
-  background-color: #e8f6ea;
+  background-color: #000000;
   text-align: center;
   margin-right: 3px;
   position: relative;
@@ -5227,7 +5227,7 @@ h6.post-title {
 }
 
 .header-info > ul > li a {
-  color: #1a1a1a;
+  color: #ffffff;
   font-weight: 500;
 }
 
@@ -5608,7 +5608,7 @@ h6.post-title {
 }
 
 .header-action-2 .header-action-icon-2 > a span.pro-count.blue {
-  background-color: #b76ce1;
+  background-color: #000000;
 }
 
 .header-action-2 .header-action-icon-2:hover > a {
@@ -6602,7 +6602,7 @@ h6.post-title {
 }
 
 .header-style-4 .header-top-ptb-1 {
-  background-color: #d874ff;
+  background-color: #040204;
   background-image: none;
   padding: 20px;
   border: 0;
@@ -6660,7 +6660,7 @@ h6.post-title {
 .header-style-4 .main-categori-wrap > a {
   color: #fff;
   line-height: 60px;
-  background: #b700ff;
+  background:#000000;
   padding: 0 30px;
 }
 
@@ -6797,7 +6797,7 @@ span.fi-rs-apps {
 }
 
 .main-menu > nav > ul > li > a.active {
-  color: #088178;
+  color:#020080;
 }
 
 .main-menu > nav > ul > li ul.sub-menu {

@@ -26,6 +26,7 @@ import uuid
 from django.urls import reverse
 from user_panel.models import Transaction
 from django.db import transaction
+from cart_management.models import Cart
 
 
 
@@ -74,11 +75,13 @@ def generate_referral_link(request):
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def index(request):
+    
     context = {
         "products": Products.objects.all(),
         "variants": Product_Variant.objects.all(),
         "brands": Brand.objects.all(),
         "categories": Category.objects.all(),
+        
     }
     return render(request, "user_side/index.html", context)
 
