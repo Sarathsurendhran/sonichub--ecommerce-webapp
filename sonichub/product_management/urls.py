@@ -35,6 +35,8 @@ urlpatterns = [
 
 
   path('search',views.search,name='search'),
+
+  path('shop-product-list',views.shop_product_list, name='shop-product-list')
  
 
 

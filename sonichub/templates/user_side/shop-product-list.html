@@ -1,4 +1,4 @@
-﻿
+
 {% extends 'user_side/base.html'%}
 {% load static %}
 {% block content %}
@@ -61,106 +61,45 @@
             </div>
         </div>
     </div>
-    <!-- ---main banner----- -->
+    
+    
     <main class="main">
-        <section class="home-slider position-relative mb-30">
-            <div class="container">
-                <div class="home-slide-cover bg-grey-10 mt-30">
-                    <div class="hero-slider-1 style-4 dot-style-1 dot-style-1-position-1">
-                        <div class="single-hero-slider single-animation-wrap">
-                            <div class="container">
-                                <div class="row align-items-center slider-animated-1">
-                                    <div class="col-lg-5 col-md-6">
-                                        <div class="hero-slider-content-2">
-                                            <h4 class="animated">Trade-In Offer</h4>
-                                            <h3 class="animated fw-900">Supper Value Deals</h3>
-                                            <h2 class="animated fw-900 text-brand">On All Products</h2>
-                                            <p class="animated">Save more with coupons & up to 70% off</p>
-                                            <a class="animated btn btn-brush btn-brush-3" href="shop-product-right.html"
-                                                tabindex="0"> Shop Now </a>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-7 col-md-6">
-                                        <div class="single-slider-img single-slider-img-1">
-                                            <img class="animated" src="{% static '/images/slider/banner1.jpg' %}" alt="" width="100%">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="single-hero-slider single-animation-wrap">
-                            <div class="container">
-                                <div class="row align-items-center slider-animated-1">
-                                    <div class="col-lg-5 col-md-6">
-                                        <div class="hero-slider-content-2">
-                                            <h4 class="animated">Hot Deals</h4>
-                                            <h3 class="animated fw-900">Trending Speakers</h3>
-                                            <h2 class="animated fw-900 text-brand">Great Collection</h2>
-                                            <p class="animated">Save more with coupons & up to 20% off</p>
-                                            <a class="animated btn btn-brush btn-brush-1" href="shop-product-right.html"
-                                                tabindex="0"> Get It Now </a>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-7 col-md-6">
-                                        <div class="single-slider-img single-slider-img-1">
-                                            <img class="animated" src="{% static '/images/slider/banner2.jpg' %}" alt="" width="100%">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="slider-arrow hero-slider-1-arrow"></div>
+            {% comment %} <div class="container d-flex justify-content-center" th:unless="${ProductDetails} != null">
+                <div class="d-flex flex-column">
+                    <h3> Sorry 🥺, We didn't fount any product in this brand!!</h3>
+                    <a class="btn btn-success-light hover-up" th:href="@{/user/home}">Back to Home</a>
                 </div>
-            </div>
-            <!-- main banner end -->
-        </section>
-        <!-- sub banner---- -->
-        <!-- <section class="banners mb-20">
-            <div class="container">
+            </div> {% endcomment %}
+            <div class="container" th:if="${ProductDetails} != null">
                 <div class="row">
-                    <div class="col-lg-4 col-md-6">
-                        <div class="banner-img wow fadeIn animated">
-                            <img src="{% static '/images/banner/banner-1.png' %}" alt="">
-                            <div class="banner-text">
-                                <span>Smart Offer</span>
-                                <h4>Save 20% on <br>Woman Bag</h4>
-                                <a href="shop-grid-right.html">Shop Now <i class="fi-rs-arrow-right"></i></a>
-                            </div>
+                    <!--SIDE FILTER STARTS-->
+                    <div class="col-lg-3">
+                        <div class="widget-category mb-30">
+                            <h5 class="section-title style-1 mb-30 wow fadeIn animated">Price Range</h5>
+                            <ul class="categories">
+                                <li>
+                                    <label for="min-price">Minimum Price</label>
+                                    <input type="number" name="min-price" id="min-price">
+                                </li>
+                                <li>
+                                    <label for="max-price">Maximum Price</label>
+                                    <input type="number" name="max-price" id="max-price">
+                                </li>
+                                <li>
+                                    <button class="form-control" id="price-filter"><span>Filter</span><i class="material-icons md-sort"></i></button>
+                                </li>
+                            </ul>
                         </div>
                     </div>
-                    <div class="col-lg-4 col-md-6">
-                        <div class="banner-img wow fadeIn animated">
-                            <img src="{% static '/images/banner/banner-2.png' %}" alt="">
-                            <div class="banner-text">
-                                <span>Sale off</span>
-                                <h4>Great Summer <br>Collection</h4>
-                                <a href="shop-grid-right.html">Shop Now <i class="fi-rs-arrow-right"></i></a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 d-md-none d-lg-flex">
-                        <div class="banner-img wow fadeIn animated  mb-sm-0">
-                            <img src="{% static '/images/banner/banner-3.png' %}" alt="">
-                            <div class="banner-text">
-                                <span>New Arrivals</span>
-                                <h4>Shop Today’s <br>Deals & Offers</h4>
-                                <a href="shop-grid-right.html">Shop Now <i class="fi-rs-arrow-right"></i></a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- sub banner end -->
-        </section> -->
+                    <!--SIDE FILTER ENDS-->
+
 
         <!------------------ products section starts-------------------- -->
 
         <section class="product-tabs pt-25 pb-20 wow fadeIn animated">
         
             <div class="container">     
-                <div class="row"> 
-                <h3 class="section-title mb-20"><span>Popular</span> Products</h3>    
+                <div class="row">  
                     <div class="tab-content wow fadeIn animated" id="myTabContent">
                         <div class="tab-pane fade show active" id="tab-one" role="tabpanel" aria-labelledby="tab-one">
                             {% comment %} product loop starts.... {% endcomment %}
@@ -209,58 +148,8 @@
             </div>
         </section>
 <!-- Products section ends -->
-        <section class="popular-categories section-padding mt-15">
-            <div class="container wow fadeIn animated">
-                <h3 class="section-title mb-20"><span>Popular</span> Categories</h3>
-               
-                
-                
-                <div class="carausel-6-columns-cover position-relative">
-                    <div class="slider-arrow slider-arrow-2 carausel-6-columns-arrow" id="carausel-6-columns-arrows"></div>
-                    <div class="carausel-6-columns" id="carausel-6-columns">
-                     {% for category in categories  %}
-                     {% if category.is_available %}
-                              
-                        <div class="card-1 d-flex justify-content-center shadow-sm ">
-                        
-                            <figure class="img-hover-scale overflow-hidden">
-                               
-                                 <h5 class="category-title" ><a href="{% url 'user_panel:category-search' category.category_name %}">{{category.category_name}}</a></h5>
-                            </figure>
-                           
-                        </div> 
-                          {% endif %}
-                         {% endfor %}
-                    </div>
-                </div>
-               
-            </div>
-        </section>
+             
               
-        <section class="section-padding">
-            <div class="container pb-20">
-                <h3 class="section-title mb-20 wow fadeIn animated"><span>Featured</span> Brands</h3>
-               
-                <div class="carausel-6-columns-cover position-relative wow fadeIn animated">
-                    <div class="slider-arrow slider-arrow-2 carausel-6-columns-arrow" id="carausel-6-columns-3-arrows">
-                    </div>
-                    <div class="carausel-6-columns text-center" id="carausel-6-columns-3">
-                     {% for brand in brands  %} 
-                     {% if brand.status %}
-                     {% if brand.brand_image %}
-                     
-                    
-                     <div class="d-inline-block brand-logo mx-3 ">
-                            <img  src="{{brand.brand_image.url}}" alt="" class="img-fluid object-fit-cover" style="max-width: 100px; max-height: 100px;">
-                        </div>
-                        {% endif %}
-                        {% endif %}
-                    {% endfor %}
-                    </div>  
-                </div>               
-                
-            </div>         
-        </section>
 
         <section class="featured section-padding">
             <div class="container pb-25">

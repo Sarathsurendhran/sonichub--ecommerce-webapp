@@ -84,16 +84,16 @@
                                 <i class="icon material-icons md-shopping_cart md-monetization_on"></i><span class="text">Orders</span>
                             </a>
                         </li>
-                        {% comment %} <li class="menu-item {% if current_url_name == 'sales_report' %} active {% endif %}">
-                            <a class="menu-link" href="#">
+                        <li class="menu-item {% if current_url_name == 'sales-report' %} active {% endif %}">
+                            <a class="menu-link" href="{% url  'admin_panel:sales-report' %}">
                                 <i class="icon material-icons md-pie_chart"></i><span class="text">Sales Report</span>
                             </a>
                         </li>
-                        <li class="menu-item {% if current_url_name == 'purchase_report' %} active {% endif %}">
+                        {% comment %} <li class="menu-item {% if current_url_name == 'purchase-report' %} active {% endif %}">
                             <a class="menu-link" href="#">
                                 <i class="icon material-icons md-bar_chart"></i><span class="text">Purchase Report</span>
                             </a>
-                        </li>{% endcomment %}
+                        </li> {% endcomment %}
                         <li class="menu-item {% if current_url_name == 'view-coupon' %} active {% endif %}">
                             <a class="menu-link" href="{% url 'coupon:view-coupon' %}">
                                 <i class="icon material-icons md-local_offer"></i><span class="text">Coupons</span>

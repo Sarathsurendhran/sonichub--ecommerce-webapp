@@ -1,0 +1,157 @@
+{% extends "admin_side/admin-base.html" %}
+{% load static %}
+{% block title %} Product list {% endblock %}
+{% block content %}
+
+<style>
+    .dropdown-custom {
+        background-color: rgb(207, 200, 200);
+
+
+    }
+
+
+    .small-text {
+        font-size: 12px;
+        /* Adjust the size as needed */
+    }
+</style>
+
+
+<section class="content-main">
+    <div class="content-header">
+        <div>
+            <h2 class="content-title card-title">Sales Report</h2>
+        </div>
+
+    </div>
+    {% for message in messages %}
+    <div class="alert alert-{{message.tags}} alert-dismissible fade show" role="alert">
+        <strong></strong>{{message}}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+    <div class="card mb-4">
+        <header class="card-header ">
+            <div class="row">
+                <div class="col-md-9">
+                    <form method="post" action="{% url 'admin_panel:order-name-search' %}" class="d-flex">
+                        {% csrf_token %}
+                        <div class="col-lg-4 col-md-4 me-2">
+                            <input type="text" name="query" placeholder="Search   Order ID" class="form-control">
+                        </div>
+                        <div class="col-lg-1 col-md-2 col-6">
+                            <button type="submit" class="btn btn-outline-primary">Search</button>
+                        </div>
+                    </form> 
+                </div>
+                <div class="col-md-3 d-flex justify-content-end">
+                    <div class="btn-group ">
+                        <button type="button" class="btn btn-success dropdown-toggle" data-bs-toggle="dropdown"
+                            aria-haspopup="true" aria-expanded="false">
+                            Download Report
+                        </button>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" href="{% url 'admin_panel:sales-report-pdf' %}">pdf</a>
+                            <a class="dropdown-item" href="{% url 'admin_panel:sales-report-excel' %}">Excel</a>
+        
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+           
+        </header>
+
+        <!-- Example single danger button -->
+
+        <div class="card-body">
+
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th class="text-middle">ID</th>
+                            <th class="text-middle">Name</th>
+                            <th class="text-middle">Email</th>
+                            <th class="text-middle">Total</th>
+                            <th class="text-middle">Date</th>
+                            <th class="text-middle">Status</th>
+                            {% comment %} <th class="text-middle">Payment Status</th> {% endcomment %}
+                            <th class="text-middle">Payment Method</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for data in order_main_data %}
+                        <tr>
+
+                            <td>
+                                <h6 class="mb-4 small-text order-id">{{ data.order_id }}</h6>
+                            </td>
+                            <td>
+                                <h6 class="mb-4 small-text">{{ data.user.username|title }}</h6>
+                            </td>
+                            <td>
+                                <h6 class="mb-4 small-text">{{ data.user.email }}</h6>
+                            </td>
+                            <td>
+                                <h6 class="mb-4 small-text">{{ data.total_amount }}</h6>
+                            </td>
+                            <td>
+                                <h6 class="mb-4 small-text">{{ data.date }}</h6>
+                            </td>
+
+                            <!-- Example single danger button -->
+
+                            <td>
+                                {% if data.payment_status %}
+                                <span class="badge alert-info">{{data.order_status}}</span>
+                                {% else %}
+                                <span class="badge alert-danger">PAYMENT PENDING</span>
+                                {% endif %}
+                                {% comment %} {% endif %} {% endcomment %}
+                            </td>
+
+                            <td>
+                                <h6 class="mb-4 small-text">{{ data.payment_option|title }}</h6>
+                            </td>
+
+
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- itemlist  .// -->
+        </div> <!-- card-body end// -->
+    </div> <!-- card end// -->
+    <div class="pagination-area mt-30 mb-50">
+        <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-start">
+                <li class="page-item active"><a class="page-link" href="#">01</a></li>
+                <li class="page-item"><a class="page-link" href="#">02</a></li>
+                <li class="page-item"><a class="page-link" href="#">03</a></li>
+                <li class="page-item"><a class="page-link dot" href="#">...</a></li>
+                <li class="page-item"><a class="page-link" href="#">16</a></li>
+                <li class="page-item"><a class="page-link" href="#"><i class="material-icons md-chevron_right"></i></a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</section>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"
+    integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3"
+    crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"
+    integrity="sha384-cuYeSxntonz0PPNlHhBs68uyIAVpIIOZZ5JqeqvYYIcEL727kskC66kF92t6Xl2V"
+    crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+
+
+{% endblock content %}

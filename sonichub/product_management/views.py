@@ -14,6 +14,14 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
 
 
+def shop_product_list(request):
+    content = {
+        "products":Products.objects.all()
+    }
+    return render(request, 'user_side/shop-product-list.html', content)
+
+
+
 def edit_variant_status_change(request, id):
     if not request.user.is_superuser:
         return redirect("admin_panel: admin_login")
@@ -74,12 +82,6 @@ def delete_images_edit(request):
     images = Product_images.objects.get(id=image_id)
     images.delete()
     return redirect("product:edit-images", product)
-
-
-# def delete_variant(request,variant_id,product):
-#     data = Product_Variant.objects.get(id=variant_id)
-#     data.delete()
-#     return redirect("product:variant-view",product)
 
 
 

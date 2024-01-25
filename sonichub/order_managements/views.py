@@ -20,7 +20,6 @@ from user_panel.views import wallet_balence
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from category_management.models import Category
-from django.template.loader import get_template
 from xhtml2pdf import pisa
 from django.template.loader import render_to_string
 from decimal import Decimal
@@ -116,6 +115,7 @@ def generate_pdf(request, order_id):
         return HttpResponse("Error creating PDF")
 
     return pdf_response
+
 
 
 def order_return(request):

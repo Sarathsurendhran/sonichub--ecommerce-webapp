@@ -9,6 +9,58 @@ from brand_management.models import Brand
 from category_management.models import Category
 from product_management.models import Products
 from order_managements.models import Order_Main_data
+from xhtml2pdf import pisa
+from django.template.loader import render_to_string
+import pandas as pd
+from bs4 import BeautifulSoup
+from django.template.loader import get_template
+from io import StringIO 
+
+def sales_report_excel(request):
+
+    context = {
+        "order_main_data":Order_Main_data.objects.all()
+    }
+    # using the same template that is used for pdf generation
+    html_content = render_to_string("admin_side/sales-report-pdf.html",context)
+  
+    df_list = pd.read_html(StringIO(html_content))
+    df = df_list[0]  
+
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename=sales-report.xlsx'
+    df.to_excel(response, index=False)
+
+    return response
+
+
+
+
+def sales_report_pdf(request):
+   context = {
+       "order_main_data":Order_Main_data.objects.all()
+   }
+   html_content = render_to_string("admin_side/sales-report-pdf.html",context)
+   pdf_response = HttpResponse(content_type = "application/pdf")
+   pdf_response["Content-Disposition"] = f'filename="{id}_details.pdf"'
+
+   pisa_status = pisa.CreatePDF(html_content, dest=pdf_response) 
+
+   if pisa_status.err:
+       return HttpResponse("error creating pdf")
+   
+   return pdf_response
+
+
+
+
+def sales_report(request):
+    context = {
+        "order_main_data":Order_Main_data.objects.all()
+    }
+    return render(request, "admin_side/sales-report.html",context )
+
+
 
 def admin_order_details(request,id):
    content = {
@@ -27,8 +79,6 @@ def order_status_change(request):
         order_data.save()
         print(request.POST.get('order_id'))
         return JsonResponse({"success":'success'})
-
-
 
 
 def order_list(request):

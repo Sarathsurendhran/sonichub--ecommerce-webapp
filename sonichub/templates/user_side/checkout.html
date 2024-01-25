@@ -203,8 +203,9 @@
 
                             {% if coupon_applied %}
                                 <span>
-                                    <i class="fi fi-rs-ticket" style="color: green;"></i>
-                                    <h5 style="color: green; display: inline;">{{coupon_code}} Coupon Applied</h5>
+                                  
+                                    <div>
+                                    <h5 style="color: green; display: inline;">  <i class="fi fi-rs-ticket" style="color: green;"></i> {{coupon_code}} Coupon Applied</h5></div>
                                 </span>
                             {% endif %}
 
@@ -316,9 +317,9 @@
             }
         });
     });
-    $('#apply-coupon').on( 'click', function() {
+    {% comment %} $('#apply-coupon').on( 'click', function() {
         $('#apply-coupon').toggle();
-    })
+    }) {% endcomment %}
 </script>
 
 
