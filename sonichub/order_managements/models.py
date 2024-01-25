@@ -6,7 +6,6 @@ from product_management.models import Product_Variant, Products
 
 class Order_Main_data(models.Model):
     user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
-    address = models.ForeignKey(Address, on_delete=models.CASCADE)
     total_amount = models.FloatField(null=False)
     date = models.DateField(auto_now_add=True)
     order_status = models.CharField(max_length=100, default="Order Placed")
@@ -15,6 +14,15 @@ class Order_Main_data(models.Model):
     is_active = models.BooleanField(default=True)
     payment_status = models.BooleanField(default=False)
     payment_id = models.CharField(max_length=50,default=1)
+
+    name = models.CharField(max_length=50, null=False, default="sarath")
+    house_name = models.CharField(max_length=400, null=False,  default="null")
+    street_name = models.CharField(max_length=300, null=False,  default="null")
+    pin_number = models.IntegerField(null=False,  default=1)
+    district = models.CharField(max_length=200, null=False, default="null" )
+    state = models.CharField(max_length=200, null=False, default="null")
+    country = models.CharField(max_length=200, null=False, default="null")
+    phone_number = models.CharField(max_length=40, null=False, default="null")
 
 
 
