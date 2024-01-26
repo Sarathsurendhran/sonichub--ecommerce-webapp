@@ -45,6 +45,7 @@ def view_coupon(request):
 
     current_date_time = datetime.now()
     current_date = current_date_time.date()
+    print(current_date)
 
     coupons = Coupon.objects.filter(expiry_date__lt=current_date)
     for coupon in coupons:

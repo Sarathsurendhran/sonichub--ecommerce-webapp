@@ -21,7 +21,7 @@
     </div>
     <div class="container"  id="productdetail" >
    
-        {% for order_id, order_sub_data_instances in grouped_order_data.items%}
+        {% for order_id, order_sub_data_instances in grouped_order_data%}
         
             <div class="row mb-3" >
                 <div class="col-md-12 card shadow-lg p-3 mb-2 bg-white rounded" >  
@@ -81,24 +81,32 @@
             </div></a>
         {% endfor %}
     </div>
+
+       <div class="pagination-area mt-30 mb-50">
+        <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-center">
+                {% for num in objects.paginator.page_range %}
+                    <li class="page-item {% if objects.number == num %}active{% endif %}">
+                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                    </li>
+                {% endfor %}
+                {% if objects.has_next %}
+                    <li class="page-item ">
+                        <a class="page-link " href="?page={{ objects.next_page_number }}">
+                            {% comment %} <i class="material-icons md-chevron_right"></i> {% endcomment %}
+                            <span class="material-symbols-outlined ">navigate_next</span>
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
 </section>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
-{% comment %} <script>
-    document.getElementById("productdetail").addEventListener("click",()=>{
-       // Assuming you have a reference to the element, for example, by using document.querySelector
-   var element = document.querySelector('.row');
-var orderId = element.getAttribute('data-order-id');
-console.log(orderId);
 
-    },true)
- document.querySelector('.row').addEventListener("click",()=>{
-
- })
-
-</script> {% endcomment %}
 
 
 {% endblock content %}

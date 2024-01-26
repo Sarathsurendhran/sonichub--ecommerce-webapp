@@ -15,6 +15,7 @@ import pandas as pd
 from bs4 import BeautifulSoup
 from django.template.loader import get_template
 from io import StringIO 
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 def sales_report_excel(request):
 
@@ -55,10 +56,24 @@ def sales_report_pdf(request):
 
 
 def sales_report(request):
+
+    order_main_data = Order_Main_data.objects.all()
+    paginator = Paginator(order_main_data, 3)
+    page = request.GET.get('page', 1)
+    
+    try:
+        objects = paginator.page(page)
+    except PageNotAnInteger:
+        objects = paginator.page(1)
+    except EmptyPage:
+        objects = paginator.page(paginator.num_pages)
+
     context = {
-        "order_main_data":Order_Main_data.objects.all()
+        "order_main_data":objects,
+        "objects":objects
     }
     return render(request, "admin_side/sales-report.html",context )
+
 
 
 
@@ -82,10 +97,27 @@ def order_status_change(request):
 
 
 def order_list(request):
+
+    order_main_data = Order_Main_data.objects.all().order_by('id').reverse()
+    order_sub_data = Order_Sub_data.objects.all().order_by("id").reverse()
+
+
+    paginator = Paginator(order_main_data, 3)
+    page = request.GET.get('page', 1)
+
+    try:
+        objects = paginator.page(page)
+    except PageNotAnInteger:
+        objects = paginator.page(1)
+    except EmptyPage:
+        objects = paginator.page(paginator.num_pages)
+
+
     
     content={
-        "order_main_data":Order_Main_data.objects.all().order_by('id').reverse(),
-        "order_sub_data":Order_Sub_data.objects.all().order_by("id").reverse()
+        "order_main_data":objects,
+        "objects":objects,
+        "order_sub_data":order_sub_data
     } 
     return render(request,'admin_side/order-list.html',content)
 

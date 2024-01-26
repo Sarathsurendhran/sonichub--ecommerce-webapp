@@ -24,6 +24,7 @@ from xhtml2pdf import pisa
 from django.template.loader import render_to_string
 from decimal import Decimal
 from datetime import date
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 
 def cancel_individual_product(request, order_sub_id):
@@ -211,11 +212,26 @@ def order_list(request, id):
 
     grouped_data = defaultdict(list)
 
+    
+
     for data in order_main_data:
         order_sub_data = data.order_sub_data_set.all()
         grouped_data[data.order_id] = order_sub_data
 
-    context = {"grouped_order_data": dict(grouped_data)}
+    flat_grouped_data = [(key, value) for key, value in grouped_data.items()]
+
+    paginator = Paginator(flat_grouped_data, 3)
+    page = request.GET.get('page', 1)
+
+    try:
+        objects = paginator.page(page)
+    except PageNotAnInteger:
+        objects = paginator.page(1)
+    except EmptyPage:
+        objects = paginator.page(paginator.num_pages)
+
+    context = {"grouped_order_data": objects,"objects":objects}
+    # context = {"grouped_order_data": dict(grouped_data)}
     return render(request, "user_side/order-list.html", context)
 
 
@@ -280,7 +296,7 @@ def confirm_order(request, id):
         wallet_amount = wallet_balence(request, id)
 
         if payment_option == "wallet payment":
-            if total_price > wallet_amount:
+            if float(total_price) > float(wallet_amount):
                 messages.warning(request, "Insufficient Balence!")
                 return redirect("order:checkout", id)
 
@@ -323,7 +339,7 @@ def confirm_order(request, id):
             return redirect("order:online-payment", order_id)
 
         if payment_option == "wallet payment":
-            return redirect("user_panel:wallet-payment", order_id, id, coupon_code)
+            return redirect("user_panel:wallet-payment", order_id, id)
 
         # clearing the cart
         data.delete()
