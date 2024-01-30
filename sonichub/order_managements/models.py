@@ -14,6 +14,7 @@ class Order_Main_data(models.Model):
     is_active = models.BooleanField(default=True)
     payment_status = models.BooleanField(default=False)
     payment_id = models.CharField(max_length=50,default=1)
+    coupon_discount = models.IntegerField(null=True) 
 
     name = models.CharField(max_length=50, null=False, default="sarath")
     house_name = models.CharField(max_length=400, null=False,  default="null")

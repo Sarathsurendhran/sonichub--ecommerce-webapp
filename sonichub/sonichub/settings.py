@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 from django.contrib.messages import constants as messages
 from pathlib import Path
 import os
+from decouple import config
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -20,10 +22,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-f+77d4=h21wd40r)u^+=ae_575r07=*sl!ms@ncy7h@id-wzob'
+SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config('DEBUG', cast=bool)
 
 ALLOWED_HOSTS = []
 
@@ -88,9 +90,9 @@ WSGI_APPLICATION = 'sonichub.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'sonichub',
-        'USER': 'postgres',
-        'PASSWORD': 'admin@123',
+        'NAME': config('DATABASE_NAME'),
+        'USER': config('DATABASE_USER'),
+        'PASSWORD': config('DATABASE_PASS'),
         'HOST': 'localhost',
         'PORT': '5433',
     }
@@ -149,10 +151,10 @@ MESSAGE_TAGS={
 # Email...
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_USE_TLS=True
+EMAIL_USE_TLS= config('EMAIL_USE_TLS', cast=bool)
 EMAIL_HOST='smtp.office365.com'
-EMAIL_HOST_USER='sonichubecommerce@outlook.com'
-EMAIL_HOST_PASSWORD='wiillnbwbdzphfla'
+EMAIL_HOST_USER= config('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD=config('EMAIL_HOST_PASSWORD')
 EMAIL_PORT=587
 
 
@@ -170,6 +172,6 @@ CORS_ALLOWED_ORIGINS = [
 
 # RazorPay
 
-RAZORPAY_KEY="rzp_test_8XSNvVIgMjtH1b"
-RAZORPAY_KEY_SECRET="ZoD2SIWERdH30p5U62WspD5M"
+RAZORPAY_KEY=config('RAZORPAY_KEY')
+RAZORPAY_KEY_SECRET=config('RAZORPAY_KEY_SECRET')
 SECURE_CROSS_ORIGIN_OPENER_POLICY="same-origin-allow-popups"

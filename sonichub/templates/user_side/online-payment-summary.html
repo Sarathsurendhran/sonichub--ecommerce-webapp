@@ -5,189 +5,167 @@
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <a class="navbar-brand" href="/"><span class="">Sonic Hub</span></a>
     </nav>
-<section class="mt-100 mb-50">
-    <div class="container" style="max-width:1300px">
+    <section class="mt-100 mb-50">
+        <div class="container" style="max-width:1300px">
 
-        <!-- <div class="col-lg-6">
-            <div class="toggle_info">
-                <span><i class="fi-rs-label mr-10"></i><span class="text-muted">Have a coupon?</span> <a href="#coupon"
-                        data-bs-toggle="collapse" class="collapsed" aria-expanded="false">Click here to enter your
-                        code</a></span>
-            </div>
-            <div class="panel-collapse collapse coupon_form " id="coupon">
-                <div class="panel-body">
-                    <p class="mb-30 font-sm">If you have a coupon code, please apply it below.</p>
-                    <form method="post">
-                        <div class="form-group">
-                            <label for="coupon-field"></label>
-                            <input type="text" id="coupon-field" placeholder="Enter Coupon Code...">
-                            <span style="color: red" id="coupon-field-error"></span>
-                        </div>
-                        <div class="form-group">
-                            <button class="btn  btn-md" name="login" id="coupon-btn">Apply Coupon</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div> -->
-<!-- 
-        <div class="row">
-            <div class="col-12">
-                <div class="divider mt-50 mb-50"></div>
-            </div>
-        </div> -->
-                <div class="row">
-                    <div class="col-md-6">
-                     <span><h1>Address</h1></span>
-                        <div class="order_review border border-shadow ">
-                            
-                            <!-- LOOP -->
-                          
-                            <div class="border border-dark rounded p-3 mb-15 table-responsive order_table text-center row">
-                            
-                                <div class="row">
-                                
-                                    <div class=" col-10 d-flex flex-column ">                                   
-                                    
-                                        <div class="d-flex justify-content-start">
-                                            <span class="bold font-lg">{{ order_data.address.name | title }}</span>
-                                        </div>
-                                        <div class="d-flex justify-content-start">
-                                            <span>{{order_data.address.house_name | title  }}</span>
-                                        </div>
-                                        <div class="d-flex justify-content-start">
-                                            <span>{{ order_data.address.street_name | title  }}</span>
-                                            <span>{{ order_data.address.district | title  }}</span>
-                                            <span>{{order_data.address.state | title  }}</span>
-                                            <span>{{order_data.address.country | title }}</span>
-                                        </div>
-                                        <div class="d-flex justify-content-start">
-                                            <span>Pin code:{{order_data.address.pin_number | title }}</span>
-                                        </div>
-                                        <div class="d-flex justify-content-start">
-                                            <span>Phone : {{ order_data.address.phone_number | title }}</span>
-                                        </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <span>
+                        <h1>Address</h1>
+                    </span>
+                    <div class="order_review border border-shadow ">
+
+                        <!-- LOOP -->
+
+                        <div class="border border-dark rounded p-3 mb-15 table-responsive order_table text-center row">
+
+                            <div class="row">
+
+                                <div class=" col-10 d-flex flex-column ">
+
+                                    <div class="d-flex justify-content-start">
+                                        <span class="bold font-lg">{{ order_data.name | title }}</span>
                                     </div>
+                                    <div class="d-flex justify-content-start">
+                                        <span>{{order_data.address.house_name | title }}</span>
+                                    </div>
+                                    <div class="d-flex justify-content-start">
+                                        <span>{{ order_data.street_name | title }}</span><br>
+                                        <span>{{ order_data.district | title }}</span><br>
+                                        <span>{{order_data.state | title }}</span><br>
+                                        <span>{{order_data.country | title }}</span>
+                                    </div>
+                                    <div class="d-flex justify-content-start">
+                                        <span>Pin code:{{order_data.pin_number | title }}</span>
+                                    </div>
+                                    <div class="d-flex justify-content-start">
+                                        <span>Phone : {{ order_data.phone_number | title }}</span>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <!-- LOOP ENDS -->
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="order_review border border-dark">
+                        <div class="mb-20">
+                            <h4>Order Summary</h4>
+                        </div>
+                        <div class="table-responsive order_table text-center">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th colspan="2">Product</th>
+                                        <th>Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- PRODUCT LOOP -->
+                                    {% for subdata in order_sub_data %}
+                                    <tr>
+                                        <td class="image product-thumbnail">
+                                            <img src="{{subdata.variant.product.thumbnail.url}}" alt="#">
+                                        </td>
+                                        <td>
+                                            <h5><a href="#">
+                                                    <span>{{ subdata.variant.product.product_name }}</span>
+                                                </a></h5>
+
+                                        </td>
+                                        <td><span>{{ subdata.quantity}} x {{ subdata.variant.product.offer_price}}</span></td>
+                                                
+                                    </tr>
+                                    {% endfor %}
+                                    <!-- PRODUCT LOOP ENDS HERE -->
+                                    <tr>
+        
+                                        <th>SubTotal</th>
+                                        <td class="product-subtotal" colspan="2">
+                                            <span class="bold pr-2"></span>
+                                            <span class="total-amount-no-discount">₹ {{ order_data.total_amount }}</span>
+                                               
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>Shipping</th>
+                                        <td colspan="2"><em>Free Shipping</em></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Total</th>
+                                        <td colspan="2" class="product-subtotal">
+                                            <span class="font-xl text-brand fw-900 pr-2"></span>
+                                            <span class="font-xl text-brand fw-900 total-amount-no-discount">₹ {{order_data.total_amount }}</span>
+                                                
+                                        </td>
+                                    </tr>
+
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="payment_method">
+                            <div class="mb-25">
+                                <h5>Payment</h5>
+                            </div>
+                            <div class="payment_option">
+                                <div class="custome-radio">
+                                    <input class="form-check-input" required="" type="radio" name="payment_option"
+                                        id="exampleRadios3" checked="">
+
+                                    <label class="form-check-label" for="exampleRadios3" value="{{'online payment'}}"
+                                        aria-controls="bankTranfer">Razorpay</label>
+
+                                    <br><br>
                                    
                                 </div>
                             </div>
-                                                      
-                           <!-- LOOP ENDS -->
                         </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="order_review border border-dark">
-                            <div class="mb-20"> <h4>Order Summary</h4> </div>
-                            <div class="table-responsive order_table text-center">
-                                <table class="table">
-                                    <thead>
-                                        <tr>
-                                            <th colspan="2">Product</th>
-                                            <th>Total</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <!-- PRODUCT LOOP -->
-                                        {% for subdata in order_sub_data %}
-                                        <tr>
-                                            <td class="image product-thumbnail">
-                                                <img src="{{subdata.variant.product.thumbnail.url}}" alt="#">
-                                            </td>
-                                            <td>
-                                                <h5><a href="#">
-                                                        <span>{{ subdata.variant.product.product_name }}</span>
-                                                    </a></h5>
-                                                                                             
-                                            </td>
-                                            <td><span>{{ subdata.variant.quantity}} x {{ subdata.variant.product.offer_price }}</span></td>
-                                        </tr>
-                                        {% endfor %}
-                                        <!-- PRODUCT LOOP ENDS HERE -->
-                                        <tr>
-                                            <th>SubTotal</th>
-                                            <td class="product-subtotal" colspan="2">
-                                                <span class="bold pr-2"></span>
-                                                <span class="total-amount-no-discount" >₹ {{ order_data.total_amount }}</span>
-                                            </td>
-                                        </tr>
-                                        <tr>    
-                                            <th>Shipping</th>
-                                            <td colspan="2"><em>Free Shipping</em></td>
-                                        </tr>
-                                        <tr>
-                                            <th>Total</th>
-                                            <td colspan="2" class="product-subtotal">
-                                                <span class="font-xl text-brand fw-900 pr-2"></span>
-                                                <span class="font-xl text-brand fw-900 total-amount-no-discount">₹ {{ order_data.total_amount }}</span>
-                                            </td>
-                                        </tr>
-                                        
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div class="payment_method">
-                                <div class="mb-25">
-                                    <h5>Payment</h5>
-                                </div>
-                                <div class="payment_option">
-                                    <div class="custome-radio">
-                                        <input class="form-check-input" required=""  type="radio" name="payment_option" id="exampleRadios3" checked="">
-                                           
-                                        <label class="form-check-label" for="exampleRadios3" value="{{'cash on delivary'}}" aria-controls="bankTranfer">Razorpay</label>
-                                          
-                                        <br><br>
-                                        {% comment %} <input class="form-check-input" required=""  value="{{'online payment'}}" type="radio" name="payment_option"
-                                            id="exampleRadios4">
-                                        <label class="form-check-label" for="exampleRadios4" aria-controls="bankTranfer" >Online Payment
-                                        </label><br><br>
-                                        <input class="form-check-input" required=""  value="{{'wallet payment'}}" type="radio" name="payment_option"
-                                            id="exampleRadios5">
-                                        <label class="form-check-label" for="exampleRadios5" aria-controls="bankTranfer" >Wallet Payment
-                                        </label> {% endcomment %}
-                                    </div>
-                                </div>
-                            </div>
-                             <input type="hidden" name="total_amount" id="total_amount" value="{{ order_data.total_amount }}">
-                              <input type="hidden" name="order_status" id="orderId"  value="{{ order_data.payment_id }}">
-                              <input type="hidden" name="order_id" id="orderMainId"  value="{{ order_data.order_id }}">
-                              {% comment %} <input type="hidden" id="url" data-url = "{% url 'order:razorpay-success' order_id %}" > {% endcomment %}
-                              
-                                                         
-                            <button type="submit" id="placeorder" class="btn btn-brand btn-lg mt-30">
-                                Place Order
-                            </button>  
-                            
-                        </div>
+                        <input type="hidden" name="total_amount" id="total_amount"
+                            value="{{ order_data.total_amount }}">
+                        <input type="hidden" name="order_status" id="orderId" value="{{ order_data.payment_id }}">
+                        <input type="hidden" name="order_id" id="orderMainId" value="{{ order_data.order_id }}">
+                        {% comment %} <input type="hidden" id="url"
+                            data-url="{% url 'order:razorpay-success' order_id %}"> {% endcomment %}
+
+
+                        <button type="submit" id="placeorder" class="btn btn-brand btn-lg mt-30">
+                            Place Order
+                        </button>
+
                     </div>
                 </div>
-    <div class="bt-1 border-color-1 mt-30 mb-30"></div>
+            </div>
+            <div class="bt-1 border-color-1 mt-30 mb-30"></div>
 
-    </div>
-    </div>
-    </div>
-    </form>
-    <!--  FORM STARTS  -->
-    </div>
+        </div>
+        </div>
+        </div>
+        </form>
+        <!--  FORM STARTS  -->
+        </div>
     </section>
-    </main>
-    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
-    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</main>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
 <script>
-    let grandTotal = parseFloat($('#total_amount').val())*100;
+    let grandTotal = parseFloat($('#total_amount').val()) * 100;
     let orderId = $('#orderId').val();
     let order_id = $('#orderMainId').val();
     let options = {
         "key": "rzp_test_8XSNvVIgMjtH1b",
-        "amount": grandTotal ,
+        "amount": grandTotal,
         "currency": "INR",
         "name": "SONIC HUB",
         "description": "Purchases",
         "image": "https://d27jswm5an3efw.cloudfront.net/app/uploads/2019/11/audio-file-types-36.jpg",
         "payment_id": orderId,
-        "theme": { "color": "#088178",},
-        "handler": function (response){ window.location.href = "/user/orderpayment-success/"+order_id.substring(1) }
+        "theme": { "color": "#088178", },
+        "handler": function (response) { window.location.href = "/user/orderpayment-success/" + order_id.substring(1) }
     };
     let rzp1 = new Razorpay(options);
 
@@ -201,10 +179,10 @@
             cancelButtonText: 'Try, after some times',
         }).then((result) => {
             if (result.isConfirmed) rzp1.open();
-            else window.location.href='/'
+            else window.location.href = '/'
         });
     });
-    $('#placeorder').on('click', function(e) {
+    $('#placeorder').on('click', function (e) {
         e.preventDefault();
         rzp1.open();
     })

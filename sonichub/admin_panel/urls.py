@@ -26,6 +26,7 @@ urlpatterns = [
     path("sales-report", views.sales_report, name="sales-report"),
     path('sales-report-pdf',views.sales_report_pdf, name="sales-report-pdf"),
     path('sales-report-excel',views.sales_report_excel, name="sales-report-excel"),
-    
-
+    path("fetchData/week",views.fetch_weekly_data, name ="fetch_weekly_data"),
+    path("fetchData/month",views.fetch_monthly_data, name ="fetch_monthly_data"),
+    path("fetchData/year",views.fetch_yearly_data, name ="fetch_yearly_data")
 ]

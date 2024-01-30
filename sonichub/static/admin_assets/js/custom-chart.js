@@ -44,7 +44,9 @@
     }
 
     function fetchData(url, successCallback) {
+        
         $.ajax({
+            
             type: 'GET',
             url: url,
             // crossDomain : true,
@@ -55,26 +57,22 @@
         });
     }
 
+    
     // Make an initial AJAX request to get the default data (monthly data)
-    fetchData('/dashboard/fetchData/Month', function (monthlyData) {
-        updateChart(monthlyData);
-    });
+               
+    fetchData('fetchData/month', function (monthlyData) { updateChart(monthlyData.response)  });
+    
 
     $('#dailyButton').on('click', function () {
-        fetchData('/dashboard/fetchData/week' , function (dailyData) {
-            updateChart(dailyData);
-        });
+        fetchData('fetchData/week' , function (dailyData) { updateChart(dailyData.response) });
     });
 
     $('#MonthlyButton').on('click', function () {
-        fetchData('/dashboard/fetchData/Month', function (monthlyData) {
-            updateChart(monthlyData);
-        });
+        
+        fetchData('fetchData/month', function (monthlyData) { updateChart(monthlyData.response) });
     });
 
     $('#YearlyButton').on('click', function () {
-        fetchData('/dashboard/fetchData/year', function (yearlyData) {
-            updateChart(yearlyData);
-        });
+        fetchData('fetchData/year', function (yearlyData) { updateChart(yearlyData.response) });
     });
 })(jQuery);

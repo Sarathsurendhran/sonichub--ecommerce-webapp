@@ -46,11 +46,16 @@
                     <div class="flex-lg-grow-1 ms-3">
                       <h6 class="small mb-0">{{data.variant.product.product_name |title}}</h6>
                       <span class="small">Color: {{data.variant.colour_name | title}}</span>
+                        {% if data.variant.product.product_category.discount %}
+                      <div style="color:green;"> category offer {{data.variant.product.product_category.discount}} % </div>
+                      
+                    {% endif %}
                     </div>
                   </div>
                 </td>
                 <td>{{data.quantity}}</td>
                 <td class="text-end">{{data.variant.product.offer_price}}</td>
+               
                  
                 
               </tr>
@@ -60,7 +65,7 @@
             <tfoot>
               <tr>
                 <td colspan="2">Subtotal</td>
-                <td class="text-end">{{order_main.total_amount}}</td>
+                <td class="text-end">{{sub_total}}</td>
                
               </tr>
               <tr>

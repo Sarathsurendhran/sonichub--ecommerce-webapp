@@ -56,7 +56,13 @@
                     <div class="flex-lg-grow-1 ms-3">
                       <h6 class="small mb-0">{{order.variant.product.product_name |title}}</h6>
                       <span class="small">Color: {{order.variant.colour_name | title}}</span>
+                        {% if order.variant.product.product_category.discount %}
+                      <div style="color:green;"> category offer {{order.variant.product.product_category.discount}} % </div>
+                      
+                    {% endif %}
                     </div>
+
+                  
                   </div>
                 </td>
                 <td>{{order.quantity}}</td>
@@ -74,7 +80,7 @@
             <tfoot>
               <tr>
                 <td colspan="2">Subtotal</td>
-                <td class="text-end">{{order_main.total_amount}}</td>
+                <td class="text-end">{{sub_total}}</td>
               </tr>
               <tr>
                 <td colspan="2">Shipping</td>
@@ -82,9 +88,15 @@
               </tr>
 
               <tr class="fw-bold">
+              {% if order_main.coupon_discount %}
+               <td colspan="2">TOTAL <br> <span style="color:green">{{order_main.coupon_discount}} % discount applied with coupon</span> </td>
+               <td class="text-end">{{order_main.total_amount}}</td>
+              
+              {% else %}
+              
                 <td colspan="2">TOTAL</td>
                 <td class="text-end">{{order_main.total_amount}}</td>
-                
+              {% endif %}
               </tr>
       
             </tfoot>

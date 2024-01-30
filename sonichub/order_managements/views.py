@@ -39,29 +39,25 @@ def cancel_individual_product(request, order_sub_id):
     find_sub_total = Order_Sub_data.objects.filter(main_order=order_main.id)
     sub_total = 0
 
-    
-    
     # credit cash on wallet when cancel individual product
-    
+
     if (
-            order_main.payment_option == "online payment"
-            or order_main.payment_option == "wallet payment"
-        ):
-
-
+        order_main.payment_option == "online payment"
+        or order_main.payment_option == "wallet payment"
+    ):
         price = data.variant.product.offer_price
         offer_discount = data.variant.product.product_category.discount
-        
+
         if offer_discount:
             discount_total = float(price) * (offer_discount / 100)
             price = float(price) - discount_total
 
         Transaction.objects.create(
-                description="Cancelled Product    " +  data.variant.product.product_name,
-                amount=price,
-                transaction_type="Credit",
-                user=user_id,
-            )    
+            description="Cancelled Product    " + data.variant.product.product_name,
+            amount=price,
+            transaction_type="Credit",
+            user=user_id,
+        )
 
     for i in find_sub_total:
         if not i.is_active:
@@ -75,9 +71,15 @@ def cancel_individual_product(request, order_sub_id):
 
         if i.variant.variant_status:
             sub_total += float(unit_price)
-            
+    
+    if order_main.coupon_discount:
+        discount = float(order_main.coupon_discount)
+        amount = float(sub_total) * (discount / 100)
+        sub_total = round(float(sub_total) - amount, 2)
+
     order_main.total_amount = sub_total
     order_main.save()
+
 
     order_sub_data = Order_Sub_data.objects.filter(
         main_order=order_main.id, is_active=False
@@ -93,8 +95,6 @@ def cancel_individual_product(request, order_sub_id):
         return redirect("order:order-details", order_main.id)
 
     return redirect("order:order-details", order_main.id)
-
-
 
 
 def generate_pdf(request, order_id):
@@ -116,7 +116,6 @@ def generate_pdf(request, order_id):
         return HttpResponse("Error creating PDF")
 
     return pdf_response
-
 
 
 def order_return(request):
@@ -180,7 +179,6 @@ def cancel_order(request, order_id, user_id):
             data.payment_option == "online payment"
             or data.payment_option == "wallet payment"
         ):
-            
             amount = request.POST.get("total_amount")
             user = UserProfile.objects.get(id=user_id)
 
@@ -196,9 +194,16 @@ def cancel_order(request, order_id, user_id):
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def order_details(request, id):
+    order_sub = Order_Sub_data.objects.filter(main_order_id=id)
+    sub_total = 0
+    for i in order_sub:
+        if i.variant.variant_status:
+            sub_total += i.quantity * i.variant.product.offer_price
+
     content = {
         "order_main": Order_Main_data.objects.get(id=id),
         "order_sub_data": Order_Sub_data.objects.filter(main_order_id=id),
+        "sub_total": sub_total,
     }
 
     return render(request, "user_side/order-details.html", content)
@@ -212,8 +217,6 @@ def order_list(request, id):
 
     grouped_data = defaultdict(list)
 
-    
-
     for data in order_main_data:
         order_sub_data = data.order_sub_data_set.all()
         grouped_data[data.order_id] = order_sub_data
@@ -221,7 +224,7 @@ def order_list(request, id):
     flat_grouped_data = [(key, value) for key, value in grouped_data.items()]
 
     paginator = Paginator(flat_grouped_data, 3)
-    page = request.GET.get('page', 1)
+    page = request.GET.get("page", 1)
 
     try:
         objects = paginator.page(page)
@@ -230,17 +233,24 @@ def order_list(request, id):
     except EmptyPage:
         objects = paginator.page(paginator.num_pages)
 
-    context = {"grouped_order_data": objects,"objects":objects}
-    # context = {"grouped_order_data": dict(grouped_data)}
+    context = {"grouped_order_data": objects, "objects": objects}
     return render(request, "user_side/order-list.html", context)
 
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def current_order_details(request, order_id):
     order_main = Order_Main_data.objects.get(order_id=order_id)
+    order_sub = Order_Sub_data.objects.filter(main_order_id=order_main.id)
+
+    sub_total = 0
+    for i in order_sub:
+        if i.variant.variant_status:
+            sub_total += i.quantity * i.variant.product.offer_price
+
     content = {
         "order_main": Order_Main_data.objects.get(order_id=order_id),
         "order_sub": Order_Sub_data.objects.filter(main_order_id=order_main.id),
+        "sub_total": sub_total,
     }
     return render(request, "user_side/current-order-details.html", content)
 
@@ -266,32 +276,15 @@ def confirm_order(request, id):
         total_price = request.POST.get("total_price")
         coupon_code = request.POST.get("coupon_code")
 
+        try:
+            discount_percentage = Coupon.objects.get(Coupon_code=coupon_code)
+            discount = discount_percentage.discount
+        except:
+            discount = None
+            pass
+
         if float(total_price) < float(sub_total):
             offers_applied = True
-
-        # coupon recheck...
-        # if coupon_code is not None and coupon_code != "None":
-        #     try:
-        #         coupon = Coupon.objects.get(
-        #             Coupon_code=coupon_code,
-        #             is_active=True,
-        #             expiry_date__gte=timezone.now().date(),
-        #             minimum_amount__lt=sub_total,
-        #         )
-
-        #         if sub_total > coupon.minimum_amount:
-        #             discount = float(coupon.discount)
-        #             amount = float(total_price) * (discount / 100)
-        #             total_price = round(float(total_price) - amount, 2)
-
-        #         else:
-        #             messages.warning(request, "Invalid coupon")
-        #             return redirect("order:checkout", user)
-
-        #     except Exception as e:
-        #         print(e)
-        #         messages.warning(request, "Enter valid coupon")
-        #         return redirect("order:checkout", user)
 
         wallet_amount = wallet_balence(request, id)
 
@@ -310,16 +303,15 @@ def confirm_order(request, id):
             order_status=order_status,
             user=user_id,
             payment_option=payment_option,
-
-            name = address_id.name,
-            house_name = address_id.house_name,
-            street_name = address_id.street_name,
-            pin_number = address_id.pin_number,
-            district = address_id.district,
-            state = address_id.state,
-            country = address_id.country,
-            phone_number = address_id.phone_number,
-            
+            coupon_discount=discount,
+            name=address_id.name,
+            house_name=address_id.house_name,
+            street_name=address_id.street_name,
+            pin_number=address_id.pin_number,
+            district=address_id.district,
+            state=address_id.state,
+            country=address_id.country,
+            phone_number=address_id.phone_number,
         )
         order_id = "#" + str(formatted_date) + str(user) + str(main_order.id)
         main_order.order_id = order_id
@@ -370,7 +362,12 @@ def confirm_order(request, id):
         main_order_id.payment_status = True
         main_order_id.save()
 
-        context = {"order_id": order_id, "address": address_id, "subtotal": sub_total, "offers applied":offers_applied}
+        context = {
+            "order_id": order_id,
+            "address": address_id,
+            "subtotal": sub_total,
+            "offers applied": offers_applied,
+        }
 
         return render(request, "user_side/order-success.html", context)
 
@@ -388,7 +385,7 @@ def checkout(request, id):
     offer_applied = False
     discount = 0
     category_discount = None
-    coupon_applied =False
+    coupon_applied = False
 
     for i in data:
         if i.variant.variant_status:
@@ -399,25 +396,30 @@ def checkout(request, id):
             continue
 
         unit_price = i.variant.product.offer_price
+        print("initial unit price:",unit_price)
         category_discount = i.variant.product.product_category.discount
 
         if (
             i.product.product_category.minimum_amount is not None
             and float(i.product.product_category.minimum_amount) <= unit_price
         ):
+            unit_price = i.variant.product.price
+            print("initial unit price if category offer:",unit_price)
             if category_discount:
                 offer_applied = True
                 unit_price = float(unit_price) - float(unit_price) * (
                     category_discount / 100
                 )
+                print("unit price after category discount:",unit_price)
 
         total_price = float(total_price) + i.quantity * float(unit_price)
+        print("final price :", total_price)
 
     if request.method == "POST":
         try:
             coupon_code = request.POST.get("coupon code").strip()
 
-            print("entered coupon:",coupon_code)
+            print("entered coupon:", coupon_code)
 
             coupon = Coupon.objects.get(
                 Coupon_code=coupon_code,
@@ -437,7 +439,7 @@ def checkout(request, id):
                 messages.warning(request, "Invalid coupon")
 
         except Exception as e:
-            print("exception",e)
+            print("exception", e)
             messages.warning(request, "Enter valid coupon")
 
     content = {
@@ -451,6 +453,6 @@ def checkout(request, id):
         "category_discount": category_discount,
         "coupons": coupons,
         "datas": data,
-        "coupon_applied":coupon_applied
+        "coupon_applied": coupon_applied,
     }
     return render(request, "user_side/checkout.html", content)

@@ -118,6 +118,8 @@ def status_update(request, id):
     return redirect("category:category-list")
 
 
+
+
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def edit_category(request, id):
     if not request.user.is_superuser:
@@ -138,6 +140,9 @@ def edit_category(request, id):
     if request.method == "POST":
         category_name = request.POST.get("category_name")
         status = request.POST.get("status")
+        checkbox = request.POST.get('checkbox')
+        
+ 
         parent = (
             None
             if request.POST["parent"] == "0"
@@ -165,12 +170,13 @@ def edit_category(request, id):
                 category_data.is_available = status
                 category_data.parent = parent
                 
-
+            
                 try:
                     minimum_amount = request.POST.get("minimum_amount",None)
                     discount = request.POST.get("discount", None)
                     discount = Decimal(discount) if discount else None
                     expirydate = request.POST.get("date",None)
+                    
 
                     if expirydate or minimum_amount:
                        expirydate = datetime.strptime(expirydate, "%Y-%m-%d").date()
@@ -178,11 +184,17 @@ def edit_category(request, id):
                     else:
                         expirydate = None
                         minimum_amount = None
-                    
-                    category_data.minimum_amount=minimum_amount
-                    category_data.discount=discount
-                    category_data.expirydate=expirydate
-                    category_data.save()
+
+                    if not checkbox:
+                        category_data.minimum_amount=None
+                        category_data.discount=None
+                        category_data.expirydate=None
+                        category_data.save()
+                    else:
+                        category_data.minimum_amount=minimum_amount
+                        category_data.discount=discount
+                        category_data.expirydate=expirydate
+                        category_data.save()
 
                 except Exception as e:
                     print(e)

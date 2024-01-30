@@ -16,6 +16,68 @@ from bs4 import BeautifulSoup
 from django.template.loader import get_template
 from io import StringIO 
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.utils import timezone
+from django.db.models import F
+from django.db.models import Sum, Count
+
+
+def fetch_monthly_data(request):
+    response = {}
+
+    end_date = timezone.now()
+  
+    start_date = end_date - timezone.timedelta(days=30)
+
+    current_date = start_date
+
+    while current_date <= end_date:
+        purchase_count = Order_Main_data.objects.filter(date=current_date, payment_status=True).count()
+        response[current_date.day] = purchase_count
+
+        current_date += timezone.timedelta(days=1)
+
+    return JsonResponse({'response': response}, status=200)
+
+
+
+def fetch_weekly_data(request):
+    response = {}
+
+    end_date = timezone.now()
+    start_date = end_date - timezone.timedelta(days=7)
+
+    current_date = start_date
+    while current_date <= end_date:
+        purchase_count = Order_Main_data.objects.filter(date=current_date, payment_status=True).count()
+        day_name = current_date.strftime("%A")
+        response[day_name] = purchase_count
+
+        current_date += timezone.timedelta(days=1)
+
+    return JsonResponse({'response':response},status=200)
+
+
+def fetch_yearly_data(request):
+    response = {}
+    end_date = timezone.now()
+    start_date = end_date.replace(month=1, day=1)
+    current_date = start_date
+
+    while current_date <= end_date:
+        next_month = current_date.replace(month=(current_date.month + 1))
+        purchase_count = Order_Main_data.objects.filter(
+            date__gte=current_date, date__lt=next_month, payment_status=True
+        ).count()
+
+        month_name = current_date.strftime("%B")
+    
+        response[month_name] = purchase_count
+
+        current_date = next_month
+
+    return JsonResponse({'response': response}, status=200)
+
+
 
 def sales_report_excel(request):
 
@@ -122,11 +184,28 @@ def order_list(request):
     return render(request,'admin_side/order-list.html',content)
 
 
+
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def admin_dashboard(request):
     if not request.user.is_superuser:
         return redirect("admin_panel:admin_login")
-    return render(request, "admin_side/admin-index.html")
+    
+    current_date = timezone.now()
+    purchase_count = Order_Main_data.objects.filter(date__month=current_date.month, payment_status=True).count()
+    result = Order_Main_data.objects.aggregate(sum = Sum('total_amount'))
+    total_amount = result['sum']
+
+    content = {
+            "total_amount":total_amount,
+            "orders":Order_Main_data.objects.filter(payment_status=True).count(),
+            "products":Products.objects.filter(is_active=True).count(),
+            "category":Category.objects.filter(is_available=True).count(),
+            "monthly_sales":purchase_count
+
+    }
+    return render(request, "admin_side/admin-index.html", content)
+
+
 
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
