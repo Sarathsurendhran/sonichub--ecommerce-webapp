@@ -1,0 +1,5 @@
+../sonicvenv/
+/media
+.env
+/venv
+/env

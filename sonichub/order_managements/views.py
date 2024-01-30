@@ -403,7 +403,7 @@ def checkout(request, id):
             i.product.product_category.minimum_amount is not None
             and float(i.product.product_category.minimum_amount) <= unit_price
         ):
-            unit_price = i.variant.product.price
+            #unit_price = i.variant.product.price
             print("initial unit price if category offer:",unit_price)
             if category_discount:
                 offer_applied = True
