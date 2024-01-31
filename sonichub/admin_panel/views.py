@@ -19,6 +19,47 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.utils import timezone
 from django.db.models import F
 from django.db.models import Sum, Count
+from datetime import datetime
+
+
+
+def sales_date_search(request):
+    if request.method == 'POST':
+        try:
+            start_date = request.POST.get('startDate')
+            end_date = request.POST.get('endDate')
+
+            if start_date and end_date:
+                start_date = datetime.strptime(start_date, '%Y-%m-%d')
+                end_date = datetime.strptime(end_date, '%Y-%m-%d')
+
+                order_data = Order_Main_data.objects.filter(date__range = [start_date, end_date])
+                if order_data.exists():
+                    return render(request, 'admin_side/sales-report.html',{'order_main_data':order_data})
+                messages.warning(request,'Not Found!')
+        except Exception as e:
+            print(e)
+            messages.warning(request, "An Error Occured{e}")
+
+    return redirect('admin_panel:sales-report')
+
+
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def sales_report_search(request):
+        if request.method == 'POST':
+           try:
+               query = request.POST.get('query')
+               order_data = Order_Main_data.objects.filter(order_id__icontains=query)
+               if order_data.exists():
+                   return render(request, 'admin_side/sales-report.html',{'order_main_data':order_data})
+               messages.warning(request,'Not Found!')
+           except Exception as e:
+               print(e)
+               messages.warning(request, "An Error Occured{e}")
+        
+        return redirect('admin_panel:sales-report')
+
 
 
 def fetch_monthly_data(request):
@@ -119,7 +160,7 @@ def sales_report_pdf(request):
 
 def sales_report(request):
 
-    order_main_data = Order_Main_data.objects.all()
+    order_main_data = Order_Main_data.objects.all().order_by('id')
     paginator = Paginator(order_main_data, 3)
     page = request.GET.get('page', 1)
     
