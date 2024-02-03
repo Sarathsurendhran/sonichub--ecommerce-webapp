@@ -27,8 +27,76 @@ from django.urls import reverse
 from user_panel.models import Transaction
 from django.db import transaction
 from cart_management.models import Cart
+from django.contrib.auth.hashers import make_password, check_password
+from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ValidationError
+from django.core.validators import EmailValidator
+
+def about(request):
+    return render(request, 'user_side/about.html')
+
+def contact(request):
+    return render(request, 'user_side/contact.html')
+
+def forgot_password(request):
+    if request.method == 'POST':
+        email_id = request.POST.get('email')
+
+        email_validate = EmailValidator()
+        try:
+            email_validate(email_id)
+        except ValidationError as e:
+            messages.warning(request, 'Please enter a valid email!')
+            return redirect("user_side:user_login")
+
+        if email_id:
+            request.session['email'] = email_id
+            request.session['value'] = 'forgotpassword'
+            return redirect("user_side:send_otp")
+
+        return redirect("user_side:user_login")
 
 
+
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def update_password(request):
+    if request.method == "POST":
+        try:
+            password = request.POST.get("password")
+            confirm_password = request.POST.get("confirm-password")
+
+            if not password or not confirm_password:
+                messages.warning(request, 'Password cannot be empty')
+                return render(request, 'user_side/forgotpassword.html')
+            
+            if password != confirm_password:
+                messages.warning(request, 'Password doesn\'t match')
+                return render(request, 'user_side/forgotpassword.html')
+
+            try:
+                data = UserProfile.objects.get(email=request.session['email'])
+            except UserProfile.DoesNotExist:
+                messages.warning(request, 'User Profile not found')
+                return render(request, 'user_side/forgotpassword.html')
+
+            password = make_password(password)
+            data.password = password
+            data.save()
+
+            del request.session['value']
+
+            messages.success(request, 'Password changed successfully')
+            return redirect("user_side:user_login")
+        
+        except Exception as e:
+            messages.warning(request, 'Something went wrong!')
+            return render(request, 'user_side/forgotpassword.html')
+
+    return render(request, 'user_side/forgotpassword.html')
+
+
+    
 
 def referral_bonus(request):
     try:
@@ -77,7 +145,7 @@ def generate_referral_link(request):
 def index(request):
     
     context = {
-        "products": Products.objects.all(),
+        "products": Products.objects.all()[:8],
         "variants": Product_Variant.objects.all(),
         "brands": Brand.objects.all(),
         "categories": Category.objects.all(),
@@ -158,6 +226,7 @@ def signup(request):
 # wiillnbwbdzphfla
 @csrf_exempt
 def send_otp(request):
+    
     otp = get_random_string(length=4, allowed_chars="0123456789")
 
     now = datetime.now().time()
@@ -182,16 +251,29 @@ def send_otp(request):
     expire_time = timenow + timedelta(seconds=60)
     request.session["otp_expiration_time"] = expire_time.strftime("%H:%M:%S")
 
-    messages.success(request, "OTP sent successfully.")
-    JsonResponse({"success": "OTP sent successfully"}, status=200)
+    if request.headers.get("x-requested-with") == "XMLHttpRequest":
+        response_data = {
+            "success": True,
+            "message": "OTP sent successfully.",
+            "email": request.session.get("email", ""),
+        }
+        return JsonResponse(response_data)
+    else:
+        messages.success(request, "OTP sent successfully.")
+        return redirect("user_side:verify_otp")
 
-    return redirect("user_side:verify_otp")
-
+   
+   
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def verify_otp(request):
     if request.method == "POST":
-        otp_entered = request.POST.get("otp")
+        otp1 = request.POST.get("otp1")
+        otp2 = request.POST.get("otp2")
+        otp3 = request.POST.get("otp3")
+        otp4 = request.POST.get("otp4")
+
+        otp_entered = otp1 + otp2 + otp3 + otp4
 
         if "otp" in request.session:
             stored_otp = request.session["otp"]
@@ -201,7 +283,8 @@ def verify_otp(request):
             if otp_entered == stored_otp:
                 current_time = datetime.now().time()
 
-                user = UserProfile.objects.get(email=request.session["email"])
+                
+                user = UserProfile.objects.get(email=request.session['email'])
 
                 if current_time <= expiration_time:
                     user.is_active = True
@@ -210,6 +293,11 @@ def verify_otp(request):
 
                     del request.session["otp"]
                     del request.session["otp_expiration_time"]
+
+                    if 'value' in request.session:
+                        if request.session['value'] == 'forgotpassword':
+                            return redirect("user_side:update-password")
+                        
                     
                     referral_bonus(request) #calling referral bonus function
 
@@ -226,6 +314,8 @@ def verify_otp(request):
             messages.error(request, "OTP verification failed. Please try again.")
 
     return render(request, "user_side/otp.html")
+
+
 
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)

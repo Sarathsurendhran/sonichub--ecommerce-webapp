@@ -12,12 +12,82 @@ import json
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 
 
-def shop_product_list(request):
+
+def price_range(request):
+    try:
+        min_price = request.POST.get('min-value')
+        max_price = request.POST.get('max-value')
+        products = Products.objects.filter(offer_price__range=[min_price, max_price], is_active=True)
+
+    except Products.DoesNotExist:
+        products = []
+
+    paginator = Paginator(products, 6)
+    page_number = request.GET.get('page')
+
+    try:
+        paginated_products = paginator.page(page_number)
+    except PageNotAnInteger:
+        paginated_products = paginator.page(1)
+    except EmptyPage:
+        paginated_products = paginator.page(paginator.num_pages)
+
     content = {
-        "products":Products.objects.all()
+        "products": paginated_products,
+        "categories": Category.objects.filter(is_available=True),
+        "brands": Brand.objects.filter(status=True)
     }
+
+    return render(request, 'user_side/shop-product-list.html', content)
+
+
+
+
+
+def shop_product_list(request, brand_id=None, category_id=None):
+    
+    if brand_id:
+        try:
+            products = Products.objects.filter(product_brand=brand_id, is_active=True)
+        except Products.DoesNotExist:
+            products = []
+
+       
+
+    elif category_id:
+        print(category_id)
+        try:
+            products = Products.objects.filter(product_category=category_id, is_active=True)
+            print(products)
+        except Products.DoesNotExist:
+            products = []
+        
+        
+    else:
+        products = Products.objects.all()
+    
+    paginator = Paginator(products, 6)
+    page = request.GET.get('page', 1)
+
+    try:
+        paginated_products = paginator.page(page)
+    
+    except PageNotAnInteger:
+        paginated_products = paginator.page(1)
+    
+    except EmptyPage:
+        paginated_products = paginator.page(paginator.num_pages)
+
+
+    content = {
+        "products":paginated_products,
+        "categories":Category.objects.filter(is_available=True),
+        "brands":Brand.objects.filter(status=True)
+    }
+
     return render(request, 'user_side/shop-product-list.html', content)
 
 

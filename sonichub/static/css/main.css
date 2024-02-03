@@ -68,6 +68,21 @@ thead {
   font-weight: 600;
 }
 
+.filter-dropdown>li>a {
+  text-decoration: none;
+  color: black;
+}
+
+.filter-dropdown>li {
+  margin-top: 8px;
+  font-size: 15px;
+}
+
+
+
+
+
+
 article, aside, details, figcaption, figure,
 footer, header, hgroup, menu, nav, section {
   display: block;

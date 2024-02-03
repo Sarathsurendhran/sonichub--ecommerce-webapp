@@ -26,7 +26,52 @@ from order_managements.models import Order_Main_data
 from cart_management.models import Cart
 from category_management.models import Category
 from django.db.models import Q
+from django.core.serializers import serialize
+import json
+from django.contrib.auth.decorators import login_required
 
+def update_mail(request):
+    try:
+        email = request.session['email']
+        data = UserProfile.objects.get(id=request.user.id)
+        data.email = email
+        data.save()
+        messages.success(request, 'Email updated successfully')
+        
+    except Exception as e:
+        print(e)
+        messages.warning(request, 'Something went wrong!')
+    
+    return redirect("user_panel:user-profile",request.user.id)
+
+
+def category_show(request, id):
+    try:
+        products = Products.objects.filter(product_category=id)
+        print(products)
+    except:
+        pass
+
+    return render(request,"user_side/index.html",{"products":products})
+
+
+def brows_categories(request):
+    try:
+        categories = Category.objects.filter(is_available=True)
+        serialized_data = serialize('json', categories)
+
+        # Convert the serialized data to a list
+        categories_list = json.loads(serialized_data)
+      
+
+    except Exception as e:
+        print(e)
+        categories_list = []
+       
+    return JsonResponse({"data": categories_list})
+    
+
+@login_required(login_url='user_side:user_login')
 def add_to_wishlist(request):
     if request.method == "POST":
         try:
@@ -52,6 +97,9 @@ def remove_wishlist(request, id):
     return redirect("user_panel:wish-list")
 
 
+
+
+@login_required(login_url='user_side:user_login')
 def wish_list(request):
     user_id = UserProfile.objects.get(id=request.user.id)
     if request.method == "POST":
@@ -159,6 +207,8 @@ def user_wallet(request, user_id):
     return render(request, "user_side/user-wallet.html", content)
 
 
+
+
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def change_password(request, id):
     if request.method == "POST":
@@ -176,6 +226,7 @@ def change_password(request, id):
             messages.warning(request, "Current Password is not correct")
 
     return render(request, "user_side/change-password.html")
+
 
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
@@ -258,26 +309,21 @@ def edit_profile(request, id):
         return redirect("user_side:user_login")
     if request.method == "POST":
         name = request.POST.get("username")
-        email = request.POST.get("email")
+        #email = request.POST.get("email")
         phone_number = request.POST.get("phone_number")
 
-        print(name, email, phone_number)
 
     try:
         if UserProfile.objects.filter(username=name).exclude(id=id).exists():
             messages.warning(request, "Username is Already Taken")
-        elif UserProfile.objects.filter(email=email).exclude(id=id).exists():
-            messages.warning(request, "Email is Already Taken")
+        # elif UserProfile.objects.filter(email=email).exclude(id=id).exists():
+        #     messages.warning(request, "Email is Already Taken")
         else:
             data = UserProfile.objects.get(id=id)
             data.username = name
-            data.email = email
             data.phone_number = phone_number
             data.save()
-
-            request.session["email"] = email
-
-            return redirect("user_panel:update-mail-otp")
+            messages.success(request, "Profile updated successfully")
     except Exception as e:
         print(e)
 
@@ -290,6 +336,13 @@ def edit_profile(request, id):
 # @login_required(login_url="user_side:user_login")
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def update_mail_otp(request):
+
+    try:
+        request.session['email'] = request.POST.get('email')
+        
+    except:
+        pass
+
     otp = get_random_string(length=4, allowed_chars="0123456789")
 
     now = datetime.now().time()
@@ -344,7 +397,7 @@ def update_mail_verify_otp(request):
             if otp_entered == stored_otp:
                 current_time = datetime.now().time()
 
-                user = UserProfile.objects.get(email=request.session["email"])
+                user = UserProfile.objects.get(id=request.user.id)
 
                 if current_time <= expiration_time:
                     user.is_active = True
@@ -353,8 +406,8 @@ def update_mail_verify_otp(request):
                     del request.session["otp"]
                     del request.session["otp_expiration_time"]
 
-                    messages.success(request, "Updated successfully.")
-                    return redirect("user_panel:user-profile", user.id)
+                    return redirect("user_panel:update-mail")
+                    
                 else:
                     messages.error(
                         request, "OTP has expired. Please request a new one."
@@ -364,7 +417,8 @@ def update_mail_verify_otp(request):
         else:
             messages.error(request, "OTP verification failed. Please try again.")
 
-    return render(request, "user_side/email-update-otp.html")
+    return render(request, "user_side/otp-for-profile.html")
+
 
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)

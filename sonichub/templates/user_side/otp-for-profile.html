@@ -191,14 +191,14 @@ inputs.forEach((input, index1) => {
    function resendOtp() {
         $.ajax({
             type: "POST",
-            url: "{% url 'user_panel:update-mail-otp' %}",  
+            url: "{% url 'user_side:send_otp' %}",  
             dataType: "json",
             success: function(response) {
                 
                 if (response.success) {
                     
                     console.log("OTP resent successfully!");
-                    window.location.href = "{% url 'user_panel:update-mail-verify-otp' %}";
+                    //window.location.href = "{% url 'user_side:verify_otp' %}";
                 
                 } else {
                     console.error("Failed to resend OTP.");

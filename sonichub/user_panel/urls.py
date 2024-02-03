@@ -23,6 +23,10 @@ urlpatterns = [
   path('remove-wishlist/<int:id>',views.remove_wishlist,name='remove-wishlist'),
   path('add-to-wishlist',views.add_to_wishlist,name='add-to-wishlist'),
   # path('referral-link',views.referral_link_generation,name='referral-link')
+  path('brows-categories', views.brows_categories, name='brows-categories'),
+  path('category-show/<int:id>',views.category_show, name = 'category-show'),
+  path('update-mail', views.update_mail, name='update-mail')
+  
   
 
 ]

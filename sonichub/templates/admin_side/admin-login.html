@@ -49,7 +49,18 @@
 </head>
 
 <body>
+        <div class="mt-150 mx-auto" style="width: 200px;">
+            {% for message in messages %}
+                          <div class="alert alert-{{message.tags}} alert-dismissible fade show" role="alert">
+                              <strong></strong>{{message}}
+                              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                          </div>
+              {% endfor %}
+        </div>
+        
     <div class="login-container">
+        
+    
         <div class="login_wrap widget-taber-content p-30 background-white border-radius-15">
             <div class="padding_eight_all bg-white">
                 <div class="heading_s1">

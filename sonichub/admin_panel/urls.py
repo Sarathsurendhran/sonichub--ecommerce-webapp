@@ -30,5 +30,6 @@ urlpatterns = [
     path("fetchData/month",views.fetch_monthly_data, name ="fetch_monthly_data"),
     path("fetchData/year",views.fetch_yearly_data, name ="fetch_yearly_data"),
     path('sales-report-search', views.sales_report_search, name='sales-report-search'),
-    path('sales-date-search',views.sales_date_search, name='sales-date-search')
+    path('sales-date-search',views.sales_date_search, name='sales-date-search'),
+    path('admin-logout', views.admin_logout, name='admin-logout')
 ]

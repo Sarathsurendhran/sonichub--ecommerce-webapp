@@ -49,8 +49,13 @@ def cancel_individual_product(request, order_sub_id):
         offer_discount = data.variant.product.product_category.discount
 
         if offer_discount:
-            discount_total = float(price) * (offer_discount / 100)
+            orginal_price = data.variant.product.price
+            print("orginal price:", orginal_price)
+            discount_total = float(orginal_price) * (offer_discount / 100)
+            print("discount total:", discount_total)
             price = float(price) - discount_total
+
+            print("final price:", price)
 
         Transaction.objects.create(
             description="Cancelled Product    " + data.variant.product.product_name,
@@ -65,8 +70,9 @@ def cancel_individual_product(request, order_sub_id):
 
         unit_price = i.variant.product.offer_price
         if i.variant.product.product_category.discount:
+            price = i.variant.product.price
             category_discount = int(i.variant.product.product_category.discount)
-            total_discount = float(unit_price) * (category_discount / 100)
+            total_discount = float(price) * (category_discount / 100)
             unit_price = float(unit_price) - total_discount
 
         if i.variant.variant_status:
@@ -403,13 +409,15 @@ def checkout(request, id):
             i.product.product_category.minimum_amount is not None
             and float(i.product.product_category.minimum_amount) <= unit_price
         ):
-            #unit_price = i.variant.product.price
+            price = i.variant.product.price
             print("initial unit price if category offer:",unit_price)
             if category_discount:
                 offer_applied = True
-                unit_price = float(unit_price) - float(unit_price) * (
+            
+                amount = float(price) * (
                     category_discount / 100
                 )
+                unit_price = float(unit_price) - float(amount)
                 print("unit price after category discount:",unit_price)
 
         total_price = float(total_price) + i.quantity * float(unit_price)

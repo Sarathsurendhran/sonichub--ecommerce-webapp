@@ -22,6 +22,10 @@ from django.db.models import Sum, Count
 from datetime import datetime
 
 
+def admin_logout(request):
+    logout(request)
+    return redirect('admin_panel:admin_login')
+
 
 def sales_date_search(request):
     if request.method == 'POST':

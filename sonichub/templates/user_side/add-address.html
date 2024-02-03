@@ -132,7 +132,7 @@
 {% comment %} <script src="{% static 'js/profile.js' %}"></script> {% endcomment %}
 
 
- {% comment %} <script>
+ <script>
   $("#phone").on("input", function () {
     let phone = $("#phone").val().trim();
     if (phone.length > 10) $("#phone").val(phone.substring(0, 10));
@@ -241,9 +241,9 @@
       } 
     });
   });
-</script> {% endcomment %}
+</script>
 
-{% comment %} <script>
+ <script>
  $(document).ready(function() {
  
   $("#phone").on("input", function () {

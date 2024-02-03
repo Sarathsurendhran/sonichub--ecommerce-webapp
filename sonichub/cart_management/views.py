@@ -6,8 +6,10 @@ from django.http import JsonResponse
 from cart_management.models import Cart
 from product_management.models import Product_Variant, Products
 from django.db import transaction
+from django.contrib.auth.decorators import login_required
 
 
+@login_required(login_url='user_side:user_login')
 def add_to_cart_index(request):
     if request.method == "POST":
         product = request.POST.get("product")
@@ -81,6 +83,7 @@ def add_to_cart(request):
             return JsonResponse({"success": "Success"},status=200)
 
 
+@login_required(login_url='user_side:user_login')
 def product_cart(request):
     data = Cart.objects.filter(user=request.user.id)
 

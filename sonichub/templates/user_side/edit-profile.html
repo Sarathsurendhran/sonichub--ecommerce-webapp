@@ -31,7 +31,7 @@
               <div class="card mb-3">
                 <div class="card-body">
 
-                <form method="post" action="{% url 'user_panel:edit-profile' user.id %}" id="form">
+                <form method="post" action="{% url 'user_panel:edit-profile' user.id %}" id="form" >
                 {% csrf_token %}
 
                   <div class="row">
@@ -43,17 +43,7 @@
                      <span style="color: red"></span>                      
                     </div>
                   </div>
-                  <hr>
-                  <div class="row">
-                    <div class="col-sm-3">
-                      <h6 class="mb-0">Email</h6>
-                    </div>
-                    <div class="col-sm-9 text-secondary">
-                    <input type="text" value="{{users.email}}"  name="email" id="email">
-                     <span style="color: red"></span>
-                    </div>
-                  </div>
-                  <hr>
+                <hr>
                   <div class="row">
                     <div class="col-sm-3">
                       <h6 class="mb-0">Phone</h6>
@@ -62,7 +52,18 @@
                       <input type="text"value="{{users.phone_number}}" name="phone_number" id="phone">
                       <span style="color: red"></span>
                     </div>
+                      <hr>
                   </div>
+                   <div class="row">
+                    <div class="col-sm-3">
+                      <h6 class="mb-0">Email</h6>
+                    </div>
+                    <div class="col-sm-9 text-secondary">
+                    <input type="email" value="{{users.email}}"  name="email" id="email">
+                    <button id ="sendotp" onclick="resendOtp(event)">send otp</button>
+                     <span style="color: red"></span>
+                    </div>
+                  </div>  
                   
                   <hr>
                   <div class="row">
@@ -80,9 +81,11 @@
     </div>
     </section>
 
-
-
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js" integrity="sha384-cuYeSxntonz0PPNlHhBs68uyIAVpIIOZZ5JqeqvYYIcEL727kskC66kF92t6Xl2V" crossorigin="anonymous"></script>
+
 <script>
   $("#phone").on("input", function () {
     let phone = $("#phone").val().trim();
@@ -144,5 +147,38 @@
     });
   });
 </script>
+
+<script>
+     function resendOtp(event) {
+      event.preventDefault()
+       var email = document.getElementById('email').value;
+        $.ajax({
+            type: "POST",
+            url: "{% url 'user_panel:update-mail-otp' %}",
+            data:{
+              "email":email
+            }, 
+            dataType: "json",
+            success: function(response) {
+                
+                if (response.success) {
+                    
+                    console.log("OTP resent successfully!");
+                    window.location.href = "{% url 'user_panel:update-mail-verify-otp' %}";
+                
+                } else {
+                    console.error("Failed to resend OTP.");
+                }
+            },
+            error: function(error) {
+                console.error("Error in Ajax request:", error);
+            }
+        });
+    }
+
+</script>
+
+
+
 
 {% endblock content %}
