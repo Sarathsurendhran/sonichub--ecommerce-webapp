@@ -70,7 +70,7 @@ def edit_brand(request,id):
         
     except Brand.DoesNotExist:
         messages.error(request, 'Brand does not exist.')
-        return redirect('brand:add-brand')
+        return redirect('brand:brand-list')
       
     if not request.user.is_superuser:
       return redirect('admin_panel:admin_login')
@@ -108,6 +108,7 @@ def edit_brand(request,id):
           brand_data.save()
 
           messages.success(request, 'Brand Updated Sucessfully')
+          return redirect("brand:brand-list")
           
       except Exception as e:
         messages.error(request, f"An Error Occured: {str(e)}")
