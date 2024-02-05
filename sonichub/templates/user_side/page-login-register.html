@@ -45,6 +45,11 @@
   #submit-button:hover {
     background-color: #007bff !important;
   }
+
+.error-msg {
+  color: red;
+}
+
 </style>
 
   <section>
@@ -180,7 +185,7 @@
         $("#password").addClass("error");
       }
       if (confirm_password === "") {
-        $("#confirm_password").next().text("Confirm_Password Cannot Be Empty");
+        $("#confirm_password").next().text("Confirm Password Cannot Be Empty");
         $("#confirm_password").addClass("error");
       } else if (password !== confirm_password) {
         $("#confirm_password").next().text("Password Doesn't Match");
