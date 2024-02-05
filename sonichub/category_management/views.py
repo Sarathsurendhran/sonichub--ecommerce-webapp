@@ -82,7 +82,7 @@ def add_category(request):
             messages.error(request, f"An Error Occured: {str(e)}")
     current_date = date.today().strftime("%Y-%m-%d")
 
-    print()
+    print(current_date)
     parentlist = Category.objects.filter(category_name__isnull=False).order_by('id').reverse()
     return render(
         request,
@@ -205,10 +205,12 @@ def edit_category(request, id):
         except Exception as e:
             messages.error(request, f"An Error Occurred: {str(e)}")
 
+    current_date = date.today().strftime("%Y-%m-%d")
     context = {
         "category_data": category_data,
         "category_parent_data": category_parent_data,
-        "checkbox_checked":checkbox_checked
+        "checkbox_checked":checkbox_checked,
+        "current_date":current_date
     }
 
     return render(request, "admin_side/edit-category.html", context)

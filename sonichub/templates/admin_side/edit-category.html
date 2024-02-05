@@ -96,7 +96,7 @@
                                  </div>
                                  <div class="col-4 ">
                                      <label for="offer-input-expiryDate"><h5>Expiry Date</h5></label>
-                                     <input name="date" type="date" id="offer-input-expiryDate" class="form-control" min="{{current_date}}" value="{{category_data.expirydate |date:'Y-m-d' }}">
+                                     <input name="date" type="date" id="offer-input-expiryDate" class="form-control" min="{{ current_date }}" value="{{category_data.expirydate |date:'Y-m-d' }}">
                                      <span id="offer-input-expiryDate-error" style="color: red"></span>
                                  </div>
                                

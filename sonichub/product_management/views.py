@@ -400,14 +400,29 @@ def add_product(request):
 def product_list(request):
     if not request.user.is_superuser:
         return redirect("admin_panel:admin_login")
+    
+    products = Products.objects.all().order_by("id").reverse()
+    
+    paginator = Paginator(products, 4)
+    page_number = request.GET.get('page')
+
+    try:
+        paginated_products = paginator.page(page_number)
+    except PageNotAnInteger:
+        paginated_products = paginator.page(1)
+    except EmptyPage:
+        paginated_products = paginator.page(paginator.num_pages)
+
     content = {
-        "products": Products.objects.all().order_by("id").reverse(),
+        "products": paginated_products,
+        "objects":paginated_products,
         "variants": Product_Variant.objects.filter(id__isnull=False)
         .order_by("id")
         .reverse(),
     }
 
     return render(request, "admin_side/product-view.html", content)
+
 
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
