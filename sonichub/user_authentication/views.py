@@ -255,9 +255,11 @@ def send_otp(request):
         response_data = {
             "success": True,
             "message": "OTP sent successfully.",
-            "email": request.session.get("email", ""),
+           
         }
+        messages.success(request, "OTP sent successfully.")
         return JsonResponse(response_data)
+        
     else:
         messages.success(request, "OTP sent successfully.")
         return redirect("user_side:verify_otp")

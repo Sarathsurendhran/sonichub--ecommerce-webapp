@@ -32,13 +32,17 @@
             </div>
             <input type="submit" value="Verify" class="btn btn-primary mb-3">
 
-              <div id="otpTimer"><h2> </h2></div>
-            <p class="resend text-muted mb-0">
-              <button class="btn btn-secondary mb-1" id="resendButton" style="display: none;" onclick="resendOtp()">Resend OTP</button>
-            </p>
-          </div>
+               <div id="otpTimer"><h2> </h2></div>
+               <p class="resend text-muted mb-0">
+                  <button class="btn btn-secondary mb-1" id="resendButton" type="button" style="display: none;" onclick="resendOtp()">Resend OTP</button>
+                </p>
+           
+          </div> 
         </div>
+        
          </form>
+         
+        
       </div>
      
     </div>
@@ -163,42 +167,21 @@ inputs.forEach((input, index1) => {
 });
 </script>
 
-
 <script>
-    var expirationTime = "{{ request.session.otp_expiration_time }}";
-    var isOtpExpired = false;
-
-    function updateTimer() {
-        var now = new Date();
-        var expiration = new Date(now.toDateString() + " " + expirationTime);
-
-        var timeDiff = expiration - now;
-        if (timeDiff > 0) {
-            var minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
-            var seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
-            
-            document.getElementById("otpTimer").innerHTML =seconds + "s";
-            document.getElementById("resendButton").style.display = "none";
-            isOtpExpired = false;
-        } else {
-            document.getElementById("otpTimer").innerHTML = "Timer expired";
-            isOtpExpired = true;
-            document.getElementById("resendButton").style.display = "block";
-        }
-    }
 
     // Function to handle resending OTP
    function resendOtp() {
         $.ajax({
-            type: "POST",
-            url: "{% url 'user_side:send_otp' %}",  
+            type: "GET",
+            url: "{% url 'user_panel:update-mail-otp' %}",  
             dataType: "json",
             success: function(response) {
                 
                 if (response.success) {
                     
                     console.log("OTP resent successfully!");
-                    //window.location.href = "{% url 'user_side:verify_otp' %}";
+                    window.location.reload(); 
+                  
                 
                 } else {
                     console.error("Failed to resend OTP.");
@@ -211,11 +194,52 @@ inputs.forEach((input, index1) => {
     }
 
   
-    updateTimer();
-    setInterval(updateTimer, 1000);
-</script>
+  
+</script> 
 
+<script>
+    // Set the initial countdown time to 60 seconds
+    let countdownTime = 60;
 
+    // Function to update the timer display
+    function updateTimer() {
+        document.getElementById('otpTimer').innerHTML = `<h6>${countdownTime} sec</h6>`;
+    }
+
+    // Function to show the "Resend OTP" button
+    function showResendButton() {
+        document.getElementById('resendButton').style.display = 'block';
+    }
+
+    // Function to start the countdown
+    function startCountdown() {
+        // Update the timer display initially
+        updateTimer();
+
+        // Use setInterval to update the timer every second
+        const countdownInterval = setInterval(function () {
+            countdownTime--;
+
+            // Update the timer display
+            updateTimer();
+
+            // Check if the countdown has reached 0
+            if (countdownTime <= 0) {
+                // Clear the interval when the countdown is complete
+                clearInterval(countdownInterval);
+          document.getElementById('otpTimer').style.display = `none`;
+
+                // Show the "Resend OTP" button
+                showResendButton();
+            }
+        }, 1000); // Update every 1000 milliseconds (1 second)
+    }
+
+    // Function to simulate OTP resend (replace with your actual resendOtp() implementation)
+   
+    // Call the startCountdown function to begin the countdown
+    startCountdown();
+</script> 
 
 
 
