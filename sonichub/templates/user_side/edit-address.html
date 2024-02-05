@@ -23,7 +23,7 @@
       <div class="col-md-11 col-lg-9 px-lg-5 col-xl-8 px-xl-3 px-xxl-5">
         <form
           method="POST"
-          class="w-100 rounded-1 p-4 border bg-white"
+          class="w-100 rounded-1 p-4 border bg-white" id ="submit-form"
           action="{% url 'user_panel:edit-address' address.id %}"
         >
         {% csrf_token %}
@@ -37,8 +37,11 @@
                   type="text"
                   class="form-control"
                   value="{{address.name}}"
+                   id="username"
                   
                 />
+                 <span id="username-span" style="color:red;"></span>
+
               </label>
 
               <label class="d-block mb-4">
@@ -49,7 +52,9 @@
                   class="form-control"
                   placeholder=""
                   value={{address.house_name}}
+                  id="house_name"
                 />
+                  <span id="house_name-span" style="color: red;"></span>
               </label>
 
               <label class="d-block mb-4">
@@ -60,22 +65,27 @@
                   class="form-control"
                   placeholder=""
                   value={{address.street_name}}
+                   id="street_name"
                 />
+                <span id="street_name-span" style="color: red;"></span>
               </label>
 
               <label class="d-block mb-4">
                 <span class="form-label d-block">District</span>
-                <input name="district" type="text" class="form-control" placeholder="" value="{{address.district}}"/>
+                <input name="district" type="text" class="form-control" placeholder="" value="{{address.district}}" id="district"/>
+                <span id="district-span" style="color: red;"></span>
               </label>
+               
             </div>
+
 
             <div class="col-md-6">
               <!-- Right side fields -->
               <label class="d-block mb-4">
                 <span class="form-label d-block">State/Province</span>
-                <input name="state" type="text" class="form-control" placeholder="" value={{address.state}} />
+                <input name="state" type="text" class="form-control" placeholder="" value={{address.state}} id="state" />
               </label>
-
+                 <span id="state-span" style="color: red;"></span>
                 <label class="d-block mb-4">
                 <span class="form-label d-block">Country</span>
                 <input
@@ -84,15 +94,17 @@
                   class="form-control"
                   placeholder=""
                   value={{address.country}}
+                  id="country"
                 />
               </label>
+          <span id="country-span" style="color: red;"></span>
 
               <label class="d-block mb-4">
                 <span class="form-label d-block">Zip/Postal code</span>
-                <input name="pin_number" type="number" class="form-control" placeholder="" value={{address.pin_number}} />
+                <input name="pin_number" type="number" class="form-control" placeholder="" value={{address.pin_number}} id="pin_number" />
               </label>
 
-            
+               <span id="pin_number-span" style="color: red;"></span>
 
               <label class="d-block mb-4">
                 <span class="form-label d-block">Phone</span>
@@ -102,13 +114,15 @@
                   class="form-control"
                   placeholder=""
                   value={{address.phone_number}}
+                  id="phone"
                 />
               </label>
+                 <span id="phone-span" style="color: red;"></span>
             </div>
           </div>
 
           <div class="mb-3">
-            <button type="submit" class="btn btn-primary px-3 rounded-3">
+            <button type="submit" class="btn btn-primary px-3 rounded-3" id ="submit-button">
               update
             </button>
           </div>
@@ -122,4 +136,123 @@
 
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 {% comment %} <script src="{% static 'js/profile.js' %}"></script> {% endcomment %}
+
+
+
+ <script>
+  $("#phone").on("input", function () {
+    let phone = $("#phone").val().trim();
+    if (phone.length > 10) $("#phone").val(phone.substring(0, 10));
+  });
+
+  $("#username").on("focus", function () {
+    $("#username-span").text("");
+  
+  });
+  
+  $("#house_name").on("focus", function () {
+    $("#house_name-span").text("");
+   
+  });
+
+  $("#street_name").on("focus", function () {
+    $("#street_name-span").text("");
+   
+  });
+
+  $("#district").on("focus", function () {
+    $("#district-span").text("");
+  
+  });
+  
+  $("#state").on("focus", function () {
+    $("#state-span").text("");
+    
+  });
+
+  $("#country").on("focus", function () {
+    $("#country-span").text("");
+    
+  });
+
+  $("#pin_number").on("focus", function () {
+    $("#pin_number-span").text("");
+  
+  });
+
+  $("#phone").on("focus", function () {
+    $("#phone-span").text("");
+   
+  });
+
+  
+
+  $(document).ready(function () {
+  
+    $("#submit-button").on("click", function (event) {
+       event.preventDefault()
+
+      let username = $("#username").val().trim();
+      let house_name = $("#house_name").val().trim();
+      let street_name = $("#street_name").val().trim();
+      let state = $("#state").val().trim();
+      let country = $("#country").val().trim();
+      let pin_number = $("#pin_number").val().trim();
+      let phone = $("#phone").val().trim();
+      let district = $("#district").val().trim();
+      let form = $("#submit-form");
+
+
+
+       const isNumeric = (value) => !isNaN(value) && value !== '';
+
+        if (isNumeric(username) || username === "") {
+            $("#username-span").text("Enter Valid User Name");
+            $("#username").addClass("error");
+        }
+
+        if (isNumeric(house_name) || house_name === "") {
+            $("#house_name-span").text("Enter Valid House Name");
+            $("#house_name").addClass("error");
+        }
+
+        if (isNumeric(street_name) || street_name === "") {
+            $("#street_name-span").text("Enter Valid Street Name");
+            $("#street_name").addClass("error");
+        }
+
+        if (isNumeric(district) || district === "") {
+            $("#district-span").text("Enter Valid District Name");
+            $("#district").addClass("error");
+        }
+
+        if (isNumeric(state) || state === "") {
+            $("#state-span").text("Enter Valid State Name");
+            $("#state").addClass("error");
+        }
+
+        if (isNumeric(country) || country === "") {
+            $("#country-span").text("Enter Valid Country Name");
+            $("#country").addClass("error");
+        }
+
+        if ( pin_number === "") {
+            $("#pin_number-span").text("Enter Valid Postal Code");
+            $("#pin_number").addClass("error");
+        }
+
+        if (phone === "") {
+            $("#phone-span").text("Phone Number Cannot Be Empty");
+        } else if (isNaN(phone) || phone.length < 10) {
+            $("#phone-span").text("Enter A Valid Phone Number");
+        }
+
+        if ($(".error").length === 0) {
+            console.log(form.serializeArray());
+            $("#submit-form").submit();
+        }
+
+    });
+  });
+</script>
 {% endblock content %}
