@@ -96,7 +96,7 @@
                 <i class="fi-rs-smartphone"></i> <a href="#">(+01) - 2345 - 6789</a>
               </li>
               <li>
-                <i class="fi-rs-marker"></i><a href="page-contact.html">Our location</a>
+                <i class="fi-rs-marker"></i><a href="{% url 'user_side:contact' %}">Our location</a>
               </li>
             </ul>
           </div>
@@ -218,13 +218,13 @@
               <div class="header-action-icon-2">
                 <a href="{% url 'user_panel:wish-list' %}">
                   <img class="svgInject" alt="Evara" src="{% static '/images/theme/icons/icon-heart.svg' %}" />
-                  <span class="pro-count blue">3</span>
+                  {% comment %} <span class="pro-count blue">3</span> {% endcomment %}
                 </a>
               </div>
               <div class="header-action-icon-2">
                 <a class="mini-cart-icon" href="{% url 'cart:product-cart' %}">
                   <img alt="Evara" src="{% static '/images/theme/icons/icon-cart.svg' %}" />
-                  <span class="pro-count blue">2</span>
+                  {% comment %} <span class="pro-count blue">2</span> {% endcomment %}
                 </a>
               </div>
             </div>

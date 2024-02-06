@@ -6,9 +6,9 @@
 <div class="page-header breadcrumb-wrap">
   <div class="container">
     <div class="breadcrumb">
-      <a rel="nofollow" href="#">Home</a>
+      {% comment %} <a rel="nofollow" href="#">Home</a>
       <span>{{ categories.category_name }}</span>
-      <span>{{ ProductDetails.name }}</span>
+      <span>{{ ProductDetails.name }}</span> {% endcomment %}
     </div>
   </div>
 </div>
@@ -135,10 +135,10 @@
                       Add to cart
                     </button>
 
-                    <button type="submit" data-id="{{ ProductDetails.id }}"
+                    {% comment %} <button type="submit" data-id="{{ ProductDetails.id }}"
                       onclick="buyNow(this.getAttribute('data-id'))" id="button-buy-now" class="button ">
                       Buy Now
-                    </button>
+                    </button> {% endcomment %}
 
                     <a aria-label="Add To Wishlist" class="action-btn hover-up" data-id="{{products.id }}"
                       onclick="addToWishList(this.getAttribute('data-id'))"><i class="fi-rs-heart"></i></a>
@@ -167,7 +167,7 @@
                     <div class="description mb-50">
                       <p>{{ products.product_description }}</p>
                     </div>
-                    <div class="social-icons single-share">
+                    {% comment %} <div class="social-icons single-share">
                       <ul class="text-grey-5 d-inline-block">
                         <li><strong class="mr-10">Share this:</strong></li>
                         <li class="social-facebook"><a href="#"><img
@@ -179,8 +179,8 @@
                         <li class="social-linkedin"><a href="#"><img
                               src="{% static 'assets/imgs/theme/icons/icon-pinterest.svg' %}" alt=""></a></li>
                       </ul>
-                    </div>
-                    <h3 class="section-title style-1 mb-30 mt-30">Reviews </h3>
+                    </div> {% endcomment %}
+                    {% comment %} <h3 class="section-title style-1 mb-30 mt-30">Reviews </h3>
                     <!--Comments-->
                     <div class="comments-area style-2">
                       <div class="row">
@@ -278,8 +278,8 @@
                             </div>
                           </div>
                         </div>
-                      </div>
-                    </div>
+                      </div> 
+                    </div>{% endcomment %}
                   </div>
                 </div>
             </section>
