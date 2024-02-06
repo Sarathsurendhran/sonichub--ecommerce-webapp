@@ -269,6 +269,10 @@ def send_otp(request):
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def verify_otp(request):
+
+    if request.user.is_authenticated:
+        return redirect("user_side:index")
+    
     if request.method == "POST":
         otp1 = request.POST.get("otp1")
         otp2 = request.POST.get("otp2")
