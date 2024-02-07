@@ -15,81 +15,53 @@ from django.http import HttpResponse
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 
 
+def shop_product_list(request):
 
-def price_range(request):
-    try:
-        min_price = request.POST.get('min-value')
-        max_price = request.POST.get('max-value')
-        products = Products.objects.filter(offer_price__range=[min_price, max_price], is_active=True)
+    products = Products.objects.all()
+    selected_brands = []
+    selected_categories = []
 
-    except Products.DoesNotExist:
-        products = []
+    # Filter products based on brand and category
+    brand_list = request.GET.getlist("brand")
+    category_list = request.GET.getlist("category")
+    min_price = request.GET.get("min_price")
+    max_price = request.GET.get("max_price")
 
-    paginator = Paginator(products, 6)
-    page_number = request.GET.get('page')
+    if brand_list:
+        products = products.filter(product_brand__in=brand_list, is_active=True)
+        for product in products:
+            selected_brands.append(product.product_brand.id)
 
-    try:
-        paginated_products = paginator.page(page_number)
-    except PageNotAnInteger:
-        paginated_products = paginator.page(1)
-    except EmptyPage:
-        paginated_products = paginator.page(paginator.num_pages)
-
-    content = {
-        "products": paginated_products,
-        "categories": Category.objects.filter(is_available=True),
-        "brands": Brand.objects.filter(status=True)
-    }
-
-    return render(request, 'user_side/shop-product-list.html', content)
-
-
-
-
-
-def shop_product_list(request, brand_id=None, category_id=None):
+    if category_list:
+        products = products.filter(product_category__in=category_list, is_active=True)
+        for product in products:
+            selected_categories.append(product.product_category.id)
     
-    if brand_id:
-        try:
-            products = Products.objects.filter(product_brand=brand_id, is_active=True)
-        except Products.DoesNotExist:
-            products = []
+    if min_price and max_price:
+        products = products.filter(offer_price__range=[min_price, max_price], is_active=True)
 
-       
 
-    elif category_id:
-        print(category_id)
-        try:
-            products = Products.objects.filter(product_category=category_id, is_active=True)
-            print(products)
-        except Products.DoesNotExist:
-            products = []
-        
-        
-    else:
-        products = Products.objects.all()
-    
-    paginator = Paginator(products, 6)
-    page = request.GET.get('page', 1)
+    # Paginate the filtered products
+    paginator = Paginator(products, 9)
+    page = request.GET.get("page", 1)
 
     try:
         paginated_products = paginator.page(page)
-    
     except PageNotAnInteger:
         paginated_products = paginator.page(1)
-    
     except EmptyPage:
         paginated_products = paginator.page(paginator.num_pages)
 
-
+    # Pass the paginated products, categories, and brands to the template
     content = {
-        "products":paginated_products,
-        "categories":Category.objects.filter(is_available=True),
-        "brands":Brand.objects.filter(status=True)
+        "products": paginated_products,
+        "categories": Category.objects.filter(is_available=True),
+        "brands": Brand.objects.filter(status=True),
+        "selected_brands": selected_brands,
+        "selected_categories": selected_categories,
     }
 
-    return render(request, 'user_side/shop-product-list.html', content)
-
+    return render(request, "user_side/shop-product-list.html", content)
 
 
 def edit_variant_status_change(request, id):
@@ -109,7 +81,6 @@ def edit_variant_status_change(request, id):
         print(e)
 
     return redirect("product:edit-variant-in-edit-product", product_variant.product.id)
-
 
 
 def thumbnail_update(request, id):
@@ -145,7 +116,6 @@ def delete_images(request):
     return redirect("product:add-images", product)
 
 
-
 def delete_images_edit(request):
     image_id = request.POST.get("image_id")
     product = request.POST.get("product_id")
@@ -154,15 +124,14 @@ def delete_images_edit(request):
     return redirect("product:edit-images", product)
 
 
-
-def edit_variant_in_edit_product(request,product):
-    if request.method == 'POST':
+def edit_variant_in_edit_product(request, product):
+    if request.method == "POST":
         try:
             color = request.POST.get("color")
             name = request.POST.get("name")
             stock = request.POST.get("stock")
             variant_id = request.POST.get("variant_id")
-            print("variant_id:",variant_id,stock)
+            print("variant_id:", variant_id, stock)
 
             data = Product_Variant.objects.get(id=variant_id)
             data.colour_code = color
@@ -176,11 +145,12 @@ def edit_variant_in_edit_product(request,product):
 
     content = {
         "products": Products.objects.get(id=product),
-        "variants": Product_Variant.objects.filter(product_id=product).order_by('id').reverse(),
+        "variants": Product_Variant.objects.filter(product_id=product)
+        .order_by("id")
+        .reverse(),
     }
 
     return render(request, "admin_side/edit-variants1.html", content)
-
 
 
 def edit_variant(request, variant_id):
@@ -197,7 +167,6 @@ def edit_variant(request, variant_id):
     except Exception as e:
         print(e)
         return JsonResponse({"error": True}, status=400)
-    
 
 
 def edit_thumbnail(request):
@@ -215,17 +184,15 @@ def edit_images(request, product):
     thumbnail = Products.objects.get(id=product)
 
     if request.method == "POST":
-        image_files= request.FILES.getlist("imageFiles")
+        image_files = request.FILES.getlist("imageFiles")
 
         existing_images = Product_images.objects.filter(product=product)
 
         for image in image_files:
             Product_images.objects.create(product=product_id, images=image)
 
-
         messages.success(request, "Image Added Sucessfully")
 
-        
     content = {
         "existing_images": Product_images.objects.filter(product=product_id)
         .order_by("id")
@@ -236,8 +203,6 @@ def edit_images(request, product):
     return render(request, "admin_side/edit-images1.html", content)
 
 
-
-
 def variant_view(request, id):
     content = {
         "products": Products.objects.get(id=id),
@@ -245,7 +210,6 @@ def variant_view(request, id):
     }
 
     return render(request, "admin_side/product-variant-view.html", content)
-
 
 
 def add_thumbnail(request):
@@ -288,8 +252,6 @@ def add_images(request, product):
         "thumbnail": Products.objects.get(id=product),
     }
     return render(request, "admin_side/add-images1.html", content)
-
-
 
 
 @csrf_exempt
@@ -351,7 +313,7 @@ def add_product(request):
         if offer_price == "":
             messages.warning(request, "Offer Price Cannot Be Empty")
             return redirect("product:add-product")
-        
+
         if float(offer_price) > float(price):
             messages.warning(request, "Offer Price Should be lessthan actual price")
             return redirect("product:edit-product", id)
@@ -361,9 +323,11 @@ def add_product(request):
             return redirect("product:add-product")
 
         if not any(char.isalpha() for char in product_name):
-            messages.warning(request, "Product Name should contain at least one alphabetical character")
+            messages.warning(
+                request,
+                "Product Name should contain at least one alphabetical character",
+            )
             return redirect("product:add-product")
-
 
         try:
             if Products.objects.filter(product_name=product_name).exists():
@@ -400,11 +364,11 @@ def add_product(request):
 def product_list(request):
     if not request.user.is_superuser:
         return redirect("admin_panel:admin_login")
-    
+
     products = Products.objects.all().order_by("id").reverse()
-    
+
     paginator = Paginator(products, 4)
-    page_number = request.GET.get('page')
+    page_number = request.GET.get("page")
 
     try:
         paginated_products = paginator.page(page_number)
@@ -415,14 +379,13 @@ def product_list(request):
 
     content = {
         "products": paginated_products,
-        "objects":paginated_products,
+        "objects": paginated_products,
         "variants": Product_Variant.objects.filter(id__isnull=False)
         .order_by("id")
         .reverse(),
     }
 
     return render(request, "admin_side/product-view.html", content)
-
 
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
@@ -466,7 +429,10 @@ def edit_product(request, id):
             return redirect("product:edit-product", id)
 
         if not any(char.isalpha() for char in product_name):
-            messages.warning(request, "Product Name should contain at least one alphabetical character")
+            messages.warning(
+                request,
+                "Product Name should contain at least one alphabetical character",
+            )
             return redirect("product:add-product")
 
         try:

@@ -30,6 +30,20 @@ from django.core.serializers import serialize
 import json
 from django.contrib.auth.decorators import login_required
 
+
+def add_new(request):
+    if request.method == "GET":
+        selected_values = request.GET.getlist('brand')
+        if selected_values:
+            print(selected_values)
+
+    content ={
+        "data":Brand.objects.all(),
+        "category":Category.objects.all()
+    }
+    return render(request, 'user_side/new-file.html',content)
+
+
 def update_mail(request):
     try:
         email = request.session['email']

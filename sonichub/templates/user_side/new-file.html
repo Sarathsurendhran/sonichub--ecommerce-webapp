@@ -1,0 +1,108 @@
+
+{% extends 'user_side/base.html'%}
+{% load static %}
+{% block content %}
+  <style>
+    /* Add custom styles here if needed */
+    .main {
+      margin-top: 50px; /* Adjust as needed */
+      margin-bottom: 50px; /* Adjust as needed */
+    }
+  </style>
+<!-- 
+<main class="main">
+  <section>
+    <div class="container mt-5">
+      <form method = "get" action = "{% url 'user_panel:add-new' %}" onsubmit="updateFormAction(event)">
+        {% for i in data %}
+        <div class="form-group row">
+          <div class="col-auto">
+            <div class="form-check">
+              <input type="checkbox" value = "{{i.id}}" style="height: 20px;">
+            </div>
+          </div>
+          <div class="col-auto">
+          {{ i.brand_name }}
+           
+          </div>
+        </div>
+        {% endfor %}
+        <input class="btn" type="submit">
+      </form>
+    </div>
+  </section> -->
+
+  <main class="main">
+    <section>
+      <div class="container mt-5">
+  <form id="filterForm" method="get">
+   
+    <div class="widget-category mb-30">
+        <h5 class="section-title style-1 mb-30 wow fadeIn animated">Brand</h5>
+        <ul class="categories">
+            {% for brand_item in data %}
+                <li class="ml-20">
+                    <label>
+                        <input type="checkbox" class="form-check-input" name="brand" value="{{ brand_item.brand_name }}" {% if brand_item.brand_name in filterBrands %} checked {% endif %}>
+                        {{ brand_item.brand_name }}
+                    </label>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="widget-category mb-30">
+        <h5 class="section-title style-1 mb-30 wow fadeIn animated">Category</h5>
+        <ul class="categories">
+            {% for category_item in category %}
+                <li class="ml-20">
+                    <label>
+                        <input type="checkbox" class="form-check-input" name="category" value="{{ category_item.category_name }}" {% if category_item.category_name in filterCategories %} checked {% endif %}>
+                        {{ category_item.category_name }}
+                    </label>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+    <button type="submit">Apply Filters</button>
+</form>
+
+</div>
+</section>
+</main>
+
+</main>
+     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js" integrity="sha384-cuYeSxntonz0PPNlHhBs68uyIAVpIIOZZ5JqeqvYYIcEL727kskC66kF92t6Xl2V" crossorigin="anonymous"></script>
+
+
+<script>
+  filterForm.addEventListener('submit', function (event) {
+    event.preventDefault();
+    
+    const formData = new FormData(filterForm);
+    console.log(formData);
+    const params = new URLSearchParams(formData);
+
+    const currentUrl = new URL(window.location.href);
+
+    // Remove existing filter parameters
+    currentUrl.searchParams.forEach((value, key) => {
+        currentUrl.searchParams.delete(key);
+    });
+
+    // Append the new filter parameters
+   currentUrl.search = `${currentUrl.search ? currentUrl.search + '&' : ''}${params.toString()}`;
+
+
+    window.location.href = currentUrl.toString();
+});
+
+</script>
+
+
+{% endblock %}
+
+

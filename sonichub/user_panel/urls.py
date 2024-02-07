@@ -25,7 +25,8 @@ urlpatterns = [
   # path('referral-link',views.referral_link_generation,name='referral-link')
   path('brows-categories', views.brows_categories, name='brows-categories'),
   path('category-show/<int:id>',views.category_show, name = 'category-show'),
-  path('update-mail', views.update_mail, name='update-mail')
+  path('update-mail', views.update_mail, name='update-mail'),
+  path('add-new',views.add_new,name='add-new')
   
   
 

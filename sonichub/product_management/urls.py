@@ -36,17 +36,9 @@ urlpatterns = [
 
   path('search',views.search,name='search'),
 
-#this for rendering shpo page 
   path('shop-product-list',views.shop_product_list, name='shop-product-list'),
 
-#this url for filtering brand
-  path('shop-product-list/<int:brand_id>',views.shop_product_list, name='shop-product-list'),
 
-#this url for filtering category
-  path('shop-product-list1/<int:category_id>', views.shop_product_list, name='shop-product-list1'),
-
-
-  path('price-range', views.price_range, name = 'price-range')
  
 
   
