@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.http import JsonResponse
 import random
 import string
-from coupon_management.models import Coupon, Users_Coupon
+from coupon_management.models import Coupon,Users_Coupon
 from cart_management.models import Cart
 from datetime import datetime
 from datetime import date   
@@ -23,7 +23,7 @@ def edit_coupon(request,id):
         data.discount=discount
         data.expiry_date=expirydate
         data.Coupon_code=coupon
-        data.is_active=True
+        data.status=True
         data.save()
         return redirect("coupon:view-coupon")
 
@@ -35,9 +35,14 @@ def edit_coupon(request,id):
 
 
 
-def delete_coupon(request,coupon_id):
+def coupon_status_change(request,coupon_id):
     data = Coupon.objects.get(id=coupon_id)
-    data.delete()
+    if data.status:
+        data.status = False
+        data.save()
+    else:
+        data.status = True
+        data.save()
     return redirect("coupon:view-coupon")
 
 
@@ -45,15 +50,14 @@ def view_coupon(request):
 
     current_date_time = datetime.now()
     current_date = current_date_time.date()
-    print(current_date)
 
     coupons = Coupon.objects.filter(expiry_date__lt=current_date)
     for coupon in coupons:
-            coupon.is_active = False
+            coupon.status = False
             coupon.save()
     
     content={
-        "coupons":Coupon.objects.all(),
+        "coupons":Coupon.objects.all().order_by('id').reverse(),
         "current_date":current_date
     }
     return render(request,"admin_side/view-coupon.html",content)
@@ -62,10 +66,11 @@ def view_coupon(request):
 
 def generate_coupon(request):
     try:
-        character = string.ascii_letters + string.digits
-        random_data = "".join(random.choice(character) for _ in range(8))
-        print(random_data)
-        return JsonResponse({"data": random_data.upper()})
+        while True:
+            character = string.ascii_letters + string.digits
+            random_data = "".join(random.choice(character) for _ in range(8))
+            if not Coupon.objects.filter(Coupon_code=random_data.upper()):
+                return JsonResponse({"data": random_data.upper()})
     except Exception as e:
         print(e)
         return JsonResponse({"status": 400}, status=400)

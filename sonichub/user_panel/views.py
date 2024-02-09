@@ -29,6 +29,7 @@ from django.db.models import Q
 from django.core.serializers import serialize
 import json
 from django.contrib.auth.decorators import login_required
+from coupon_management.models import Coupon, Users_Coupon
 
 
 def add_new(request):
@@ -181,7 +182,7 @@ def wallet_balence(request, user_id):
     return grand_total
 
 
-def wallet_payment(request, order_id, id):
+def wallet_payment(request, order_id, id, coupon_code=None):
     order_main = Order_Main_data.objects.get(order_id=order_id)
 
     user = UserProfile.objects.get(id=id)
@@ -193,6 +194,17 @@ def wallet_payment(request, order_id, id):
 
     order_main.payment_status = True
     order_main.save()
+
+    if coupon_code is not None and coupon_code != "None":
+        coupon = Coupon.objects.get(Coupon_code=coupon_code)
+        user = UserProfile.objects.get(id=request.user.id)
+        Users_Coupon.objects.create(
+            user=user,
+            coupon_code=coupon.Coupon_code,
+            coupon_discount=coupon.discount,
+            order_id=order_main
+            
+        )
 
     Transaction.objects.create(
         user=user,

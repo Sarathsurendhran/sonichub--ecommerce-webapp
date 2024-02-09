@@ -40,7 +40,9 @@
                 <tr>
                     <th>Product</th>
                     <th>Quantity</th>
+                    <th>Unit Price</th>
                     <th>Price</th>
+
                     <th class="text-end">Action</th>
                 </tr>
             </thead>
@@ -58,18 +60,27 @@
                       <span class="small">Color: {{order.variant.colour_name | title}}</span>
                         {% if order.variant.product.product_category.discount %}
                       <div style="color:green;"> category offer {{order.variant.product.product_category.discount}} % </div>
-                      
                     {% endif %}
-                    </div>
-
-                  
+                    </div>    
                   </div>
                 </td>
+
                 <td>{{order.quantity}}</td>
                 <td class="text-end">{{order.variant.product.offer_price}}</td>
+               <td class="text-end">
+                  {% if order.total_cost_coupon %}
+                      {{ order.total_cost_coupon }} 
+                      <span style="text-decoration: line-through;">{{ order.total_cost }}</span> 
+                  {% else %}
+                      {{ order.total_cost }} 
+                  {% endif %}
+              </td>
+
+
+
                 {% if order_main.order_status != 'Delivered' and order_main.order_status != 'Cancelled' and order_main.order_status != 'Returned' %}
                 {% if order.is_active %}
-                 <td class="text-end"> <a href="{% url 'order:cancel-individual-product' order.id %}" class="btn btn-md" >Cancel</a></td>               
+                 <td class="text-end"> <a href="{% url 'order:cancel-individual-product' order.id  order_main.order_id %}" class="btn btn-md" >Cancel</a></td>               
                 {% else %}
                   <td class=" text-end"><h4><span class=" mr-3 badge  bg-danger ">Cancelled</span></h4></td>               
                 {% endif %}
@@ -79,22 +90,22 @@
             {% endfor %}
             <tfoot>
               <tr>
-                <td colspan="2">Subtotal</td>
+                <td colspan="3">Subtotal</td>
                 <td class="text-end">{{sub_total}}</td>
               </tr>
               <tr>
-                <td colspan="2">Shipping</td>
+                <td colspan="3">Shipping</td>
                 <td class="text-end">Free Shipping</td>
               </tr>
 
               <tr class="fw-bold">
-              {% if order_main.coupon_discount %}
-               <td colspan="2">TOTAL <br> <span style="color:green">{{order_main.coupon_discount}} % discount applied with coupon</span> </td>
+              {% if user_coupon.coupon_discount and order_main.order_status != 'Cancelled' and order_main.order_status != 'Returned' and coupons %}
+               <td colspan="3">TOTAL <br> <span style="color:green">{{user_coupon.coupon_discount}} % discount applied with coupon  {{user_coupon.coupon_code}}</span> </td>
                <td class="text-end">{{order_main.total_amount}}</td>
               
               {% else %}
               
-                <td colspan="2">TOTAL</td>
+                <td colspan="3">TOTAL</td>
                 <td class="text-end">{{order_main.total_amount}}</td>
               {% endif %}
               </tr>
@@ -127,8 +138,8 @@
                     <div class="d-flex justify-content-end">
                         {% if order_main.order_status != 'Delivered' and order_main.order_status != 'Cancelled' and order_main.order_status != 'Returned' %}
                             {% if order_main.payment_status %}
-                                <a class="btn btn-outline-danger me-2" id="cancelorder">Cancel Order</a>
-                                <input type="hidden" name="total_amount" value="{{ order_main.total_amount }}">
+                                {% comment %} <a class="btn btn-outline-danger me-2" id="cancelorder">Cancel Order</a>
+                                <input type="hidden" name="total_amount" value="{{ order_main.total_amount }}"> {% endcomment %}
                             {% else %}
                                 <a href="{% url 'order:online-payment' order_main.order_id %}" class="btn btn-outline-success me-2">Pay Now</a>
                             {% endif %}  

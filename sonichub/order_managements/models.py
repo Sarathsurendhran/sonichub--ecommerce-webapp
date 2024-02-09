@@ -33,3 +33,20 @@ class Order_Sub_data(models.Model):
     variant = models.ForeignKey(Product_Variant, on_delete=models.CASCADE)
     quantity = models.IntegerField(null=False, default=0)
     is_active = models.BooleanField(default=True)
+
+    def total_cost_coupon(self):
+        unit_price = self.variant.product.offer_price * self.quantity
+        if self.variant.product.product_category.discount:
+            price = self.variant.product.price
+            category_discount = int(self.variant.product.product_category.discount)
+            total_discount = float(price) * (category_discount / 100)
+            unit_price = float(unit_price) - total_discount
+
+            return unit_price
+
+    
+    def total_cost(self):
+         return self.quantity * self.variant.product.offer_price
+    
+   
+

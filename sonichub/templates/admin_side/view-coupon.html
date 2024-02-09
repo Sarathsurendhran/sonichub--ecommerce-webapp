@@ -27,6 +27,9 @@
                     <th class="text-center">Discount</th>
                     <th class="text-center">Minimum Amount Eligible</th>
                     <th class="text-center">Expiry Status</th>
+                    <th class="text-center">Change Status</th>
+                    <th class="text-center">Action</th>
+
                     <th></th>
                   </tr>
                 </thead>
@@ -45,18 +48,23 @@
                           {{ coupon.expiry_date|date:"d M Y" }}
                         </span>
                       </td>
-                      <td class="d-flex align-items-center justify-content-end">
-                        <a href="{% url 'coupon:edit-coupon' coupon.id %}" class="btn btn-info btn-square-md d-flex align-items-center me-2 mb-5">
+
+                        <td class="text-center">
+                             <a  href="{% url 'coupon:coupon-status-change' coupon.id %}" {% if coupon.status %} class="btn btn-success btn-sm" {% else %} class="btn btn-danger btn-sm" {% endif %}>
+                             {% if coupon.status %}
+                             Active
+                             {% else %}
+                             Inactive
+                             {% endif %}
+                             </a>
+                             
+                        </td>
+
+                      <td class="d-flex align-items-center justify-content-center">
+                        <a href="{% url 'coupon:edit-coupon' coupon.id %}" class="btn btn-info btn-square-md ">
                           <i class="material-icons md-edit pr-1"></i>
                         </a>
-                        <form action="{% url 'coupon:delete-coupon' coupon.id %}" method="post" class="delete-form">
-                          {% csrf_token %}
-                          <input type="hidden" name="couponID" value="{{ coupon.id }}">
-                          <button  class="btn btn-danger btn-square-md d-flex align-items-center mt-15 delete-btn">
-                            <i class="material-icons md-delete"></i>
-                          </button>
-                          <label for="couponID"></label>
-                        </form>
+                       
                       </td>
                     </tr>
                   {% endfor %}

@@ -27,7 +27,7 @@ from datetime import date
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 
-def cancel_individual_product(request, order_sub_id):
+def cancel_individual_product(request, order_sub_id, order_id):
     data = Order_Sub_data.objects.get(id=order_sub_id)
     data.is_active = False
     data.save()
@@ -39,24 +39,42 @@ def cancel_individual_product(request, order_sub_id):
     find_sub_total = Order_Sub_data.objects.filter(main_order=order_main.id)
     sub_total = 0
 
-    # credit cash on wallet when cancel individual product
+    order_sub_data = Order_Sub_data.objects.filter(main_order=order_main.id, is_active=False).count()
+    order_sub_data_total = Order_Sub_data.objects.filter(main_order=order_main.id).count()
 
+    try:
+        user_coupon = Users_Coupon.objects.get(order=order_main.id)
+        coupons = Coupon.objects.get(Coupon_code=user_coupon.coupon_code)
+    except Exception as e:
+        print("exception :", e)
+        user_coupon = None
+        coupons = None
+        pass
+
+    # credit cash on wallet when cancel individual product
     if (
         order_main.payment_option == "online payment"
         or order_main.payment_option == "wallet payment"
     ):
-        price = data.variant.product.offer_price
+        
+        price = data.variant.product.offer_price * data.quantity
         offer_discount = data.variant.product.product_category.discount
 
         if offer_discount:
             orginal_price = data.variant.product.price
-            print("orginal price:", orginal_price)
             discount_total = float(orginal_price) * (offer_discount / 100)
-            print("discount total:", discount_total)
             price = float(price) - discount_total
 
-            print("final price:", price)
 
+        if order_sub_data == order_sub_data_total:
+             if user_coupon and coupons:
+                if price >= coupons.minimum_amount:
+                    discount = float(user_coupon.coupon_discount)
+                    amount = float(price) * (discount / 100)
+                    price = round(float(price) - amount, 2)
+
+
+        # storing the datas in the transtaction table for wallet amount
         Transaction.objects.create(
             description="Cancelled Product    " + data.variant.product.product_name,
             amount=price,
@@ -64,11 +82,13 @@ def cancel_individual_product(request, order_sub_id):
             user=user_id,
         )
 
+
+    # Calculating the tota amount for storing main order table
     for i in find_sub_total:
         if not i.is_active:
             continue
 
-        unit_price = i.variant.product.offer_price
+        unit_price = i.variant.product.offer_price * i.quantity
         if i.variant.product.product_category.discount:
             price = i.variant.product.price
             category_discount = int(i.variant.product.product_category.discount)
@@ -77,22 +97,20 @@ def cancel_individual_product(request, order_sub_id):
 
         if i.variant.variant_status:
             sub_total += float(unit_price)
-    
-    if order_main.coupon_discount:
-        discount = float(order_main.coupon_discount)
-        amount = float(sub_total) * (discount / 100)
-        sub_total = round(float(sub_total) - amount, 2)
 
+    # calculating the amount afert coupon discount if any
+    if user_coupon and coupons:
+        print("enterd coupon applying section")
+        if sub_total >= coupons.minimum_amount:
+            discount = float(user_coupon.coupon_discount)
+            amount = float(sub_total) * (discount / 100)
+            sub_total = round(float(sub_total) - amount, 2)
+            
+    
     order_main.total_amount = sub_total
     order_main.save()
 
-
-    order_sub_data = Order_Sub_data.objects.filter(
-        main_order=order_main.id, is_active=False
-    ).count()
-    order_sub_data_total = Order_Sub_data.objects.filter(
-        main_order=order_main.id
-    ).count()
+    # if full product cancelled individullay this code will mark that order cancelled
 
     if order_sub_data == order_sub_data_total:
         order_main.order_status = "Cancelled"
@@ -162,10 +180,24 @@ def payment_success(request, order_id):
     return render(request, "user_side/order-success.html", {"order_id": order_id})
 
 
-def online_payment(request, order_id):
+def online_payment(request, order_id, coupon_code=None):
     order_instance = get_object_or_404(Order_Main_data, order_id=order_id)
     if order_instance.payment_status:
         return redirect("order:current-order-details", order_id)
+
+    if coupon_code is not None and coupon_code != "None":
+        coupon = Coupon.objects.get(Coupon_code=coupon_code)
+        user = UserProfile.objects.get(id=request.user.id)
+        Users_Coupon.objects.create(
+            user=user,
+            coupon_code=coupon.Coupon_code,
+            coupon_discount=coupon.discount,
+            order=order_instance
+        )
+     # clearing the cart after payment
+    data = Cart.objects.filter(user=request.user.id)
+    data.delete()
+
     context = {
         "order_data": Order_Main_data.objects.get(order_id=order_id),
         "order_sub_data": Order_Sub_data.objects.filter(
@@ -188,7 +220,7 @@ def cancel_order(request, order_id, user_id):
             amount = request.POST.get("total_amount")
             user = UserProfile.objects.get(id=user_id)
 
-            transaction_data = Transaction.objects.create(
+            Transaction.objects.create(
                 user=user,
                 description="Cancelled Order " + order_id,
                 amount=amount,
@@ -202,17 +234,59 @@ def cancel_order(request, order_id, user_id):
 def order_details(request, id):
     order_sub = Order_Sub_data.objects.filter(main_order_id=id)
     sub_total = 0
-    for i in order_sub:
-        if i.variant.variant_status:
-            sub_total += i.quantity * i.variant.product.offer_price
+    price = 0
+    amount = 0
+    total_subtotal = 0
 
-    content = {
-        "order_main": Order_Main_data.objects.get(id=id),
-        "order_sub_data": Order_Sub_data.objects.filter(main_order_id=id),
-        "sub_total": sub_total,
+    for i in order_sub:
+        sub_total = i.variant.product.offer_price * i.quantity
+        if i.variant.product.product_category.discount:
+            price = i.variant.product.price
+            category_discount = int(i.variant.product.product_category.discount)
+            total_discount = float(price) * (category_discount / 100)
+            sub_total =  float(sub_total) - total_discount
+            print("subtotal in side loop:",sub_total)
+
+        total_subtotal += float(sub_total)
+      
+    try:
+        order_main = Order_Main_data.objects.get(id=id)
+        user_coupon = Users_Coupon.objects.get(order=id)
+        coupons = Coupon.objects.get(Coupon_code=user_coupon.coupon_code)
+        
+        for i in order_sub:
+            if not i.is_active:
+                continue
+            if i.variant.product.product_category.discount:
+                sub_total = float(sub_total) + float(i.variant.product.offer_price * i.quantity)
+            else:
+                amount = float(amount) + float(i.variant.product.offer_price * i.quantity)
+                print("amount", amount, "coupons",coupons)
+
+        
+        if i.variant.product.product_category.discount:
+            if not sub_total >= coupons.minimum_amount:
+                coupons = None
+        else:
+            if not amount >= coupons.minimum_amount:
+                coupons = None
+
+    except Exception as e:
+        print(e)
+        user_coupon = None
+        coupons = None
+        pass
+
+    content = { 
+        "order_main": order_main,
+        "order_sub_data": order_sub,
+        "sub_total": total_subtotal,
+        "user_coupon":user_coupon,
+        "coupons":coupons, 
     }
 
     return render(request, "user_side/order-details.html", content)
+
 
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
@@ -334,19 +408,32 @@ def confirm_order(request, id):
             )
 
         if payment_option == "online payment":
-            return redirect("order:online-payment", order_id)
+            if coupon_code:
+                return redirect("order:online-payment", order_id, coupon_code)
+            else:
+                return redirect("order:online-payment", order_id)
+
 
         if payment_option == "wallet payment":
-            return redirect("user_panel:wallet-payment", order_id, id)
+            if coupon_code:
+                return redirect("user_panel:wallet-payment", order_id, id, coupon_code)
+            else:
+                return redirect("user_panel:wallet-payment", order_id, id)
 
         # clearing the cart
         data.delete()
 
-        # changing coupon status
+        # saving coupon information of each users
         if coupon_code is not None and coupon_code != "None":
             coupon = Coupon.objects.get(Coupon_code=coupon_code)
-            coupon.is_active = False
-            coupon.save()
+            user = UserProfile.objects.get(id=request.user.id)
+            Users_Coupon.objects.create(
+                user=user,
+                coupon_code=coupon.Coupon_code,
+                coupon_discount=coupon.discount,
+                order_id=main_order_id.id
+                
+            )
 
         # creating razorpay object
 
@@ -381,8 +468,15 @@ def confirm_order(request, id):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def checkout(request, id):
     data = Cart.objects.filter(user=id)
-    coupons = Coupon.objects.filter(
-        is_active=True, expiry_date__gte=timezone.now().date()
+
+    # Fetching all active coupons that have not expired
+    all_coupons = Coupon.objects.filter(
+        status=True, expiry_date__gte=timezone.now().date()
+    )
+    user_coupon = Users_Coupon.objects.filter(user=id)
+    # Fetching all the coupons that are not in the user coupon
+    coupons = all_coupons.exclude(
+        Coupon_code__in=user_coupon.values_list("coupon_code", flat=True)
     )
 
     total_price = 0
@@ -402,7 +496,7 @@ def checkout(request, id):
             continue
 
         unit_price = i.variant.product.offer_price
-        print("initial unit price:",unit_price)
+        print("initial unit price:", unit_price)
         category_discount = i.variant.product.product_category.discount
 
         if (
@@ -410,15 +504,13 @@ def checkout(request, id):
             and float(i.product.product_category.minimum_amount) <= unit_price
         ):
             price = i.variant.product.price
-            print("initial unit price if category offer:",unit_price)
+            print("initial unit price if category offer:", unit_price)
             if category_discount:
                 offer_applied = True
-            
-                amount = float(price) * (
-                    category_discount / 100
-                )
+
+                amount = float(price) * (category_discount / 100)
                 unit_price = float(unit_price) - float(amount)
-                print("unit price after category discount:",unit_price)
+                print("unit price after category discount:", unit_price)
 
         total_price = float(total_price) + i.quantity * float(unit_price)
         print("final price :", total_price)
@@ -431,7 +523,7 @@ def checkout(request, id):
 
             coupon = Coupon.objects.get(
                 Coupon_code=coupon_code,
-                is_active=True,
+                status=True,
                 expiry_date__gte=date.today(),
             )
 

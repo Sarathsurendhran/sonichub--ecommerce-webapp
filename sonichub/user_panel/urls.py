@@ -16,7 +16,6 @@ urlpatterns = [
   path('address-status-change/<int:id>',views.address_status_change,name='address-status-change'),
   path('change-password/<int:id>',views.change_password,name='change-password'),
   path('user-wallet/<int:user_id>',views.user_wallet,name='user-wallet'),
-  path('wallet-payment/<str:order_id>/<int:id>',views.wallet_payment,name='wallet-payment'),
   path('get-names',views.get_names,name='get-names'),
   path('category-search/<str:name>',views.category_search,name="category-search"),
   path('wish-list',views.wish_list,name="wish-list"),
@@ -26,8 +25,10 @@ urlpatterns = [
   path('brows-categories', views.brows_categories, name='brows-categories'),
   path('category-show/<int:id>',views.category_show, name = 'category-show'),
   path('update-mail', views.update_mail, name='update-mail'),
-  path('add-new',views.add_new,name='add-new')
-  
+  path('add-new',views.add_new,name='add-new'),
+
+  path('wallet-payment/<str:order_id>/<int:id>',views.wallet_payment,name='wallet-payment'),
+  path('wallet-payment/<str:order_id>/<int:id>/<str:coupon_code>',views.wallet_payment,name='wallet-payment'),
   
 
 ]
