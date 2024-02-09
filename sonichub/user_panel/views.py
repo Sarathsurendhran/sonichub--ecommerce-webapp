@@ -32,6 +32,103 @@ from django.contrib.auth.decorators import login_required
 from coupon_management.models import Coupon, Users_Coupon
 
 
+
+# wiillnbwbdzphfla
+@csrf_exempt
+# @login_required(login_url="user_side:user_login")
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def update_password_otp(request):
+
+    try:
+        request.session['email'] = request.POST.get('email')
+        
+    except:
+        pass
+
+    otp = get_random_string(length=4, allowed_chars="0123456789")
+
+    now = datetime.now().time()
+    time_as_string = now.strftime("%H:%M:%S")
+
+    request.session["otp"] = otp
+    request.session["otp_time"] = time_as_string
+
+    site_name = "Sonichub"
+    subject = f"OTP for Change Password on {site_name}"
+    message = f"Hi {request.user},<br><br>\
+        Thanks for updating your data on {site_name}.<br><br>\
+        <span style='font-size: 16px;'>Your OTP for the update is: {otp}</span><br><br>\
+        Please use this OTP to Change Password.<br><br>\
+        Best regards,<br>\
+        The {site_name} Team"
+
+    send_mail(
+        subject,
+        message,
+        "sonichubecommerce@outlook.com",
+        [request.session["email"]],
+        fail_silently=False,
+    )
+
+
+    timenow = datetime.now()
+    expire_time = timenow + timedelta(seconds=60)
+    request.session["otp_expiration_time"] = expire_time.strftime("%H:%M:%S")
+    print(request.session["email"])
+
+    if request.headers.get("x-requested-with") == "XMLHttpRequest":
+        response_data = {
+            "success": True,
+            "message": "OTP sent successfully.",
+           
+        }
+        messages.success(request, "OTP sent successfully.")
+        return JsonResponse(response_data)
+    else:
+        messages.success(request, "OTP sent successfully.")
+        return redirect("user_panel:update-password-verify-otp")
+
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def update_password_verify_otp(request):
+    if request.method == "POST":
+        otp1 = request.POST.get("otp1")
+        otp2 = request.POST.get("otp2")
+        otp3 = request.POST.get("otp3")
+        otp4 = request.POST.get("otp4")
+        otp_entered = otp1 + otp2 + otp3 + otp4
+
+        if "otp" in request.session:
+            stored_otp = request.session["otp"]
+            otp_expiration_time = request.session["otp_expiration_time"]
+            expiration_time = datetime.strptime(otp_expiration_time, "%H:%M:%S").time()
+
+            if otp_entered == stored_otp:
+                current_time = datetime.now().time()
+
+                user = UserProfile.objects.get(id=request.user.id)
+
+                if current_time <= expiration_time:
+                    user.is_active = True
+                    user.save()
+
+                    del request.session["otp"]
+                    del request.session["otp_expiration_time"]
+
+                    return redirect("user_panel:update-mail")
+                    
+                else:
+                    messages.error(
+                        request, "OTP has expired. Please request a new one."
+                    )
+            else:
+                messages.error(request, "OTP doesn't match.")
+        else:
+            messages.error(request, "OTP verification failed. Please try again.")
+
+    return render(request, "user_side/change_password_otp.html")
+
+
 def add_new(request):
     if request.method == "GET":
         selected_values = request.GET.getlist('brand')
@@ -97,8 +194,12 @@ def add_to_wishlist(request):
             variant = Product_Variant.objects.filter(
                 product=product_id, variant_status=True
             ).first()
-            Wishlist.objects.create(user=user_id, variant=variant)
-            return JsonResponse({"status": "success"}, status=200)
+
+            if not Wishlist.objects.filter(user=user_id, variant=variant):
+                Wishlist.objects.create(user=user_id, variant=variant)
+                return JsonResponse({"status": "success"}, status=200)
+            else:
+                return JsonResponse({"status": "Item already in wishlist"}, status=200)
         except Exception as e:
             return JsonResponse({"status": "error"}, status=403)
 
@@ -114,7 +215,6 @@ def remove_wishlist(request, id):
 
 
 
-@login_required(login_url='user_side:user_login')
 def wish_list(request):
     user_id = UserProfile.objects.get(id=request.user.id)
     if request.method == "POST":
@@ -247,7 +347,7 @@ def change_password(request, id):
             data.password = password
             data.save()
             request.session["email"] = data.email
-            return redirect("user_panel:update-mail-otp")
+            return redirect("user_panel:update-password-otp")
         else:
             messages.warning(request, "Current Password is not correct")
 

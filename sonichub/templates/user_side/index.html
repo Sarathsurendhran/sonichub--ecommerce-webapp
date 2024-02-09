@@ -348,7 +348,6 @@ $(".addToCartBtn").on('click', function(event) {
 
 <script>
 function addToWishList(dataid){
-  
   console.log(dataid)
   $.ajax({
     type:'POST',
@@ -358,27 +357,30 @@ function addToWishList(dataid){
       csrfmiddlewaretoken:'{{ csrf_token }}'
     },
     success:function(response){
-       Swal.fire({
-        title:'Added to wishlist',
-        icon:'success',
-
-      })
-
+      if (response.status === "success") {
+        Swal.fire({
+          title:'Added to wishlist',
+          icon:'success',
+        })
+      } else {
+        Swal.fire({
+          title: 'Item already in wishlist',
+          icon: 'info',
+        })
+      }
     },
-     error: function(xhr, status, error) {
+    error: function(xhr, status, error) {
       console.error('AJAX request failed:', status, error);
       Swal.fire({
         title: 'Something went wrong!',
         icon: 'error',
         text: 'Please try again later.',
-    })
+      })
     }
-
   }) 
-
 }
-
 </script>
+
 
 
 

@@ -29,6 +29,8 @@ urlpatterns = [
 
   path('wallet-payment/<str:order_id>/<int:id>',views.wallet_payment,name='wallet-payment'),
   path('wallet-payment/<str:order_id>/<int:id>/<str:coupon_code>',views.wallet_payment,name='wallet-payment'),
+  path('update-password-otp',views.update_password_otp, name='update-password-otp'),
+  path('update-password-verify-otp',views.update_password_verify_otp, name='update-password-verify-otp'),
   
 
 ]
