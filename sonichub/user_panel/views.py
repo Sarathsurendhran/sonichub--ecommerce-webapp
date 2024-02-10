@@ -35,15 +35,14 @@ from coupon_management.models import Coupon, Users_Coupon
 
 # wiillnbwbdzphfla
 @csrf_exempt
-# @login_required(login_url="user_side:user_login")
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def update_password_otp(request):
 
-    try:
-        request.session['email'] = request.POST.get('email')
+    # try:
+    #     request.session['email'] = request.POST.get('email')
         
-    except:
-        pass
+    # except:
+    #     pass
 
     otp = get_random_string(length=4, allowed_chars="0123456789")
 
@@ -53,29 +52,28 @@ def update_password_otp(request):
     request.session["otp"] = otp
     request.session["otp_time"] = time_as_string
 
+    print("in send otp")
+    for key, value in request.session.items():
+                print(f"{key}: {value}")
+
+
     site_name = "Sonichub"
     subject = f"OTP for Change Password on {site_name}"
-    message = f"Hi {request.user},<br><br>\
-        Thanks for updating your data on {site_name}.<br><br>\
-        <span style='font-size: 16px;'>Your OTP for the update is: {otp}</span><br><br>\
-        Please use this OTP to Change Password.<br><br>\
-        Best regards,<br>\
-        The {site_name} Team"
+    message = f"Hi {request.user},\n\nThanks for updating your data on {site_name}.\n\nYour OTP for the update is: {otp}\n\nPlease use this OTP to change your password.\n\nBest regards,\nThe {site_name} Team"
+    email = request.session.get("email")
 
     send_mail(
         subject,
         message,
         "sonichubecommerce@outlook.com",
-        [request.session["email"]],
+        [email],
         fail_silently=False,
     )
-
-
+    
     timenow = datetime.now()
     expire_time = timenow + timedelta(seconds=60)
     request.session["otp_expiration_time"] = expire_time.strftime("%H:%M:%S")
-    print(request.session["email"])
-
+    
     if request.headers.get("x-requested-with") == "XMLHttpRequest":
         response_data = {
             "success": True,
@@ -98,7 +96,12 @@ def update_password_verify_otp(request):
         otp4 = request.POST.get("otp4")
         otp_entered = otp1 + otp2 + otp3 + otp4
 
+        print("session in verify otp")
+        for key, value in request.session.items():
+                     print(f"{key}: {value}")
+        
         if "otp" in request.session:
+            print("entered inside otp section")
             stored_otp = request.session["otp"]
             otp_expiration_time = request.session["otp_expiration_time"]
             expiration_time = datetime.strptime(otp_expiration_time, "%H:%M:%S").time()
@@ -115,7 +118,9 @@ def update_password_verify_otp(request):
                     del request.session["otp"]
                     del request.session["otp_expiration_time"]
 
-                    return redirect("user_panel:update-mail")
+                    request.session["otp-status"] = 'otp-verified'
+
+                    return redirect("user_panel:change-password") 
                     
                 else:
                     messages.error(
@@ -334,19 +339,35 @@ def user_wallet(request, user_id):
 
 
 
-
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
-def change_password(request, id):
+def change_password(request):
+    try:
+        user = UserProfile.objects.get(id=request.user.id)
+        otp_status = request.session.get("otp-status")
+        if otp_status == "otp-verified":
+            new_password = request.session.get("new_password")
+            if new_password:
+                password = make_password(new_password)
+                user.password = password
+                user.save()
+                del request.session["new_password"]
+            return redirect("user_panel:user-profile", request.user.id)
+
+    except UserProfile.DoesNotExist:
+        messages.error(request, "User profile does not exist.")
+        return redirect("user_panel:user-profile", request.user.id)
+    
+    except Exception as e:
+        print(e)
+        messages.error(request, "An error occurred.")
+        return redirect("user_panel:user-profile", request.user.id) 
+
     if request.method == "POST":
         current_password = request.POST.get("current_password")
-        new_password = request.POST.get("new_password")
-        data = UserProfile.objects.get(id=id)
-
-        if data.check_password(current_password):
-            password = make_password(new_password)
-            data.password = password
-            data.save()
-            request.session["email"] = data.email
+        new_password = request.POST.get("new_password") 
+        if user.check_password(current_password):
+            request.session["email"] = user.email
+            request.session["new_password"] = new_password
             return redirect("user_panel:update-password-otp")
         else:
             messages.warning(request, "Current Password is not correct")
