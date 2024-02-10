@@ -319,20 +319,75 @@ def order_list(request, id):
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def current_order_details(request, order_id):
+    print(order_id)
+    # order_main = Order_Main_data.objects.get(order_id=order_id)
+    # order_sub = Order_Sub_data.objects.filter(main_order_id=order_main.id)
+
+    # sub_total = 0
+    # for i in order_sub:
+    #     if i.variant.variant_status:
+    #         sub_total += i.quantity * i.variant.product.offer_price
+
+    # content = {
+    #     "order_main": Order_Main_data.objects.get(order_id=order_id),
+    #     "order_sub": Order_Sub_data.objects.filter(main_order_id=order_main.id),
+    #     "sub_total": sub_total,
+    # }
     order_main = Order_Main_data.objects.get(order_id=order_id)
     order_sub = Order_Sub_data.objects.filter(main_order_id=order_main.id)
-
     sub_total = 0
-    for i in order_sub:
-        if i.variant.variant_status:
-            sub_total += i.quantity * i.variant.product.offer_price
+    price = 0
+    amount = 0
+    total_subtotal = 0
 
-    content = {
-        "order_main": Order_Main_data.objects.get(order_id=order_id),
-        "order_sub": Order_Sub_data.objects.filter(main_order_id=order_main.id),
-        "sub_total": sub_total,
+    for i in order_sub:
+        sub_total = i.variant.product.offer_price * i.quantity
+        if i.variant.product.product_category.discount:
+            price = i.variant.product.price
+            category_discount = int(i.variant.product.product_category.discount)
+            total_discount = float(price) * (category_discount / 100)
+            sub_total =  float(sub_total) - total_discount
+            print("subtotal in side loop:",sub_total)
+
+        total_subtotal += float(sub_total)
+    
+    try:
+        order_main = Order_Main_data.objects.get(id=order_main.id)
+        user_coupon = Users_Coupon.objects.get(order=order_main.id)
+        coupons = Coupon.objects.get(Coupon_code=user_coupon.coupon_code)
+        
+        for i in order_sub:
+            if not i.is_active:
+                continue
+            if i.variant.product.product_category.discount:
+                sub_total = float(sub_total) + float(i.variant.product.offer_price * i.quantity)
+            else:
+                amount = float(amount) + float(i.variant.product.offer_price * i.quantity)
+                print("amount", amount, "coupons",coupons)
+
+        
+        if i.variant.product.product_category.discount:
+            if not sub_total >= coupons.minimum_amount:
+                coupons = None
+        else:
+            if not amount >= coupons.minimum_amount:
+                coupons = None
+
+    except Exception as e:
+        print(e)
+        user_coupon = None
+        coupons = None
+        pass
+
+    content = { 
+        "order_main": order_main,
+        "order_sub_data": order_sub,
+        "sub_total": total_subtotal,
+        "user_coupon":user_coupon,
+        "coupons":coupons,
     }
     return render(request, "user_side/current-order-details.html", content)
+
 
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
