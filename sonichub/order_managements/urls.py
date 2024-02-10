@@ -18,7 +18,4 @@ urlpatterns = [
     path('cancel-individual-product/<int:order_sub_id>/<str:order_id>',views.cancel_individual_product, name="cancel-individual-product"),
     
     
-      
-    
-    
 ]

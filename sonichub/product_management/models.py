@@ -27,7 +27,7 @@ class Products(models.Model):
 class Product_Variant(models.Model):
     product = models.ForeignKey(Products, on_delete=models.CASCADE)
     colour_name = models.CharField(null=False)
-    variant_stock = models.IntegerField(null=False)
+    variant_stock = models.PositiveIntegerField(null=False,default=0)
     variant_status = models.BooleanField(default=True)
     colour_code = models.CharField(null=False)
 

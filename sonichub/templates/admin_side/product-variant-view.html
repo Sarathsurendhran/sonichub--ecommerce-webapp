@@ -21,9 +21,21 @@
         {% comment %} <div>
             <h2 class="content-title card-title">Product: {{product.get_product_name}}</h2>
         </div> {% endcomment %}
+
+         
         <div>
+    
+      
             <h4 class="content-title card-title">Available Variants</h4>
+               {% for message in messages %}
+                  <div class="alert alert-{{message.tags}} alert-dismissible fade show" role="alert">
+                      <strong></strong>{{message}}
+                      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                  </div>
+              {% endfor %}  
         </div>
+       
+         
      
     </div>
     <div class="card mb-4">
@@ -112,6 +124,7 @@
 <script>
     $(document).ready(function () {
         $('.edit-action').click(function () {
+           
             var row = $(this).closest('tr');
             
            
@@ -127,6 +140,8 @@
                 var stockValue = row.find('#edit-stock-input').val();
                 var variant_id = row.find('#variant_id').val();
 
+    
+
                 console.log(variant_id)
 
                 var data = {
@@ -139,7 +154,8 @@
                     
                 };
                
-                let url =  "/admin/productedit-variant/" + variant_id
+               let url = "/productedit-variant/" + variant_id;
+
                 $.ajax({
                     type: 'GET',
                     url: url,
@@ -149,8 +165,8 @@
                         console.log('Update successful:', response);
                     },
                     error: function (error) {
-
-                        alert("Something went wrong!")
+                        window.location.reload()
+                        console.log("Something went wrong!")
                     }
                 });
             }

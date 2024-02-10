@@ -155,15 +155,24 @@ def edit_variant_in_edit_product(request, product):
 
 def edit_variant(request, variant_id):
     try:
+        variant_instance = Product_Variant.objects.get(id=variant_id)
         color = request.GET.get("color")
         name = request.GET.get("name")
         stock = request.GET.get("stock")
+        print(stock)
+        print("product is:",variant_instance.product.id)
+        stock = int(stock)
+        if stock < 0:
+            messages.warning(request, "stock should be positive ineter!")
+            return JsonResponse({"error": True}, status=400)
+    
         data = Product_Variant.objects.get(id=variant_id)
         data.colour_code = color
         data.colour_name = name
         data.variant_stock = stock
         data.save()
         return JsonResponse({"success": True}, status=200)
+
     except Exception as e:
         print(e)
         return JsonResponse({"error": True}, status=400)
@@ -319,7 +328,7 @@ def add_product(request):
             return redirect("product:edit-product", id)
 
         if price.startswith("-") or offer_price.startswith("-"):
-            messages.warning(request, "Please Enter positive values")
+            messages.warning(request, "Product price should be positive integers")
             return redirect("product:add-product")
 
         if not any(char.isalpha() for char in product_name):
