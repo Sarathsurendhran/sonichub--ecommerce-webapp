@@ -27,26 +27,6 @@ def admin_logout(request):
     return redirect('admin_panel:admin_login')
 
 
-def sales_date_search(request):
-    if request.method == 'POST':
-        try:
-            start_date = request.POST.get('startDate')
-            end_date = request.POST.get('endDate')
-
-            if start_date and end_date:
-                start_date = datetime.strptime(start_date, '%Y-%m-%d')
-                end_date = datetime.strptime(end_date, '%Y-%m-%d')
-
-                order_data = Order_Main_data.objects.filter(date__range = [start_date, end_date])
-                if order_data.exists():
-                    return render(request, 'admin_side/sales-report.html',{'order_main_data':order_data})
-                messages.warning(request,'Not Found!')
-        except Exception as e:
-            print(e)
-            messages.warning(request, "An Error Occured{e}")
-
-    return redirect('admin_panel:sales-report')
-
 
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
@@ -126,9 +106,26 @@ def fetch_yearly_data(request):
 
 def sales_report_excel(request):
 
-    context = {
-        "order_main_data":Order_Main_data.objects.all()
-    }
+    try:
+        start_date_str= request.GET.get('start_date')
+        end_date_str = request.GET.get('end_date')
+    except:
+        pass
+
+    #If both start_date and end_date are provided, filter data accordingly
+    if start_date_str and end_date_str:
+
+        start_date = datetime.strptime(start_date_str, '%b. %d, %Y, midnight')
+        end_date = datetime.strptime(end_date_str, '%b. %d, %Y, midnight')
+       
+        start_date_formatted = start_date.strftime('%Y-%m-%d')
+        end_date_formatted = end_date.strftime('%Y-%m-%d')
+        order_main_data = Order_Main_data.objects.filter(date__range=[start_date_formatted, end_date_formatted])
+    else:
+       # If no dates provided, return all data
+        order_main_data = Order_Main_data.objects.all()
+
+    context = {"order_main_data": order_main_data}
     # using the same template that is used for pdf generation
     html_content = render_to_string("admin_side/sales-report-pdf.html",context)
   
@@ -145,19 +142,81 @@ def sales_report_excel(request):
 
 
 def sales_report_pdf(request):
-   context = {
-       "order_main_data":Order_Main_data.objects.all()
-   }
-   html_content = render_to_string("admin_side/sales-report-pdf.html",context)
-   pdf_response = HttpResponse(content_type = "application/pdf")
-   pdf_response["Content-Disposition"] = f'filename="{id}_details.pdf"'
 
-   pisa_status = pisa.CreatePDF(html_content, dest=pdf_response) 
+    try:
+        start_date_str= request.GET.get('start_date')
+        end_date_str = request.GET.get('end_date')
+    except:
+        pass
 
-   if pisa_status.err:
-       return HttpResponse("error creating pdf")
    
-   return pdf_response
+    #If both start_date and end_date are provided, filter data accordingly
+    if start_date_str and end_date_str:
+
+        start_date = datetime.strptime(start_date_str, '%b. %d, %Y, midnight')
+        end_date = datetime.strptime(end_date_str, '%b. %d, %Y, midnight')
+       
+        start_date_formatted = start_date.strftime('%Y-%m-%d')
+        end_date_formatted = end_date.strftime('%Y-%m-%d')
+        order_main_data = Order_Main_data.objects.filter(date__range=[start_date_formatted, end_date_formatted])
+    else:
+       # If no dates provided, return all data
+        order_main_data = Order_Main_data.objects.all()
+
+    context = {"order_main_data": order_main_data}
+    html_content = render_to_string("admin_side/sales-report-pdf.html", context)
+    pdf_response = HttpResponse(content_type="application/pdf")
+    pdf_response["Content-Disposition"] = f'filename="{id}_details.pdf"'
+
+    pisa_status = pisa.CreatePDF(html_content, dest=pdf_response)
+
+    if pisa_status.err:
+        return HttpResponse("error creating pdf")
+
+    return pdf_response
+
+
+def sales_date_search(request):
+    if request.method == 'POST':
+        try:
+            start_date = request.POST.get('startDate')
+            end_date = request.POST.get('endDate')
+  
+            if start_date and end_date:
+                start_date = datetime.strptime(start_date, '%Y-%m-%d')
+                end_date = datetime.strptime(end_date, '%Y-%m-%d')
+
+                order_data = Order_Main_data.objects.filter(date__range = [start_date, end_date])
+                if order_data.exists():
+                    content = {
+                        'order_main_data':order_data,
+                        'start_date':start_date,
+                        'end_date':end_date
+
+                    }
+                    return render(request, 'admin_side/sales-report.html',content)
+                messages.warning(request,'Not Found!')
+        except Exception as e:
+            print(e)
+            messages.warning(request, "An Error Occured{e}")
+
+    return redirect('admin_panel:sales-report')
+
+
+# def sales_report_pdf(request):
+#    context = {
+#        "order_main_data":Order_Main_data.objects.all()
+#    }
+#    html_content = render_to_string("admin_side/sales-report-pdf.html",context)
+#    pdf_response = HttpResponse(content_type = "application/pdf")
+#    pdf_response["Content-Disposition"] = f'filename="{id}_details.pdf"'
+
+#    pisa_status = pisa.CreatePDF(html_content, dest=pdf_response) 
+
+#    if pisa_status.err:
+#        return HttpResponse("error creating pdf")
+   
+#    return pdf_response
 
 
 
@@ -239,9 +298,10 @@ def admin_dashboard(request):
     purchase_count = Order_Main_data.objects.filter(date__month=current_date.month, payment_status=True).count()
     result = Order_Main_data.objects.aggregate(sum = Sum('total_amount'))
     total_amount = result['sum']
+    rounded_total_amount = round(total_amount, 2)
 
     content = {
-            "total_amount":total_amount,
+            "total_amount":rounded_total_amount,
             "orders":Order_Main_data.objects.filter(payment_status=True).count(),
             "products":Products.objects.filter(is_active=True).count(),
             "category":Category.objects.filter(is_available=True).count(),

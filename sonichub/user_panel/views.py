@@ -421,14 +421,14 @@ def add_address(request, id):
 
     if request.method == "POST":
         try:
-            name = request.POST.get("name")
-            house_name = request.POST.get("house_name")
-            street_name = request.POST.get("street_name")
-            district = request.POST.get("district")
-            state = request.POST.get("state")
-            pin_number = request.POST.get("pin_number")
-            country = request.POST.get("country")
-            phone_number = request.POST.get("phone_number")
+            name = request.POST.get("name").strip()
+            house_name = request.POST.get("house_name").strip()
+            street_name = request.POST.get("street_name").strip()
+            district = request.POST.get("district").strip()
+            state = request.POST.get("state").strip()
+            pin_number = request.POST.get("pin_number").strip()
+            country = request.POST.get("country").strip()
+            phone_number = request.POST.get("phone_number").strip()
 
             Address.objects.create(
                 name=name,

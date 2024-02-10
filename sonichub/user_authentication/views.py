@@ -131,7 +131,7 @@ def referral_bonus(request):
 def generate_referral_link(request):
     try:
         user_data = UserProfile.objects.get(id=request.user.id)
-        signup_url = "http://127.0.0.1:8000/signup"
+        signup_url = "https://sarathsurendhran.online/signup"
         referral_link = request.build_absolute_uri(
             signup_url + f"?referral_code={str(user_data.referral_codes)}"
         )
@@ -235,17 +235,35 @@ def send_otp(request):
     request.session["otp"] = otp
     request.session["otp_time"] = time_as_string
 
-    site_name = "Sonichub"
-    subject = f"OTP for Sign Up on {site_name}"
-    message = f"Hi there!\n\nThanks for signing up on {site_name}.\n\nYour OTP is: {otp}\n\nPlease use this OTP to verify your account.\n\nBest regards,\nThe {site_name} Team"
+    if 'value' in request.session:
+        if request.session['value'] == 'forgotpassword':
 
-    send_mail(
-        subject,
-        message,
-        "sonichubecommerce@outlook.com",
-        [request.session["email"]],
-        fail_silently=False,
-    )
+            site_name = "Sonichub"
+            subject = f"OTP for forgot password on {site_name}"
+            message = f"Hi there!\n\nThanks for signing up on {site_name}.\n\nYour OTP is: {otp}\n\nPlease use this OTP to update your password.\n\nBest regards,\nThe {site_name} Team"
+
+            send_mail(
+                subject,
+                message,
+                "sonichubecommerce@outlook.com",
+                [request.session["email"]],
+                fail_silently=False,
+            )
+
+        
+    else:
+
+        site_name = "Sonichub"
+        subject = f"OTP for Sign Up on {site_name}"
+        message = f"Hi there!\n\nThanks for signing up on {site_name}.\n\nYour OTP is: {otp}\n\nPlease use this OTP to verify your account.\n\nBest regards,\nThe {site_name} Team"
+
+        send_mail(
+            subject,
+            message,
+            "sonichubecommerce@outlook.com",
+            [request.session["email"]],
+            fail_silently=False,
+        )
 
     timenow = datetime.now()
     expire_time = timenow + timedelta(seconds=60)
