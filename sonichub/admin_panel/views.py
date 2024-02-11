@@ -245,11 +245,7 @@ def sales_report(request):
 
 
 def admin_order_details(request,id):
-#    content = {
-#       "order_main":Order_Main_data.objects.get(id=id),
-#       "order_sub_data":Order_Sub_data.objects.filter(main_order_id=id) 
-#    }  
-   
+
     order_main = Order_Main_data.objects.get(id=id)
     order_sub = Order_Sub_data.objects.filter(main_order_id=order_main.id)
     sub_total = 0
@@ -273,22 +269,9 @@ def admin_order_details(request,id):
         user_coupon = Users_Coupon.objects.get(order=order_main.id)
         coupons = Coupon.objects.get(Coupon_code=user_coupon.coupon_code)
         
-        for i in order_sub:
-            if not i.is_active:
-                continue
-            if i.variant.product.product_category.discount:
-                sub_total = float(sub_total) + float(i.variant.product.offer_price * i.quantity)
-            else:
-                amount = float(amount) + float(i.variant.product.offer_price * i.quantity)
-                print("amount", amount, "coupons",coupons)
-
-        
-        if i.variant.product.product_category.discount:
-            if not sub_total >= coupons.minimum_amount:
-                coupons = None
-        else:
-            if not amount >= coupons.minimum_amount:
-                coupons = None
+        if user_coupon:
+            if not order_main.total_amount >= coupons.minimum_amount: 
+                coupons = None 
 
     except Exception as e:
         print(e)

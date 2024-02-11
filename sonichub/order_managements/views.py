@@ -184,6 +184,8 @@ def online_payment(request, order_id, coupon_code=None):
     order_instance = get_object_or_404(Order_Main_data, order_id=order_id)
     if order_instance.payment_status:
         return redirect("order:current-order-details", order_id)
+    
+
 
     if coupon_code is not None and coupon_code != "None":
         coupon = Coupon.objects.get(Coupon_code=coupon_code)
@@ -245,8 +247,7 @@ def order_details(request, id):
             category_discount = int(i.variant.product.product_category.discount)
             total_discount = float(price) * (category_discount / 100)
             sub_total =  float(sub_total) - total_discount
-            print("subtotal in side loop:",sub_total)
-
+           
         total_subtotal += float(sub_total)
       
     try:
@@ -261,15 +262,20 @@ def order_details(request, id):
                 sub_total = float(sub_total) + float(i.variant.product.offer_price * i.quantity)
             else:
                 amount = float(amount) + float(i.variant.product.offer_price * i.quantity)
-                print("amount", amount, "coupons",coupons)
+                
 
-        
-        if i.variant.product.product_category.discount:
-            if not sub_total >= coupons.minimum_amount:
-                coupons = None
-        else:
-            if not amount >= coupons.minimum_amount:
-                coupons = None
+            # if i.variant.product.product_category.discount:
+            #     print("not","sub_total", sub_total,">=", "coupon min amount", coupons.minimum_amount)
+            #     if not sub_total >= coupons.minimum_amount:
+            #         coupons = None
+            # else:
+            #     print("not","amount:",amount, ">=" ,"coupon minimum amount:",coupons.minimum_amount,)
+            #     if  not amount >= coupons.minimum_amount :
+            #         coupons = None
+                
+        if user_coupon:
+            if not order_main.total_amount >= coupons.minimum_amount: 
+                coupons = None       
 
     except Exception as e:
         print(e)
@@ -320,19 +326,7 @@ def order_list(request, id):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def current_order_details(request, order_id):
     print(order_id)
-    # order_main = Order_Main_data.objects.get(order_id=order_id)
-    # order_sub = Order_Sub_data.objects.filter(main_order_id=order_main.id)
-
-    # sub_total = 0
-    # for i in order_sub:
-    #     if i.variant.variant_status:
-    #         sub_total += i.quantity * i.variant.product.offer_price
-
-    # content = {
-    #     "order_main": Order_Main_data.objects.get(order_id=order_id),
-    #     "order_sub": Order_Sub_data.objects.filter(main_order_id=order_main.id),
-    #     "sub_total": sub_total,
-    # }
+    
     order_main = Order_Main_data.objects.get(order_id=order_id)
     order_sub = Order_Sub_data.objects.filter(main_order_id=order_main.id)
     sub_total = 0
@@ -356,21 +350,9 @@ def current_order_details(request, order_id):
         user_coupon = Users_Coupon.objects.get(order=order_main.id)
         coupons = Coupon.objects.get(Coupon_code=user_coupon.coupon_code)
         
-        for i in order_sub:
-            if not i.is_active:
-                continue
-            if i.variant.product.product_category.discount:
-                sub_total = float(sub_total) + float(i.variant.product.offer_price * i.quantity)
-            else:
-                amount = float(amount) + float(i.variant.product.offer_price * i.quantity)
-                print("amount", amount, "coupons",coupons)
-
         
-        if i.variant.product.product_category.discount:
-            if not sub_total >= coupons.minimum_amount:
-                coupons = None
-        else:
-            if not amount >= coupons.minimum_amount:
+        if user_coupon:
+            if not order_main.total_amount >= coupons.minimum_amount: 
                 coupons = None
 
     except Exception as e:
@@ -533,6 +515,7 @@ def checkout(request, id):
     coupons = all_coupons.exclude(
         Coupon_code__in=user_coupon.values_list("coupon_code", flat=True)
     )
+
 
     total_price = 0
     sub_total = 0
