@@ -122,12 +122,47 @@ def cancel_individual_product(request, order_sub_id, order_id):
 
 
 def generate_pdf(request, order_id):
+      
     order_main = Order_Main_data.objects.get(order_id=order_id)
-    order_sub_data = Order_Sub_data.objects.filter(main_order_id=order_main.id)
+    order_sub = Order_Sub_data.objects.filter(main_order_id=order_main.id)
+    sub_total = 0
+    price = 0
+    amount = 0
+    total_subtotal = 0
 
-    content = {
+    for i in order_sub:
+        sub_total = i.variant.product.offer_price * i.quantity
+        if i.variant.product.product_category.discount:
+            price = i.variant.product.price
+            category_discount = int(i.variant.product.product_category.discount)
+            total_discount = float(price) * (category_discount / 100)
+            sub_total =  float(sub_total) - total_discount
+            print("subtotal in side loop:",sub_total)
+
+        total_subtotal += float(sub_total)
+    
+    try:
+        order_main = Order_Main_data.objects.get(id=order_main.id)
+        user_coupon = Users_Coupon.objects.get(order=order_main.id)
+        coupons = Coupon.objects.get(Coupon_code=user_coupon.coupon_code)
+        
+        
+        if user_coupon:
+            if not order_main.total_amount >= coupons.minimum_amount: 
+                coupons = None
+
+    except Exception as e:
+        print(e)
+        user_coupon = None
+        coupons = None
+        pass
+
+    content = { 
         "order_main": order_main,
-        "order_sub_data": order_sub_data,
+        "order_sub_data": order_sub,
+        "sub_total": total_subtotal,
+        "user_coupon":user_coupon,
+        "coupons":coupons,
     }
 
     html_content = render_to_string("user_side/invoice.html", content)

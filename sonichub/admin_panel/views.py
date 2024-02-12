@@ -224,7 +224,7 @@ def sales_date_search(request):
 
 def sales_report(request):
 
-    order_main_data = Order_Main_data.objects.all().order_by('id')
+    order_main_data = Order_Main_data.objects.all().order_by('id').reverse()
     paginator = Paginator(order_main_data, 3)
     page = request.GET.get('page', 1)
     
