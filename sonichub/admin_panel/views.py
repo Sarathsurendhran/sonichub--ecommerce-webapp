@@ -429,7 +429,7 @@ def user_name_search(request):
                 messages.warning(request,'Not Found')
         except Exception as a:
             messages.warning(request, "An Error Occured{a}")
-    return redirect("admin_panel:user_list")
+    return redirect("admin_panel:users_list")
 
 
 
