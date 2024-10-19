@@ -417,13 +417,18 @@ function addToWishList(dataid){
       variant_id:variantId,
       csrfmiddlewaretoken:'{{ csrf_token }}'
     },
-    success:function(response){
-       Swal.fire({
-        title:'Added to wishlist',
-        icon:'success',
-
-      })
-
+     success:function(response){
+      if (response.status === "success") {
+        Swal.fire({
+          title:'Added to wishlist',
+          icon:'success',
+        })
+      } else {
+        Swal.fire({
+          title: 'Item already in wishlist',
+          icon: 'info',
+        })
+      }
     },
     error: function(response){
       Swal.fire({

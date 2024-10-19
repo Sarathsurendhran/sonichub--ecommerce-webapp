@@ -223,9 +223,17 @@ def remove_wishlist(request, id):
 def wish_list(request):
     user_id = UserProfile.objects.get(id=request.user.id)
     if request.method == "POST":
-        variant = request.POST.get("variant_id")
-        variant_id = Product_Variant.objects.get(id=variant)
-        Wishlist.objects.create(user=user_id, variant=variant_id)
+        try:
+            variant = request.POST.get("variant_id")
+            variant_id = Product_Variant.objects.get(id=variant)
+            if not Wishlist.objects.filter(user=user_id, variant=variant):
+                Wishlist.objects.create(user=user_id, variant=variant_id)
+                return JsonResponse({"status": "success"}, status=200)
+            else:
+                return JsonResponse({"status": "Item already in wishlist"}, status=200)
+        except Exception as e:
+            return JsonResponse({"status": "error"}, status=403)
+    
     content = {"wishlist": Wishlist.objects.filter(user=user_id)}
     return render(request, "user_side/wish-list.html", content)
 
@@ -567,11 +575,11 @@ def update_mail_verify_otp(request):
 
     return render(request, "user_side/otp-for-profile.html")
 
-
+    
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def address_list(request, id):
-    content = {"address": Address.objects.filter(user_id=id)}
+    content = {"address": Address.objects.filter(user_id=id, status=True)}
 
     return render(request, "user_side/address-list.html", content)
 

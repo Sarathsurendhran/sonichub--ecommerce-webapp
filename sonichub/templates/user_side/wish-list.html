@@ -34,6 +34,7 @@
                     <th scope="col">Name</th>
                     <th scope="col">Price</th>
                     <th scope="col">Remove</th>
+                    <th scope="col">Add to Cart</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -80,19 +81,18 @@
                           </button>
                         </form>
                       </td>
+
+                       <td class="action" data-title="Remove">
+                        <form method="post" action="{% url 'user_panel:remove-wishlist' data.id %}" onsubmit="return false">
+                          {% csrf_token %}
+                          <button class="btn border-0" onclick="confirmDelete(this.form)">
+                            <i class="fi fi-rs-shopping-cart"></i>
+                          </button>
+                        </form>
+                      </td>
                     </tr>
                   {% endfor %}
-                  <!-- CART LOOP END -->
-                  {% comment %} <tr>
-                    <td colspan="6" class="text-end">
-                      <form method="post" action="#" onsubmit="return false">
-                        {% csrf_token %}
-                        <button class="text-muted btn border-0" onclick="confirmClear(this.form)">
-                          <i class="fi-rs-cross-small"></i>Clear Cart
-                        </button>
-                      </form>
-                    </td>
-                  </tr> {% endcomment %}
+                
                 </tbody>
               </table>
             </div>
@@ -134,4 +134,28 @@
 
   }
   </script>
+
+<script>
+
+  $.ajax({ 
+        type: 'POST',
+        url: '{% url "cart:add-to-cart" %}', 
+        data: { product: productId, csrfmiddlewaretoken: '{{ csrf_token }}', variant: variantId, quantity: 1 },
+        success: function (response) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Added to Cart!',
+                text: 'The item has been added to your cart.',
+            });
+        },
+        error:  function (response){ 
+          
+        Swal.fire({
+          icon: 'error',
+          title: `Can't add to cart`,
+          text: `We don't have enough Quantity!`,
+      }); }
+    });
+</script>
+
 {% endblock content %}

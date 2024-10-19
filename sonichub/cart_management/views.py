@@ -73,8 +73,6 @@ def add_to_cart(request):
             currentQty = cart_obj.quantity
             print("current",currentQty)
 
-            
-
             if not created:
                 if currentQty + newQty > availableQty or availableQty == 0:
                     return JsonResponse({"error":"Error"}, status=400)

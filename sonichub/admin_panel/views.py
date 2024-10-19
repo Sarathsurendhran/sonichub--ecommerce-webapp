@@ -336,7 +336,11 @@ def admin_dashboard(request):
     purchase_count = Order_Main_data.objects.filter(date__month=current_date.month, payment_status=True).count()
     result = Order_Main_data.objects.aggregate(sum = Sum('total_amount'))
     total_amount = result['sum']
-    rounded_total_amount = round(total_amount, 2)
+    # Handle the case where total_amount is None
+    if total_amount is None:
+        rounded_total_amount = 0  
+    else:
+        rounded_total_amount = round(total_amount, 2)
 
     content = {
             "total_amount":rounded_total_amount,
@@ -391,7 +395,7 @@ def admin_login(request):
 def users_list(request):
     if not request.user.is_superuser:
         return redirect("admin_panel:admin_login")
-    user_details = UserProfile.objects.all().filter(is_superuser=False)
+    user_details = UserProfile.objects.all().filter(is_superuser=False).reverse()
     context = {"user_details": user_details}
 
     return render(request, "admin_side/admin-userslist.html", context)
