@@ -5,11 +5,13 @@ import string
 from coupon_management.models import Coupon,Users_Coupon
 from cart_management.models import Cart
 from datetime import datetime
-from datetime import date   
+from datetime import date  
+from sonichub.decorators import superuser_required 
 
 #admin side...
 
 
+@superuser_required
 def edit_coupon(request,id):
     today_date = date.today().isoformat()
     if request.method == "POST":
@@ -35,6 +37,7 @@ def edit_coupon(request,id):
 
 
 
+@superuser_required
 def coupon_status_change(request,coupon_id):
     data = Coupon.objects.get(id=coupon_id)
     if data.status:
@@ -46,6 +49,7 @@ def coupon_status_change(request,coupon_id):
     return redirect("coupon:view-coupon")
 
 
+@superuser_required
 def view_coupon(request):
 
     current_date_time = datetime.now()
@@ -64,6 +68,7 @@ def view_coupon(request):
 
 
 
+@superuser_required
 def generate_coupon(request):
     try:
         while True:
@@ -76,6 +81,7 @@ def generate_coupon(request):
         return JsonResponse({"status": 400}, status=400)
 
 
+@superuser_required
 def add_coupon(request):
 
     today_date = date.today().isoformat()

@@ -21,6 +21,8 @@ from django.db.models import F
 from django.db.models import Sum, Count
 from datetime import datetime
 from coupon_management.models import Coupon, Users_Coupon
+from sonichub.decorators import superuser_required
+
 
 
 def admin_logout(request):
@@ -105,6 +107,7 @@ def fetch_yearly_data(request):
 
 
 
+@superuser_required
 def sales_report_excel(request):
 
     try:
@@ -142,7 +145,9 @@ def sales_report_excel(request):
 
 
 
+@superuser_required
 def sales_report_pdf(request):
+
 
     try:
         start_date_str= request.GET.get('start_date')
@@ -222,6 +227,7 @@ def sales_date_search(request):
 
 
 
+@superuser_required
 def sales_report(request):
 
     order_main_data = Order_Main_data.objects.all().order_by('id').reverse()
@@ -242,8 +248,7 @@ def sales_report(request):
     return render(request, "admin_side/sales-report.html",context )
 
 
-
-
+@superuser_required
 def admin_order_details(request,id):
 
     order_main = Order_Main_data.objects.get(id=id)
@@ -288,7 +293,6 @@ def admin_order_details(request,id):
     }
     return render(request,"admin_side/admin-order-details.html",content)
 
-
 def order_status_change(request):
     if request.method == 'POST':
         order_id = request.POST.get('order_id')
@@ -299,8 +303,10 @@ def order_status_change(request):
         print(request.POST.get('order_id'))
         return JsonResponse({"success":'success'})
 
-
+@superuser_required
 def order_list(request):
+    if not request.user.is_superuser:
+        return redirect("admin_panel:admin_login")
 
     order_main_data = Order_Main_data.objects.all().order_by('id').reverse()
     order_sub_data = Order_Sub_data.objects.all().order_by("id").reverse()
@@ -327,6 +333,7 @@ def order_list(request):
 
 
 
+@superuser_required
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def admin_dashboard(request):
     if not request.user.is_superuser:
@@ -391,6 +398,7 @@ def admin_login(request):
     return render(request, "admin_side/admin-login.html")
 
 
+@superuser_required
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def users_list(request):
     if not request.user.is_superuser:
@@ -401,6 +409,7 @@ def users_list(request):
     return render(request, "admin_side/admin-userslist.html", context)
 
 
+@superuser_required
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def block_unblock_user(request, id):
     if not request.user.is_superuser:
@@ -437,6 +446,7 @@ def user_name_search(request):
 
 
 
+
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def brand_name_search(request):
     if request.method == "POST":
@@ -450,6 +460,7 @@ def brand_name_search(request):
         except Exception as e:
             messages.warning(request, "An error Occured:{e}")
     return redirect("brand:brand-list")
+
 
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)

@@ -220,6 +220,7 @@ def remove_wishlist(request, id):
 
 
 
+@login_required(login_url='user_side:user_login')
 def wish_list(request):
     user_id = UserProfile.objects.get(id=request.user.id)
     if request.method == "POST":

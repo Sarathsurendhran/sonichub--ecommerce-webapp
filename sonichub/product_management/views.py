@@ -5,6 +5,7 @@ from django.views.decorators.cache import cache_control
 from product_management.models import Products, Product_images, Product_Variant
 from category_management.models import Category
 from brand_management.models import Brand
+from sonichub.decorators import superuser_required
 from .models import *
 from django.db import transaction
 from django.contrib.auth import authenticate
@@ -64,6 +65,7 @@ def shop_product_list(request):
     return render(request, "user_side/shop-product-list.html", content)
 
 
+@superuser_required
 def edit_variant_status_change(request, id):
     if not request.user.is_superuser:
         return redirect("admin_panel: admin_login")
@@ -82,7 +84,7 @@ def edit_variant_status_change(request, id):
 
     return redirect("product:edit-variant-in-edit-product", product_variant.product.id)
 
-
+@superuser_required
 def thumbnail_update(request, id):
     if request.method == "POST":
         thumbnail = request.FILES.get("thumbnail_image")
@@ -95,19 +97,19 @@ def thumbnail_update(request, id):
         data.save()
         return redirect("product:edit-product", id)
 
-
+@superuser_required
 def delete_thumbnail_add_image(request, id):
     product_data = Products.objects.get(id=id)
     product_data.thumbnail.delete()
     return redirect("product:add-images", product_data.id)
 
-
+@superuser_required
 def delete_thumbnail_edit_image(request, id):
     product_data = Products.objects.get(id=id)
     product_data.thumbnail.delete()
     return redirect("product:edit-images", product_data.id)
 
-
+@superuser_required
 def delete_images(request):
     image_id = request.POST.get("image_id")
     product = request.POST.get("product_id")
@@ -115,7 +117,7 @@ def delete_images(request):
     images.delete()
     return redirect("product:add-images", product)
 
-
+@superuser_required
 def delete_images_edit(request):
     image_id = request.POST.get("image_id")
     product = request.POST.get("product_id")
@@ -123,7 +125,7 @@ def delete_images_edit(request):
     images.delete()
     return redirect("product:edit-images", product)
 
-
+@superuser_required
 def edit_variant_in_edit_product(request, product):
     if request.method == "POST":
         try:
@@ -153,6 +155,7 @@ def edit_variant_in_edit_product(request, product):
     return render(request, "admin_side/edit-variants1.html", content)
 
 
+@superuser_required
 def edit_variant(request, variant_id):
     try:
         variant_instance = Product_Variant.objects.get(id=variant_id)
@@ -178,6 +181,7 @@ def edit_variant(request, variant_id):
         return JsonResponse({"error": True}, status=400)
 
 
+@superuser_required
 def edit_thumbnail(request):
     image = request.FILES.get("imageFiles")
     product = request.POST.get("productId")
@@ -187,6 +191,7 @@ def edit_thumbnail(request):
     return redirect("product:edit-images", product)
 
 
+@superuser_required
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def edit_images(request, product):
     product_id = Products.objects.get(id=product)
@@ -212,6 +217,7 @@ def edit_images(request, product):
     return render(request, "admin_side/edit-images1.html", content)
 
 
+@superuser_required
 def variant_view(request, id):
     content = {
         "products": Products.objects.get(id=id),
@@ -221,6 +227,7 @@ def variant_view(request, id):
     return render(request, "admin_side/product-variant-view.html", content)
 
 
+@superuser_required
 def add_thumbnail(request):
     image = request.FILES.get("imageFiles")
     product = request.POST.get("productId")
@@ -230,6 +237,7 @@ def add_thumbnail(request):
     return redirect("product:add-images", product)
 
 
+@superuser_required
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def add_images(request, product):
     product_id = Products.objects.get(id=product)
@@ -262,7 +270,7 @@ def add_images(request, product):
     }
     return render(request, "admin_side/add-images1.html", content)
 
-
+@superuser_required
 @csrf_exempt
 def add_variant(request, product):
     try:
@@ -291,7 +299,7 @@ def add_variant(request, product):
 
     return render(request, "admin_side/add-product-variants.html", {"product": product})
 
-
+@superuser_required
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def add_product(request):
     if not request.user.is_superuser:
@@ -368,7 +376,7 @@ def add_product(request):
 
     return render(request, "admin_side/add-product.html", content)
 
-
+@superuser_required
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def product_list(request):
     if not request.user.is_superuser:
@@ -396,7 +404,7 @@ def product_list(request):
 
     return render(request, "admin_side/product-view.html", content)
 
-
+@superuser_required
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def edit_product(request, id):
     product_data = Products.objects.get(id=id)
@@ -481,7 +489,7 @@ def edit_product(request, id):
 
     return render(request, "admin_side/edit-product.html", content)
 
-
+@superuser_required
 def status_change(request, id):
     if not request.user.is_superuser:
         return redirect("admin_panel: admin_login")

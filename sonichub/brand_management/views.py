@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.views.decorators.cache import cache_control
 import admin_panel
 from product_management.models import Products,Product_Variant
+from sonichub.decorators import superuser_required
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def brand_list(request):
