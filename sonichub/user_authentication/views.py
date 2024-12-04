@@ -232,7 +232,7 @@ def send_otp(request):
     now = datetime.now().time()
     time_as_string = now.strftime("%H:%M:%S")
 
-    request.session["otp"] = '1000'
+    request.session["otp"] = otp
     request.session["otp_time"] = time_as_string
 
     if 'value' in request.session:
