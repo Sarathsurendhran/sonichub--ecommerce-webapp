@@ -245,7 +245,7 @@ def send_otp(request):
             # send_mail(
             #     subject,
             #     message,
-            #     "sonichubecommerce@outlook.com",
+            #     "teamlink904@gmail.com",
             #     [request.session["email"]],
             #     fail_silently=False,
             # )
@@ -260,7 +260,7 @@ def send_otp(request):
         send_mail(
             subject,
             message,
-            "sonichubecommerce@outlook.com",
+            "teamlink904@gmail.com",
             [request.session["email"]],
             fail_silently=False,
         )
