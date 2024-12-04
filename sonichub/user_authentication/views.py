@@ -242,13 +242,13 @@ def send_otp(request):
             subject = f"OTP for forgot password on {site_name}"
             message = f"Hi there!\n\nThanks for signing up on {site_name}.\n\nYour OTP is: {otp}\n\nPlease use this OTP to update your password.\n\nBest regards,\nThe {site_name} Team"
 
-            # send_mail(
-            #     subject,
-            #     message,
-            #     "teamlink904@gmail.com",
-            #     [request.session["email"]],
-            #     fail_silently=False,
-            # )
+            send_mail(
+                subject,
+                message,
+                "teamlink904@gmail.com",
+                [request.session["email"]],
+                fail_silently=False,
+            )
 
         
     else:
